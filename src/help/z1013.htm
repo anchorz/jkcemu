@@ -1,0 +1,519 @@
+<html>
+<body>
+ <h1>Z1013</h1>
+  Der Mikrorechnerbausatz Z1013 ist ein Einplatinenrechner,
+  der ab 1985 im VEB Robotron-Elektronik Riesa hergestellt wurde.
+  Zielgruppe f&uuml;r diesen Bausatz waren Amateure und Bastler,
+  die an die fertig best&uuml;ckte Leiterplatte nur noch
+  die mitgelieferte Folientastatur sowie einen selbst bereitzustellenden
+  (also nicht mithelieferten) 12V-Transformator anl&ouml;ten mussten.
+ <br/><br/>
+  Die urspr&uuml;ngliche Idee des Z1013 lag darin, elektronische Bauteile,
+  die den Anforderungen der Industrie nicht gerecht werden
+  (so genannte Anfallbauelemente, die zwar funktional in Ordnung sind,
+  aber z.B. die ben&ouml;tigten Taktfrequenzen nicht erreichen),
+  in Form eines relativ niedrig getakteten Computer-Bausatzes
+  der Bev&ouml;kerung nutzbar zu machen.
+  Dadurch hatte der Z1013 anfangs nur eine Taktfrequenz von 1&nbsp;MHz
+  (Modell Z1013.01) und war mit 650&nbsp;Mark der billigste in der DDR
+  verf&uuml;gbare Rechner, der eine Bildschirmsteuerung besa&szlig; und
+  somit als vollwertiger Heimcomputer gelten kann.
+  Au&szlig;erdem war er auch von Anfang an &uuml;ber einen offiziellen Weg
+  f&uuml;r private Anwender erwerbbar, allerdings nur im Robotron-Laden
+  in Erfurt und mit ca. einem Jahr Wartezeit.
+ <br/><br/>
+  Die Idee, f&uuml;r den Z1013 Anfallauelemente zu verwenden,
+  hat sich f&uuml;r den Hersteller allerdings als ung&uuml;nstig erwiesen,
+  da aus Garantiegr&uuml;nden die Bauelemente letztendlich ausgemessen
+  werden mussten.
+  Aus diesem Grund wurde der Z1013 ab 1987 mit &quot;vollwertigen&quot;
+  Bauelementen und 2&nbsp;MHz Taktfrequenz ausgeliefert (Modell Z1013.16).
+  Dadurch stieg aber auch der Preis auf 965&nbsp;Mark.
+  1989 kam das Modell Z1013.64 heraus, welches 64&nbsp;KByte RAM
+  besa&szlig; und im Preis sogar auf 590&nbsp;Mark gefallen war.
+ <br/><br/>
+
+ <h2>Hinweise zur Emulation</h2>
+  <ul>
+   <li>
+    <a href="z1013.htm#hardware">1. Emulierte Hardware</a>
+    <ul>
+     <li><a href="z1013.htm#kb8x4">1.1. Folienflachtastatur</a></li>
+     <li><a href="z1013.htm#kb8x8">1.2. Alphatastatur</a></li>
+     <li><a href="z1013.htm#peters">1.3. Peters-Platine</a></li>
+     <li><a href="z1013.htm#mega">1.4. Mega-ROM-Modul</a></li>
+     <li><a href="z1013.htm#printer">1.5. Drucker</a></li>
+     <li><a href="z1013.htm#joystick">1.6. Joysticks</a></li>
+     <li><a href="z1013.htm#fdc">1.7. Floppy-Disk-Modul</a></li>
+     <li>
+      <a href="z1013.htm#usb">1.8. USB-Anschluss (Vinculum VDIP Modul)</a>
+     </li>
+     <li><a href="z1013.htm#rtc">1.9. Echtzeituhrmodul</a></li>
+    </ul>
+   </li>
+   <li><a href="z1013.htm#software">2. Im ROM enthaltene Software</a></li>
+   <li><a href="z1013.htm#disks">3. Enthaltene Diskettenabbilder</a></li>
+   <li>
+    <a href="z1013.htm#etc">4. Sonstiges</a>
+    <ul>
+     <li>
+      <a href="z1013.htm#basic_io">4.1. BASIC-Programme speichern, laden und &ouml;ffnen</a>
+     </li>
+     <li><a href="z1013.htm#paste">4.2. Einf&uuml;gen von Text</a></li>
+    </ul>
+   </li>
+  </ul>
+ <br/>
+
+ <h2><a name="hardware">1. Emulierte Hardware</a></h2>
+  Da der Z1013 als Bausatz ausgeliefert wurde,
+  sind f&uuml;r diesen besonders h&auml;ufig Modifizierungen
+  und Erweiterungen entwickelt wurden.
+  Das trifft insbesondere auf Tastatur, Monitorprogramm
+  und RAM-Gr&ouml;&szlig;e zu.
+  JKCEMU emuliert die g&auml;ngigen Tastaturen
+  mit jeweils einem oder mehreren dazu passenden Monitorprogrammen.
+  In den <a href="settings.htm">Einstellungen</a> w&auml;hlen Sie
+  die gew&uuml;nschte Kombination aus Monitorprogramm und Tastatur aus.
+ <br/><br/>
+  Emuliert werden:
+  <ul>
+   <li>Je nach Monitorprogramm 2 oder 4&nbsp;KByte ROM</li>
+   <li>16 oder 64&nbsp;KByte RAM</li>
+   <li>
+    Tastaturen:
+    <ul>
+     <li><a href="z1013.htm#kb8x4">Folienflachtastatur</a> (8x4-Matrix)</li>
+     <li><a href="z1013.htm#kb8x8">Alphatastatur</a> (8x8-Matrix)</li>
+     <li>K7659 (12x8-Matrix)</li>
+     <li>S6009 (12x8-Matrix)</li>
+    </ul>
+   </li>
+   <li>Kassettenrecorderanschluss</li>
+   <li>
+    Erweiterungen:
+    <ul>
+     <li>Peters-Platine</li>
+     <li>
+      optional:
+      <ul>
+       <li>KC-BASIC-Modul</li>
+       <li><a href="z1013.htm#mega">Mega-ROM-Modul</a></li>
+       <li><a href="z1013.htm#printer">Drucker</a></li>
+       <li><a href="z1013.htm#joystick">Joysticks</a></li>
+       <li>
+	Zwei&nbsp;<a href="ramfloppy.htm">RAM-Floppies</a>
+	nach <em>Mikroprozessortechnik</em>
+	Heft&nbsp;3/1988 an den E/A-Basis-Adressen&nbsp;98h und 58h
+       </li>
+       <li><a href="z1013.htm#fdc">Floppy-Disk-Modul</a></li>
+       <li>
+	<a href="gide.htm">GIDE</a> mit bis zu zwei Festplatten
+	an der E/A-Basisadresse&nbsp;40h und 80h
+       </li>
+       <li>
+	<a href="kcnet.htm">KCNet</a>-kompatible Netzwerkkarte
+	an der E/A-Basisadressen&nbsp;C0h
+       </li>
+       <li>
+	<a href="z1013.htm#usb">USB-Anschluss</a> (Vinculum VDIP Modul)
+       </li>
+       <li><a href="z1013.htm#rtc">Echtzeituhrmodul</a></li>
+       <li>Grafikkarte des CC&nbsp;Jena (80x25 Zeichen)</li>
+       <li>
+	Vollgrafikerweiterung nach <em>Kleinstrechnertips</em>
+	Heft&nbsp;11 und <em>Funkamateur</em> Heft&nbsp;7/91
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ <br/>
+
+ <h3><a name="kb8x4">1.1. Folienflachtastatur</a></h3>
+  Die Ziffern auf der Folienflachtastatur sind standardm&auml;&szlig;ig
+  nur &uuml;ber die Shift-1-Taste erreichbar.
+  Man kann aber im Monitorprogramm und &uuml;ber Systemaufrufe
+  die Shift-Ebenen so umschalten,
+  dass Ziffern ohne Shift-Taste eingegeben werden k&ouml;nnen.
+  Daf&uuml;r ist dann bei einigen Buchstaben die Shift-1-Taste
+  zu bet&auml;tigen.
+  Dieses Umkodieren der Zeichen st&ouml;rt aber im Emulator.
+  Aus diesem Grund erkennt JKCEMU die Umschaltung der Shift-Ebenen
+  automatisch und emuliert dann das Dr&uuml;cken der Shift-1-Taste
+  entsprechend anders.
+  Das hat zur Folge, dass die Monitorkommandos <em>A</em> und <em>H</em>
+  scheinbar keine Wirkung haben.
+ <br/><br/>
+  Insgesamt enth&auml;lt die Folienflachtastatur vier Shift-Tasten,
+  die von einigen Spielprogrammen auch direkt abgefragt
+  und zur Steuerung der Spielfigur verwendet werden.
+  Damit Sie solche Programme auch im Emulator ohne Einschr&auml;nkungen
+  bedienen k&ouml;nnen,
+  werden diese vier Shift-Tasten auch als Einzeltasten emuliert,
+  und zwar mit den Funktionstasten <em>F1</em> bis <em>F4</em>.
+ <br/><br/>
+  F&uuml;r die Folienflachtastatur steht eine
+  <a href="keyboard.htm">Tastaturansicht</a> zur Verf&uuml;gung.
+ <br/><br/>
+
+ <h3><a name="kb8x8">1.2. Alphatastatur</a></h3>
+  Unter der Alphatastatur versteht man die Tastatur,
+  die vom A.2-Monitorprogramm vorausgesetzt wird.
+  Dabei handelt es sich jedoch nicht um eine fertige Tastatur,
+  sondern nur um eine Schaltung zum Anschluss einer Tastatur
+  mit einer 8x8-Matrix.
+  Der Schaltplan dazu und die vorgeschriebene Anordnung der Tasten
+  in der Matrix sind in der Erg&auml;nzungsanleitung zum Z1013.16 angegeben.
+  Dort ist auch eine schematisch Tastenanordnung angegeben.
+  Diese steht im Emulator als <a href="keyboard.htm">Tastaturansicht</a>
+  zur Verf&uuml;gung.
+ <br/><br/>
+  Mit Ausnahme der Taste <em>Graph&nbsp;E/A</em> sind alle Tasten
+  bzw. Zeichen der Alphatastatur gew&ouml;hnlich auch auf der Tastatur
+  des Emulatorrechners zu finden.
+  Die Taste <em>Graph&nbsp;E/A</em> l&auml;sst sich mit der
+  Funktionstaste F1 bet&auml;tigen.
+ <br/><br/>
+
+ <h3><a name="peters">1.3. Peters-Platine</a></h3>
+  Die Peters-Platine erm&ouml;glicht &uuml;ber E/A-Port&nbsp;4
+  die Abschaltung des ROMs sowie die Umschaltung des Zeichensatzes,
+  der Taktfrequenz und der Bildschirmorganisation.
+ <br/><br/>
+  Bedeutung der Bits von E/A-Port&nbsp;4:
+ <br/>
+  <table border="1">
+   <tr>
+    <th valign="top">Bit</th>
+    <th valign="top">Bedeutung bei Wert&nbsp;0 (Standard)</th>
+    <th valign="top">Bedeutung bei Wert&nbsp;1</th>
+   </tr>
+   <tr>
+    <td valign="top">4</td>
+    <td valign="top">ROM eingeblendet</td>
+    <td valign="top">
+     ROM aus- und daf&uuml;r RAM eingeblendet
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">5</td>
+    <td valign="top">Standardzeichensatz</td>
+    <td valign="top">
+     alternativer Zeichensatz,<br/>
+     Der Emulator schaltet auf einen Zeichensatz mit deutschen Umlauten
+     nach ISO&nbsp;646 und inversen Zeichen um.<br/><br/>
+     <b>Achtung!</b> Wurde in den Z1013-Einstellungen,
+     Bereich <em>Sonstiges</em>,
+     eine alternative Zeichensatzdatei eingebunden, gilt folgendes:
+     <ul>
+      <li>
+       Ist die extern eingebundene Zeichensatzdatei kleiner als 4&nbsp;KByte,
+       wird diese f&uuml;r den Standard- und den alternativen Zeichensatz
+       verwendet, d.h., eine Umschaltung &uuml;ber Port&nbsp;4
+       hat keine Wirkung.
+      </li>
+      <li>
+       Ist die extern eingebundene Zeichensatzdatei 4&nbsp;KByte gro&szlig;,
+       werden die unteren 2&nbsp;KByte als Standard- und die oberen
+       2&nbsp;KByte als alternativer Zeichensatz verwendet.
+       In dem Fall zeigt die Umschaltung des Zeichensatzes eine Wirkung.
+      </li>
+     </ul>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">6</td>
+    <td valign="top">Taktfrequenz 2&nbsp;MHz</td>
+    <td valign="top">
+     Taktfrequenz 4&nbsp;MHz,<br/><br/>
+     <b>Achtung!</b> Der Emulator schaltet nur dann auf 4&nbsp;MHz um,
+     wenn in den <a href="settings.htm#speed">Einstellungen</a>
+     der Standardwert von 2&nbsp;MHz angegeben ist.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">7</td>
+    <td valign="top">Bildschirm 32x32&nbsp;Zeichen</td>
+    <td valign="top">Bildschirm 64x16&nbsp;Zeichen</td>
+   </tr>
+  </table>
+ <br/><br/>
+
+ <h3><a name="mega">1.4. Mega-ROM-Modul</a></h3>
+  Das vom Z9001, KC85/1 und KC87 her bekannte und an den Z1013 angepasste
+  Mega-ROM-Modul bietet 2,5&nbsp;MByte Speicher,
+  aufgeteilt auf 256 einzelne 10&nbsp;KByte Segmente.
+  Das jeweils aktive Segment wird im Adressbereich C000h-E7FFh eingeblendet.
+  Die Umschaltung des aktive Segments erfolgt &uuml;ber einen Ausgabebefehl
+  auf E/A-Adresse FFh.
+  Eine softwarem&auml;&szlig;ige Abschaltung des Moduls wie beim
+  Z9001, KC85/1 und KC87 ist mit der Z1013-Variante nicht m&ouml;glich.
+ <br/><br/>
+  Im JKCEMU ist kein Inhalt f&uuml;r das Mega-ROM-Modul enthalten.
+  Sie m&uuml;ssen deshalb in den Einstellungen eine entsprechende
+  ROM-Datei ausw&auml;hlen.
+ <br/><br/>
+  Das Mega-ROM-Modul ist nicht mit dem KC-BASIC-Modul kombinierbar.
+ <br/><br/>
+
+ <h3><a name="printer">1.5. Drucker</a></h3>
+  Es gibt zwei M&ouml;glichkeiten, einen
+  <a href="print.htm">Drucker zu emulieren</a>:
+  <ol>
+   <li>Abfangen der entsprechenden Sprungverteileraufrufe</li>
+   <li>Emulation einer Centronics-Schnittstelle am Anwendertor</li>
+  </ol>
+ <br/>
+  Bei der ersten Variante werden die Aufrufe f&uuml;r Druckausgaben
+  am Sprungverteiler abgefangen und an den aktuellen Druckauftrag
+  anh&auml;ngt.
+  Ein Druckertreiber ist nicht n&ouml;tig.
+  Allerdings funktioniert diese Variante nur bei Programmen,
+  die f&uuml;r Druckerausgaben auch den Sprungverteiler verwenden.
+ <br/><br/>
+  Bei der zweiten Variante ist entweder ein Druckertreiber erforderlich
+  oder aber das Anwendungsprogramm bedient selbst die
+  Centronics-Schnittstelle.
+  Datenausgaben an der emulierten Centronics-Schnittstelle werden
+  an den aktuellen Druckauftrag anh&auml;ngt.
+ <br/><br/>
+
+ <h3><a name="joystick">1.6. Joysticks (Spielhebel)</a></h3>
+  F&uuml;r den Z1013 wurden mehrere Hardware-Varianten f&uuml;r den
+  Anschluss von <a href="joystick.htm">Joysticks</a> ver&ouml;ffentlicht
+  sowie eine entsprechende Software-Schnittstelle definiert.
+  JKCEMU kann sowohl die drei g&auml;ngigen Hardware-Varianten
+  als auch die Software-Schnittstelle emulieren.
+  Es h&auml;ngt allerdings vom konkreten Spiel- bzw. Anwendungsprogramm ab,
+  welche Art der Emulation Sie aktivieren m&uuml;ssen.
+ <br/><br/>
+  Manche Programme fragen direkt das Anwendertor ab,
+  an dem die Spielhebel angeschlossen sind.
+  In dem Fall m&uuml;ssen Sie in den
+  <a href="settings.htm">Einstellungen</a> im Bereich <em>Z1013</em>
+  im Reiter <em>Anwendertor</em>
+  die richtige Joystick-Hardware ausw&auml;hlen.
+ <br/><br/>
+  Benutzt dagegen das Spiel- bzw. Anwendungsprogramm
+  die Software-Schnittstelle,
+  dann aktivieren Sie auf der Unterseite <em>Sonstiges</em> die Option
+  <em>Sprungverteileraufrufe f&uuml;r Joystick-Abfragen abfangen</em>.
+  In dem Fall emuliert JKCEMU den Joystick-Treiber,
+  der normalerweise bei Joystick-Abfragen &uuml;ber den Sprungverteiler
+  aufgerufen wird.
+  Alternativ k&ouml;nnen Sie aber auch diese Option ausschalten
+  und selbst einen passenden Joystick-Treiber laden,
+  der die Verbindung zwischen der Software-Schnittstelle
+  und der (emulierten) Hardware herstellt.
+ <br/><br/>
+
+ <h3><a name="fdc">1.7. Floppy-Disk-Modul</a></h3>
+  Das Floppy-Disk-Modul wird an folgenden Ein-/Ausgabeadressen
+  <a href="floppydisk.htm">emuliert</a>:
+  <table border="1">
+   <tr><th>E/A-Adresse</th><th>Bedeutung</th></tr>
+   <tr>
+    <td valign="top">F0h</td>
+    <td valign="top">Statusregister</td>
+   </tr>
+   <tr>
+    <td valign="top">F1h</td>
+    <td valign="top">Datenregister</td>
+   </tr>
+   <tr>
+    <td valign="top">F8h</td>
+    <td valign="top">Terminal Count</td>
+   </tr>
+   <tr>
+    <td valign="top">FAh</td>
+    <td valign="top">RESET</td>
+   </tr>
+  </table>
+ <br/><br/>
+
+ <h3><a name="usb">1.8. USB-Anschluss (Vinculum VDIP Modul)</a></h3>
+  Das <a href="usb.htm">USB-Modul</a> wird an den E/A-Basisadressen
+  DCh und FCh emuliert.
+  Ist das <a href="z1013.htm#mega">Mega-ROM-Modul</a> aktiviert,
+  wird das USB-Modul nur an der Basisadresse DCh emuliert,
+  da es sonst einen Konflikt mit der E/A-Adresse FFh geben w&uuml;rde.
+ <br/><br/>
+
+ <h3><a name="rtc">1.9. Echtzeituhrmodul</a></h3>
+  Es wird eine Echtzeituhr RTC-62421 bzw. RTC-72421 an den
+  E/A-Adressen&nbsp;70h bis 7Fh emuliert.
+  Die Uhr kann nur gelesen, nicht aber gestellt werden.
+ <br/><br/>
+
+ <h2><a name="software">2. Im ROM enthaltene Software</a></h2>
+  <ul>
+   <li>
+    Monitorprogramm, je nach Einstellung:
+    <ul>
+     <li>Originales Monitorprogramm Version&nbsp;2.02</li>
+     <li>Originales Monitorprogramm Version&nbsp;A.2</li>
+     <li>
+      Monitorprogramm von Rainer Brosig Version&nbsp;2.028
+      f&uuml;r Tastatur K7659
+     </li>
+     <li>
+      Monitorprogramm von Rainer Brosig Version&nbsp;2.028
+      f&uuml;r Tastatur S6009
+     </li>
+     <li>
+      Monitorprogramm von Jens M&uuml;ller Version&nbsp;1992
+      (siehe <a href="z1013/mon_jm_1992.htm">Beschreibung</a>)
+     </li>
+     <li>
+      Boot-Lader&nbsp;BL4 von Rainer Brosig
+      (Boot-Diskette im ersten emulierten Diskettenlaufwerk eingelegen!)
+     </li>
+    </ul>
+   </li>
+   <li>KC-ROM-BASIC Vesion&nbsp;1.0 (im KC-BASIC-Modul)</li>
+  </ul>
+ <br/>
+  Die ROM-Inhalte k&ouml;nnen Sie in den
+  <a href="settings.htm">Einstellungen</a>
+  durch Angabe externer ROM-Dateien ersetzen.
+ <br/><br/>
+  <b>Achtung!</b> Wenn Sie auf diese Art und Weise ein anderes
+  Monitorprogramm einbinden, m&uuml;ssen Sie sicherstellen,
+  dass in den <a href="settings.htm">Einstellungen</a>
+  die richtige Tastaturhardware ausgew&auml;hlt ist.
+ <br/><br/>
+
+
+ <h2><a name="disks">3. Enthaltene Diskettenabbilder</a></h2>
+  JKCEMU enth&auml;lt f&uuml;r die Z1013-Emulation
+  folgende Diskettenabbilder:
+  <ul>
+   <li>
+    CP/M-Boot-Diskette f&uuml;r 64x16&nbsp;Zeichen<br/><br/>
+    Zum Booten von der Diskette m&uuml;ssen Sie folgende Konfiguration
+    einstellen:
+    <ul>
+     <li>Z1013.16</li>
+     <li>Boot Lader 4 / Tastatur K7659</li>
+     <li>RAM-Floppy an E/A-Basisadresse 98h</li>
+     <li>Floppy-Disk-Modul</li>
+     <li>7-Bit-Centronics am Anwendertor</li>
+    </ul>
+   </li>
+   <li>
+    CP/M-Boot-Diskette f&uuml;r 80x25&nbsp;Zeichen<br/><br/>
+    Zum Booten von der Diskette m&uuml;ssen Sie folgende Konfiguration
+    einstellen:
+    <ul>
+     <li>Z1013.16</li>
+     <li>Boot Lader 4 / Tastatur K7659</li>
+     <li>RAM-Floppy an E/A-Basisadresse 98h</li>
+     <li>Floppy-Disk-Modul</li>
+     <li>7-Bit-Centronics am Anwendertor</li>
+     <li>Grafikkarte des CC&nbsp;Jena (80x25 Zeichen)</li>
+     <li>Echtzeituhrmodul</li>
+    </ul>
+   </li>
+  </ul>
+ <br/>
+  Die Laufwerkszuordnung bei beiden Diskettenabbildern ist:
+ <br/><br/>
+  <table border="1">
+   <tr><td valign="top">A:</td><td>RAM-Floppy</td></tr>
+   <tr>
+    <td valign="top">B:</td>
+    <td>erstes Diskettenlaufwerk, 820-KByte-Format</td>
+   </tr>
+   <tr>
+    <td valign="top">C:</td>
+    <td>erstes Diskettenlaufwerk, 624-KByte-Format</td>
+   </tr>
+   <tr>
+    <td valign="top">D:</td>
+    <td>
+     erstes Diskettenlaufwerk, 780-KByte-Format
+     <br/>
+     <b>Achtung!</b> Dieses Format haben die Diskettenabbilder selbst,
+     d.h., sie sind unter dem Laufwerk <em>D:</em> ansprechbar.
+   </td>
+   </tr>
+   <tr>
+    <td valign="top">E:</td>
+    <td>erstes Diskettenlaufwerk, 800-KByte-Format</td>
+   </tr>
+  </table>
+ <br/>
+  Auf der CP/M-Boot-Diskette f&uuml;r 80x25&nbsp;Zeichen
+  sind in User-Ebene&nbsp;15 auch die Quelltexte f&uuml;r das BIOS
+  enthalten.
+  Anleitungen dazu finden Sie als Textdateien in User-Ebene&nbsp;0.
+  Diese Dateien k&ouml;nnen mit dem CP/M-Kommando <em>TYPE</em>
+  gelesen werden.
+ <br/><br/>
+
+ <h2><a name="etc">4. Sonstiges</a></h2>
+
+ <h3>
+  <a name="basic_io">4.1. BASIC-Programme speichern, laden und &ouml;ffnen</a>
+ </h3>
+  JKCEMU bietet eine spezielle Unterst&uuml;tzung f&uuml;r das
+  <a href="loadsavebasic.htm">Speichern und Laden von BASIC-Programmen</a>
+  sowie f&uuml;r das &Ouml;ffnen von im Arbeitsspeicher befindlichen
+  BASIC-Programmen im Texteditor.
+  Die entsprechenden Funktionen finden Sie im Men&uuml; <em>Datei</em>.
+ <br/><br/>
+  Folgende BASIC-Interpreter werden unterst&uuml;tzt:
+ <br/>
+  <ul>
+   <li>Z1013-BASIC Version&nbsp;3.1 (Tiny-BASIC)</li>
+   <li>HC-BASIC im RAM (KC-BASIC)</li>
+   <li>HC-BASIC im ROM (KC-BASIC)</li>
+  </ul>
+ <br/>
+  Beim Speichern von BASIC-Programmen erscheint ein Fenster zur Auswahl
+  des Dateiformats.
+  Speichern Sie bitte Tiny-BASIC-Programme als
+  <a href="fileformats.htm#headersave">Headersave-Datei (*.z80)</a>
+  mit dem Dateityp&nbsp;<em>b</em> und KC-BASIC-Programme entweder als
+  <a href="fileformats.htm#kcbasic">KC-BASIC-Programmdatei (*.sss)</a>
+  oder als
+  <a href="fileformats.htm#headersave">Headersave-Datei (*.z80)</a>
+  mit dem Dateityp&nbsp;<em>B</em>.
+ <br/><br/>
+  Wenn Sie ein BASIC-Programm in einem anderen Dateiformat speichern,
+  erkennt JKCEMU sp&auml;ter beim Laden der Datei nicht mehr,
+  dass es sich um ein BASIC-Programm handelt und passt die
+  Systemzellen des BASIC-Interpreters nicht an.
+  Das geladene Programm l&auml;sst sich dann nicht nutzen.
+ <br/><br/>
+
+ <h3><a name="paste">4.2. Einf&uuml;gen von Text</a></h3>
+  Das Einf&uuml;gen von Text aus der Zwichenablage erfolgt gew&ouml;hnlich
+  in der Form, dass f&uuml;r jedes einzuf&uuml;gende Zeichen
+  das Dr&uuml;cken der entsprechenden Taste bzw. Tastenkombination
+  simuliert wird. Dieses Prinzip ist recht langsam.
+  F&uuml;r den Z1013 gibt es in den
+  <a href="settings.htm">Einstellungen</a> die Option
+  <em>Einf&uuml;gen von Text durch Abfangen des Systemaufrufs</em>.
+  Bei dieser Option lauscht der Emulator auf der Einsprungadresse
+  f&uuml;r die Systemfunktion INKEY.
+  Wenn diese Systemfunktion aufgerufen wird, pr&uuml;ft JKCEMU,
+  ob ein Zeichen eingef&uuml;gt werden soll.
+  Wenn ja, schreibt er das n&auml;chste einzuf&uuml;gende Zeichen
+  in das entsprechende Prozessorregister und simuliert einen RETURN-Befehl.
+  Sollten das Betriebssystem oder das Anwendungsprogramm die Tastatur nicht
+  &uuml;ber die INKEY-Systemfunktion abfragen,
+  funktioniert das Einf&uuml;gen von Text nicht,
+  und Sie m&uuml;ssen die Option ausschalten.
+ <br/><br/>
+  Bei dieser Option muss JKCEMU die Startadresse der INKEY-Funktion kennen.
+  Das ist f&uuml;r die im Emulator integrierten Monnitorprogramme der Fall.
+  Sollten Sie jedoch ein anderes Betriebssystem starten oder durch Einbinden
+  eines externen ROM-Images ein anderes Monitorprogramm verwenden,
+  bei dem die INKEY-Funktion auf einer anderen Adresse beginnt,
+  m&uuml;ssen Sie die Option ebenfalls ausschalten.
+</body>
+</html>
+

@@ -1,0 +1,62 @@
+<html>
+<body>
+ <h1><a href="../basicc.htm">BASIC-Compiler</a></h1>
+
+ <h2>Einschr&auml;nkungen des Compilers gegen&uuml;ber einem Interpreter</h2>
+  Das Ziel des BASIC-Compilers ist es,
+  schnelle und m&ouml;glichst kleine Maschinencodeprogramme zu erzeugen,
+  die keine unn&ouml;tigen Funktionen enthalten.
+  Der BASIC-Quelltext und nicht ben&ouml;tigte BASIC-Funktionalit&auml;ten
+  sind im Maschinencodeprogramm nicht vorhanden.
+  Daraus resultieren einige Einschr&auml;nkungen gegen&uuml;ber
+  der Ausf&uuml;hrung eines BASIC-Programms im Interpreter:
+ <br/><br/>
+
+ <h3>1. CALL und USR</h3>
+  Grunds&auml;tzlich bestehen bei der CALL-Anweisung und der USR-Funktion
+  keine Einschr&auml;nkung gegen&uuml;ber dem Interpreter.
+  Jedoch rufen manche BASIC-Programme mit CALL oder USR
+  Maschinenunterprogramme des BASIC-Interpreters auf.
+  Andere Programme enthalten in REM-Zeilen Maschinencode, der aufgerufen wird.
+  Untergrogramme des BASIC-Interpreters beziehungsweise in REM-Zeilen
+  versteckter Maschinencode sind im erzeugten Maschinencodeprogramm
+  nicht (mehr) vorhanden und k&ouml;nnen somit auch nicht aufgerufen werden.
+  Wird dennoch so ein CALL- oder USR-Befehl ausgef&uuml;hrt,
+  f&uuml;hrt das wahrscheinlich zum Absturz des Programms.
+ <br/><br/>
+  Eine L&ouml;sung des Problems besteht darin,
+  die ben&ouml;tigten Maschinencoderoutinen vor ihrem Aufruf
+  mit POKE-Befehlen zu erzeugen oder mit der
+  <a href="instructions.htm#asm">ASM</a>-Anweisung direkt
+  in das BASIC-Programm zu integrieren.
+ <br/><br/>
+
+ <h3>2. GOTO und GOSUB</h3>
+  Wird hinter GOTO oder GOSUB eine Zeilennummer angegeben,
+  muss es eine konstante Zahl (Literal) sein.
+  Ein variabler Ausdruck, wie bei manchen Interpretern m&ouml;glich,
+  ist nicht erlaubt.
+  Da im erzeugten Maschinencodeprogramm kein BASIC-Quelltext und somit
+  auch keine Zeilennummern mehr vorhanden sind,
+  muss bereits der Compiler die Sprungziele aufl&ouml;sen.
+  Das kann er jedoch nur tun, wenn die Ziele eindeutig feststehen,
+  d.h., wenn sie nicht variabel sind.
+ <br/><br/>
+  Der Compiler k&ouml;nnte zwar in das erzeugte Maschinencodeprogramm
+  auch eine Zuordnung von Zeilennummern zu Maschinencodeadressen einbauen
+  und so auch variable Sprungziele erm&ouml;glichen,
+  jedoch w&uuml;rde dann das Programm ziemlich aufgebl&auml;ht werden.
+  Da das aber nicht das Ziel des BASIC-Compilers ist,
+  werden variable Sprungziele eben nicht unterst&uuml;tzt.
+  Mit gewissen Einschr&auml;nkungen lassen sich jedoch solche Anforderungen
+  mit den Anweisungen <a href="instructions.htm#on_goto">ON...GOTO</a>
+  und <a href="instructions.htm#on_gosub">ON...GOSUB</a> realisieren.
+ <br/><br/>
+  Des Weiteren m&uuml;ssen die hinter GOTO und GOSUB stehenden
+  Zeilennummern bzw. Marken auch existieren.
+  Manche BASIC-Interpreter springen bei einer nicht existierenden
+  Zeilennummer zur n&auml;chst h&ouml;heren existierenden Zeile.
+  Der JKCEMU-BASIC-Compiler unterst&uuml;tzt soetwas jedoch nicht.
+ <br/>
+</body>
+</html>

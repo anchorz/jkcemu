@@ -1,0 +1,468 @@
+<html>
+<body>
+ <h1>A5105 (BIC, ALBA-PC&nbsp;1505)</h1>
+  Der Bildungscomputer A5105, h&auml;ufig auch kurz nur Bildungscomputer,
+  BIC oder BIC&nbsp;A5105 genannt, wurde von Robotron f&uuml;r
+  das Bildungssystem der DDR entwickelt und im Herbst 1989 eingef&uuml;hrt.
+  Das System bestand standardm&auml;&szlig;ig aus folgenden Komponenten:
+  <ul>
+   <li>
+    Computergrundger&auml;t (CGG) K1505
+    <ul>
+     <li>eigentlicher Computer mit Tastatur in einem Ger&auml;t</li>
+     <li>
+      mit separaten Netzteil auch als BASIC-Heimcomputer nutzbar
+      (Anschl&uuml;sse f&uuml;r Kassettenrecorder und Joysticks vorhanden)
+     </li>
+     <li>
+      Monitoranschluss nur &uuml;ber RGB,<br/>
+      f&uuml;r TV-Anschluss separater HF-Modulator notwendig
+     </li>
+    </ul>
+   </li>
+   <li>
+    Diskettenspeichereinheit (DSE) K5651
+    <ul>
+     <li>Floppy-Disk-Controller (FDC) mit einem Diskettenlaufwerk</li>
+     <li>CP/M-kompatibles Betriebssystem SCPX&nbsp;1505 im ROM</li>
+     <li>Netzwerkanschluss (BICLAN)</li>
+     <li>Netzteil, auch zur Stromversorgung des Computergrundger&auml;tes</li>
+     <li>wird direkt mit dem Computergrundger&auml;t zusammengesteckt</li>
+    </ul>
+   </li>
+   <li>
+    Monitor K7222 (schwarz/gr&uuml;n)
+    <ul>
+     <li>
+      Obwohl der A5105 Farbausgabe bietet, wurde &uuml;blicherweise
+      nur ein Schwarz/Gr&uuml;n-Monitor ausgeliefert.
+     </li>
+    </ul>
+   </li>
+  </ul>
+  <br/>
+   Restbest&auml;nde des A5105 wurden auch als ALBA-PC&nbsp;1505 verkauft.
+   Dieser  bestand aus dem Computergrundger&auml;t K1505,
+   dem Netzteil K0309 und dem HF-Modulator 690034.
+   Optional wurde auch ein FDC-Modul mit Diskettenlaufwerk angeboten.
+  <br/><br/>
+
+ <h2>Hinweise zur Emulation</h2>
+  <ul>
+   <li>
+    <a href="a5105.htm#hardware">1. Emulierte Hardware</a>
+    <ul>
+     <li><a href="a5105.htm#keyboard">1.1. Tastatur</a></li>
+     <li><a href="a5105.htm#sound">1.2. Sound-Generator</a></li>
+     <li>
+      <ul>
+       <li><a href="#sound_ex">1.2.1. Sound-Beispielprogramme</a></li>
+      </ul>
+     </li>
+     <li>
+      <a href="a5105.htm#printer">1.3. V24-Schnittstelle mit Drucker</a>
+     </li>
+    </ul>
+   </li>
+   <li><a href="a5105.htm#software">2. Im ROM enthaltene Software</a></li>
+   <li>
+    <a href="a5105.htm#disks">3. Enthaltene Diskettenabbilder</a>
+    <ul>
+     <li>
+      <a href="a5105.htm#rbas_disks">3.1. Hinweise zu den RBASIC-Disketten</a>
+     </li>
+     <li>
+      <a href="a5105.htm#scpx_disk">3.2. Hinweise zur SCPX-Systemdiskette</a>
+     </li>
+    </ul>
+   </li>
+   <li>
+    <a href="a5105.htm#etc">4. Sonstiges</a>
+    <ul>
+     <li>
+      <a href="a5105.htm#basic_open">4.1. BASIC-Programme im Texteditor &ouml;ffnen</a>
+     </li>
+     <li>
+      <a href="a5105.htm#basic_io">4.2. BASIC-Programme speichern und laden</a>
+     </li>
+     <li>
+      <a href="a5105.htm#load_into_mem">4.3. Dateien in den Arbeistspeicher laden</a>
+     </li>
+     <li><a href="a5105.htm#font">4.4. Zeichensatz</a></li>
+     <li>
+      <a href="a5105.htm#screensize">4.5. Gr&ouml;&szlig;e und Seitenverh&auml;ltnis der Bildschirmausgabe</a>
+     </li>
+     <li>
+      <a href="a5105.htm#paste">4.6 Einf&uuml;gen von Text aus der Zwischenablage</a>
+     </li>
+     <li>
+      <a href="a5105.htm#images">4.7. A5105-Bilddateien</a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ <br/><br/>
+
+ <h2><a name="hardware">1. Emulierte Hardware</a></h2>
+  Emuliert werden:
+  <ul>
+   <li>Grundger&auml;t</li>
+   <li><a href="print.htm">Drucker</a></li>
+   <li>Zwei <a href="joystick.htm">Joysticks</a></li>
+   <li>
+    Optional:
+    <ul>
+     <li><a href="floppydisk.htm">Floppy-Disk-Station</a></li>
+     <li>Zwei <a href="ramfloppy.htm">RAM-Floppies</a></li>
+     <li>
+      <a href="kcnet.htm">KCNet</a>-kompatible Netzwerkkarte
+      an der E/A-Basisadresse&nbsp;C0h
+     </li>
+     <li>
+      <a href="usb.htm">USB-Anschluss</a> (Vinculum VDIP Modul)
+      an den E/A-Basisadressen&nbsp;2Ch und FCh
+     </li>
+    </ul>
+   </li>
+  </ul>
+ <br/>
+
+ <h3><a name="keyboard">1.1. Tastatur</a></h3>
+  Einige Tasten das A5105 sind auf der Tastatur des Emulatorrechners
+  &uuml;blicherweise nicht zu finden oder anders beschriftet.
+  Diese Tasten werden deshalb folgenderma&szlig;en gemappt:
+ <br/>
+  <table border="1">
+   <tr><th>A5105-Taste</th><th>JKCEMU-Taste</th></tr>
+   <tr><td>PF1</td><td>F1</td></tr>
+   <tr><td>PF2</td><td>F2</td></tr>
+   <tr><td>PF3</td><td>F3</td></tr>
+   <tr><td>PF4</td><td>F4</td></tr>
+   <tr><td>PF5</td><td>F5</td></tr>
+   <tr><td>HOME</td><td>F6 oder Pos1</td></tr>
+   <tr><td>STOP</td><td>F7</td></tr>
+   <tr><td>INS&nbsp;MODE</td><td>Einfg</td></tr>
+   <tr><td>DEL</td><td>Entf</td></tr>
+  </table>
+ <br/>
+
+ <h3><a name="sound">1.2. Sound-Generator</a></h3>
+  Zum H&ouml;ren der vom Sound-Generator ausgegebenen T&ouml;ne
+  m&uuml;ssen Sie die Audiofunktion
+  <a href="audio.htm#sound_out">T&ouml;ne ausgeben</a> aktivieren.
+  Alle anderen Audiofunktionen beziehen sich auf den emulierten
+  Kassettenrecorderanschluss.
+ <br/><br/>
+  Der Sound-Generator wird immer mit der originalen Taktfrequenz emuliert,
+  d.h., wenn Sie in den <a href="settings.htm">Einstellungen</a>
+  eine andere Taktfrequenz angeben,
+  wirkt sich das nur auf die Emulation des Mikroprozessors aus.
+ <br/><br/>
+
+ <h3><a name="sound_ex">1.2.1. Sound-Beispielprogramme</a></h3>
+  Hier finden Sie einige Beispielprogramme,
+  die die F&auml;higkeiten des Sound-Generators demonstrieren.
+  Das Programm <em>Hubschrauber</em> basiert auf dem entsprechenden
+  Beispielprogramm in der Dokumentation
+  <em>BILDUNGSCOMPUTER robotron A5105 - Das Musiksystem</em>.
+  Die anderen Programme stammen vom JKCEMU-Entwickler selbst.
+ <br/><br/>
+  <table border="0">
+   <tr>
+    <td valign="top" nowrap="nowrap">
+     <tt>
+      100&nbsp;PRINT:PRINT&nbsp;"Hubschrauber"&#10;<br/>
+      110&nbsp;SOUND&nbsp;0,111&#10;<br/>
+      120&nbsp;SOUND&nbsp;1,0&#10;<br/>
+      130&nbsp;SOUND&nbsp;6,30&#10;<br/>
+      140&nbsp;SOUND&nbsp;8,16&#10;<br/>
+      150&nbsp;SOUND&nbsp;11,44&#10;<br/>
+      160&nbsp;SOUND&nbsp;12,1&#10;<br/>
+      170&nbsp;SOUND&nbsp;13,14&#10;<br/>
+      180&nbsp;SOUND&nbsp;7,9&#10;<br/>
+      190&nbsp;PRINT:PRINT&nbsp;"Abbruch&nbsp;mit&nbsp;beliebiger&nbsp;Taste"&#10;<br/>
+      200&nbsp;IF LEN(INKEY$)=0 THEN 200&#10;<br/>
+      210&nbsp;SOUND&nbsp;7,0&#10;<br/>
+      220&nbsp;END
+     </tt>
+    </td>
+    <td>&nbsp;</td>
+    <td valign="top" nowrap="nowrap">
+     <tt>
+      10&nbsp;PRINT:PRINT&nbsp;"Explosion"&#10;<br/>
+      20&nbsp;SOUND&nbsp;5,20&#10;<br/>
+      30&nbsp;SOUND&nbsp;11,0&#10;<br/>
+      40&nbsp;SOUND&nbsp;12,31&#10;<br/>
+      50&nbsp;SOUND&nbsp;13,0&#10;<br/>
+      60&nbsp;SOUND&nbsp;9,16&#10;<br/>
+      70&nbsp;SOUND&nbsp;7,16&#10;<br/>
+      80&nbsp;END
+     </tt>
+    </td>
+    <td>&nbsp;</td>
+    <td valign="top" nowrap="nowrap">
+     <tt>
+      100&nbsp;PRINT:PRINT&nbsp;"Meeresrauschen"&#10;<br/>
+      110&nbsp;SOUND&nbsp;6,20&#10;<br/>
+      120&nbsp;SOUND&nbsp;8,0&#10;<br/>
+      130&nbsp;SOUND&nbsp;9,16&#10;<br/>
+      140&nbsp;SOUND&nbsp;10,8&#10;<br/>
+      150&nbsp;SOUND&nbsp;11,0&#10;<br/>
+      160&nbsp;SOUND&nbsp;12,50&#10;<br/>
+      170&nbsp;SOUND&nbsp;13,14&#10;<br/>
+      180&nbsp;SOUND&nbsp;7,48&#10;<br/>
+      190&nbsp;PRINT:PRINT&nbsp;"Abbruch&nbsp;mit&nbsp;beliebiger&nbsp;Taste"&#10;<br/>
+      200&nbsp;IF LEN(INKEY$)=0 THEN 200&#10;<br/>
+      210&nbsp;SOUND&nbsp;7,0&#10;<br/>
+      220&nbsp;END
+     </tt>
+    </td>
+    <td>&nbsp;</td>
+    <td valign="top" nowrap="nowrap">
+     <tt>
+      100&nbsp;PRINT:PRINT&nbsp;"Schranke"&#10;<br/>
+      110&nbsp;SOUND&nbsp;2,200&#10;<br/>
+      120&nbsp;SOUND&nbsp;3,1&#10;<br/>
+      130&nbsp;SOUND&nbsp;9,16&#10;<br/>
+      140&nbsp;SOUND&nbsp;11,0&#10;<br/>
+      150&nbsp;SOUND&nbsp;12,40&#10;<br/>
+      160&nbsp;SOUND&nbsp;13,8&#10;<br/>
+      170&nbsp;SOUND&nbsp;7,2&#10;<br/>
+      180&nbsp;PRINT:PRINT&nbsp;"Abbruch&nbsp;mit&nbsp;beliebiger&nbsp;Taste"&#10;<br/>
+      190&nbsp;IF LEN(INKEY$)=0 THEN 190&#10;<br/>
+      200&nbsp;SOUND&nbsp;7,0&#10;<br/>
+      210&nbsp;END
+     </tt>
+    </td>
+   </tr>
+  </table>
+ <br/><br/>
+
+ <h3><a name="printer">1.3. V24-Schnittstelle mit Drucker</a></h3>
+  Es wird ein an der V24-Schnittelle des Grundger&auml;tes angeschlossener
+  <a href="print.htm">Drucker</a> emuliert.
+  Sowohl diese Schnittstelle als auch die emulierten V24-Parameter
+  entsprechen den Standardeinstellungen des A5105,
+  d.h. eine spezielle Druckereinstellung ist im A5105-Betriebssystem
+  nicht notwendig.
+ <br/><br/>
+
+ <h2><a name="software">2. Im ROM enthaltende Software</a></h2>
+  <ul>
+   <li>RBASIC Version&nbsp;2.01</li>
+   <li>
+    RBASIC Disk Version&nbsp;2.00
+    (nur bei Emulation der Floppy Disk Station)
+   </li>
+  </ul>
+ <br/><br/>
+
+ <h2><a name="disks">3. Enthaltene Diskettenabbilder</a></h2>
+  JKCEMU enth&auml;lt f&uuml;r die A5105-Emulation
+  folgende Diskettenabbilder:
+  <ul>
+   <li>
+    RBASIC-Programmdiskette mit einigen ausgew&auml;hlten
+    Demonstrations-, Spiel- und Anwendungsprogrammen
+   </li>
+   <li>RBASIC-Systemdiskette, enth&auml;lt u.a. das BIC-DEMO-Programm</li>
+   <li>SCPX-Systemdiskette</li>
+  </ul>
+ <br/>
+  F&uuml;r die Nutzung der Diskettenabbilder muss die Emulation
+  der Floppy-Disk-Station aktiviert werden.
+ <br/><br/>
+
+ <h3><a name="rbas_disks">3.1. Hinweise zu den RBASIC-Disketten</a></h3>
+  Die RBASIC-Programme haben die Endung <em>.bas</em>
+  und werden gestartet mit:
+ <br/><br/>
+  &nbsp;&nbsp;<tt>run "programm.bas"</tt>
+ <br/><br/>
+  Anstelle von <em>programm.bas</em> ist der richtige Dateiname anzugeben.
+  Das BIC-Demo-Programm auf der RBASIC-Systemdiskette hat keine Dateiendung
+  und wird deshalb gestartet mit:
+ <br/><br/>
+  &nbsp;&nbsp;<tt>run "bicdemo"</tt>
+ <br/><br/>
+  Das Verzeichnis l&auml;sst man sich anzeigen mit:
+ <br/><br/>
+  &nbsp;&nbsp;<tt>files</tt>
+ <br/><br/>
+  oder z.B. nur die BASIC-Dateien mit:
+ <br/><br/>
+  &nbsp;&nbsp;<tt>files "*.bas"</tt>
+ <br/><br/>
+
+ <h3><a name="scpx_disk">3.2. Hinweise zur SCPX-Systemdiskette</a></h3>
+  Das SCPX verlangt beim Booten eine beschreibbare Diskette.
+  Da die im Emulator integrierten Diskettenabbilder aber nicht
+  beschreibbar sind,
+  sollte die SCPX-Systemdiskette im Fenster
+  <em>JKCEMU Diskettenstation</em> zuerst exportiert
+  und dann die so entstandene Abbilddatei ohne Schreibschutz
+  ge&ouml;ffnet werden.
+  Aus diesem Grund finden Sie die SCPX-Systemdiskette auch nur in den
+  Untermen&uuml;s <em>Andere Diskette einlegen</em>
+  und <em>Diskette exportieren</em>.
+ <br/><br/>
+  Sie k&ouml;nnen die SCPX-Systemdiskette aber auch &uuml;ber
+  das Untermen&uuml; <em>Andere Diskette einlegen</em>
+  direkt einlegen und davon booten.
+  Allerdings erscheint dann eine Fehlerausschrift.
+  Diese k&ouml;nnen Sie jedoch mit einem Tastendruck &uuml;bergehen
+  und so trotzdem mit SCPX arbeiten.
+ <br/><br/>
+  Die SCPX-Systemdiskette ist als Laufwerk <em>A:</em> sichtbar
+  und enth&auml;lt auch Treiber f&uuml;r die beiden RAM-Floppies
+  (<em>RAFBIC20.COM</em> und <em>RAFBIC24.COM</em>).
+ <br/><br/>
+
+
+ <h2><a name="etc">4. Sonstiges</a></h2>
+
+ <h3>
+  <a name="basic_open">4.1. BASIC-Programme im Texteditor &ouml;ffnen</a>
+ </h3>
+  Der Men&uuml;punkt <em>Datei</em> &rarr;
+  <em>BASIC-Programm im Texteditor &ouml;ffnen...</em>
+  ist in der A5105-Emulation nicht aktiv,
+  da das Bin&auml;rformat der RBASIC-Programme nicht dokumentiert
+  und deshalb auch nicht vollst&auml;ndig bekannt ist.
+  Sie k&ouml;nnen aber trotzdem ein im Arbeitsspeicher befindliches
+  BASIC-Programm im Texteditor &ouml;ffnen,
+  indem Sie dieses mit dem Kommando <tt>LLIST</tt>
+  &quot;ausdrucken&quot; und anschlie&szlig;end
+  das Druckergebnis im Texteditor &ouml;ffnen.
+  Das Druckergebnis erreichen Sie &uuml;ber den Men&uuml;punkt
+  <em>Extra</em> &rarr; <em>Druckauftr&auml;ge</em>
+  (siehe <a href="print.htm">Drucken</a>).
+ <br/><br/>
+
+ <h3><a name="basic_io">4.2. BASIC-Programme speichern und laden</a></h3>
+  JKCEMU bietet eine spezielle Unterst&uuml;tzung f&uuml;r das
+  <a href="loadsavebasic.htm">Speichern und Laden von BASIC-Programmen</a>.
+  Zum Speichern nutzen Sie bitte die Funktion
+  <em>BASIC-Programm speichern...</em> im Men&uuml; <em>Datei</em>
+  und speichern das jeweilge Programm als
+  <a href="fileformats.htm#rbasic">BASIC-/RBASIC-Programmdatei (*.bas)</a>.
+  Alternativ ist auch das Speichern als
+  <a href="fileformats.htm#headersave">Headersave-Datei (*.z80)</a>
+  mit dem Dateityp&nbsp;<em>B</em> m&ouml;glich.
+ <br/><br/>
+  Wenn Sie ein BASIC-Programm in einem anderen Dateiformat speichern,
+  erkennt JKCEMU sp&auml;ter beim Laden der Datei nicht mehr,
+  dass es sich um ein BASIC-Programm handelt und passt die
+  Systemzellen des BASIC-Interpreters nicht an.
+  Das geladene Programm l&auml;sst sich dann nicht nutzen.
+ <br/><br/>
+  Haben Sie in den <a href="settings.htm">Einstellungen</a>
+  zum A5105 die Emulation des Floppy Disk Moduls aktiviert,
+  k&ouml;nnen Sie alternativ auch die BASIC-Programme
+  mit Hilfe der RBASIC-Kommandos <em>SAVE</em>
+  und <em>LOAD</em> auf einer emulierten Diskette speichern
+  und von dort wieder laden.
+ <br/><br/>
+
+ <h3>
+  <a name="load_into_mem">4.3. Dateien in den Arbeistspeicher laden</a>
+ </h3>
+  In der SCPX-Betriebsart wird durch das Betriebssystem automatisch
+  der ROM zyklisch eingeblendet.
+  Damit bei diesem Verhalten das Laden von Dateien in den Arbeitsspeicher
+  mit Hilfe der Emulatorfunktionen sicher funktioniert,
+  werden Dateien immer in den RAM geladen,
+  auch wenn dieser gerade nicht eingeblendet ist.
+ <br/><br/>
+
+ <h3><a name="font">4.4. Zeichensatz</a></h3>
+  Der A5105 enth&auml;lt einen programmierbaren Zeichengenerator,
+  der standardm&auml;&szlig;ig mit dem alten DOS-Zeichensatz
+  (Codepage&nbsp;437) gef&uuml;llt ist.
+  Sollte der Zeichengenerator softwarem&auml;&szlig;ig anders
+  programmiert werden, kann das der Emulator nicht wissen.
+  Aus diesem Grund konvertiert JKCEMU beim Kopieren
+  aus der Bildschirmausgabe des A5105 die Zeichen immer entsprechend
+  der Codepage&nbsp;437 in den Zeichensatz des Emulatorrechners,
+  unabh&auml;ngig davon,
+  wie der Zeichengenerator tats&auml;chlich programmiert ist.
+ <br/><br/>
+
+ <h3>
+  <a name="screensize">4.5. Gr&ouml;&szlig;e und Seitenverh&auml;ltnis der Bildschirmausgabe</a>
+ </h3>
+  Der A5105 bietet verschiedene Bildschirmaufl&ouml;sungen.
+  Wenn zwischen diesen umgeschaltet wird
+  (z.B. mit dem BASIC-Befehl <tt>screen&nbsp;1</tt> in den 80-Zeichenmodus),
+  &auml;ndern sich auch die Gr&ouml;&szlig;e des Emulatorfensters
+  sowie das Seitenverh&auml;ltnis.
+  Beim Original bleibt dagegen die Gr&ouml;&szlig;e
+  des Bildschirmausgabebereichs immer gleich.  Mit der Option
+  <em>Gleiche Fenstergr&ouml;&szlig;e in allen Bildschirmmodi</em>
+  k&ouml;nnen Sie das Verhalten an das des Originals anpassen.
+  Allerdings ist dann auch das Emulatorfenster immer so gro&szlig;,
+  dass die h&ouml;chste Bildschirmaufl&ouml;sung dargestellt werden kann.
+ <br/><br/>
+
+ <h3>
+  <a name="paste">4.6. Einf&uuml;gen von Text aus der Zwischenablage</a>
+ </h3>
+  Das Einf&uuml;gen von Text aus der Zwichenablage erfolgt gew&ouml;hnlich
+  in der Form, dass f&uuml;r jedes einzuf&uuml;gende Zeichen
+  das Dr&uuml;cken der entsprechenden Taste bzw. Tastenkombination
+  simuliert wird. Dieses Prinzip ist recht langsam.
+  F&uuml;r den A5105 gibt es in den
+  <a href="settings.htm">Einstellungen</a> die Option
+  <em>Einf&uuml;gen von Text durch Abfangen des Systemaufrufs</em>.
+  Bei dieser Option lauscht der Emulator auf der Einsprungadresse
+  f&uuml;r die Systemfunktion CONIN.
+  Wenn diese Systemfunktion aufgerufen wird, pr&uuml;ft JKCEMU,
+  ob ein Zeichen eingef&uuml;gt werden soll.
+  Wenn ja, schreibt er das n&auml;chste einzuf&uuml;gende Zeichen
+  in das entsprechende Prozessorregister und simuliert einen RETURN-Befehl.
+  Sollten das Betriebssystem oder das Anwendungsprogramm die Tastatur nicht
+  &uuml;ber die CONIN-Systemfunktion abfragen,
+  funktioniert das Einf&uuml;gen von Text nicht,
+  und Sie m&uuml;ssen die Option ausschalten.
+ <br/><br/>
+
+ <h3><a name="images">4.7. A5105-Bilddateien</a></h3>
+  Der <a href="tools/imageviewer.htm">JKCEMU Bildbetrachter</a>
+  unterst&uuml;tzt sowohl lesend als auch schreibend A5105-Bilddateien,
+  die dem RBASIC-Grafikmodus <em>SCREEN&nbsp;5</em>
+  (320x200&nbsp;Pixel, 16&nbsp;Farben) entsprechen.
+  Zur Anzeige im JKCEMU Bildbetrachter m&uuml;ssen die Dateien
+  die Endung <em>*.scr</em> haben.
+  Umgekehrt k&ouml;nnen mit dem Bildbetrachter solche Bilddateien
+  erzeugt werden,
+  indem man sie einfach mit der Endung <em>*.scr</em> speichert.
+  Das Laden und Anzeigen solcher Dateien auf dem A5105
+  ist mit folgendem kleinen RBASIC-Programm m&ouml;glich:
+ <br/>
+  <tt>
+   &#10;<br/>
+   10 SCREEN 0:CLS&#10;<br/>
+   20 FILES "*.scr"&#10;<br/>
+   30 PRINT:INPUT "Bilddatei:";F$&#10;<br/>
+   40 IF INSTR(F$,".")=0 THEN F$=F$+".SCR"&#10;<br/>
+   50 SCREEN 5,0:CLS&#10;<br/>
+   60 BLOAD F$,S:PAUSE 300&#10;<br/>
+   70 GOTO 10&#10;<br/>
+  </tt>
+ <br/>
+  Das Programm zeigt die Liste der vorhandenen Bilddateien an
+  und fragt nach dem Namen der zu ladenden Datei.
+  Der Dateiname kann dabei auch ohne die Endung <em>.SCR</em>
+  eingegeben werden.
+ <br/><br/>
+  Eine erweiterte Version dieses Programms ist auf der
+  im Emulator enthaltenen <em>BIC A5105 RBASIC Systemdiskette</em>
+  vorhanden.
+  Wenn Sie diese Diskette im Fenster <em>JKCEMU Diskettenstation</em>
+  eingelegt haben und sich im RBASIC befinden,
+  k&ouml;nnen Sie das Programm starten mit:
+ <br/><br/>
+  <tt>run &quot;viewscr.bas&quot;</tt>
+ <br/><br/>
+</body>
+</html>

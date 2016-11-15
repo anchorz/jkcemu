@@ -1,0 +1,132 @@
+<html>
+<body>
+ <h1>H&uuml;bler-Grafik-MC</h1>
+  Im Jahr 1988 ver&ouml;ffentlichte Bernd H&uuml;bler in dem Buch
+  <em>Mikroelektronik in der Amateurpraxis&nbsp;3</em>
+  unter dem Titel <em>BASIC-Kleincomputer mit Grafik</em>
+  die Bauanleitung eines Selbstbaucomputers.
+  Da dieser Computer keinen eigenen Namen hat und sich der Titel
+  der Ver&ouml;ffentlichung auch nicht als solcher eignet,
+  wird der Computer im JKCEMU <em>H&uuml;bler-Grafik-MC</em> genannt.
+ <br/><br/>
+
+ <h2>Hinweise zur Emulation</h2>
+  <ul>
+   <li>
+    <a href="hgmc.htm#1">1. Emulierte Hardware</a>
+    <ul>
+     <li><a href="hgmc.htm#1.1">1.1. Drucker</a></li>
+    </ul>
+   </li>
+   <li><a href="hgmc.htm#2">2. Im ROM enthaltene Software</a></li>
+   <li>
+    <a href="hgmc.htm#3">3. BASIC</a>
+    <ul>
+     <li><a href="hgmc.htm#3.1">3.1. BASIC-Interpreter</a></li>
+     <li>
+      <a href="hgmc.htm#3.2">3.2. BASIC-Programme speichern und laden</a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ <br/>
+
+
+ <h2><a name="1">1. Emulierte Hardware</a></h2>
+  <ul>
+   <li>Je nach Einstellung 4 oder 18&nbsp;KByte ROM</li>
+   <li>64&nbsp;KByte RAM inklusive Bildwiederholspeicher</li>
+   <li>CTC</li>
+   <li>PIO</li>
+   <li>
+    optional:
+    <ul>
+     <li>
+      <a href="kcnet.htm">KCNet-kompatible Netzwerkkarte</a>
+      an der E/A-Basisadressen&nbsp;C0h
+     </li>
+     <li>
+      <a href="usb.htm">USB-Anschluss</a> (Vinculum VDIP Modul)
+      an der E/A-Basisadressen&nbsp;FCh
+     </li>
+    </ul>
+   </li>
+  </ul>
+  Von dem IO-System werden nur die CTC und die PIO emuliert.
+  Die SIO und das Kassettenrecorderinterface sowie ggf.
+  an der PIO angeschlossene Hardware werden nicht emuliert.
+ <br/><br/>
+
+ <h3><a name="1.1">1.1. Drucker</a></h3>
+  Es wird ein Drucker emuliert,
+  indem JKCEMU die Betriebssystemaufrufe f&uuml;r Druckausgaben
+  abf&auml;ngt und die Daten an den aktuellen Druckauftrag anh&auml;ngt.
+  Diese Funktion ist in den <a href="settings.htm">Einstellungen</a>
+  abschaltbar.
+ <br/><br/>
+
+
+ <h2><a name="2">2. Im ROM enthaltene Software</a></h2>
+  <ul>
+   <li>Monitorprogramm Version&nbsp;3.0</li>
+   <li>
+    Geringf&uuml;gig modifiziertes HBASIC&nbsp;3.3
+    (optional, siehe Abschnitt&nbsp;3.1.)
+   </li>
+  </ul>
+  Im Monitorprogramm kann man sich mit <em>HELP</em>
+  eine Liste aller Kommandos anzeigen lassen.
+  Die Liste enth&auml;lt sowohl die Kommandos des Monitorprogramm selbst
+  als auch solche,
+  die eventuell an anderen Stellen im Arbeitsspeicher zu finden sind.
+ <br/><br/>
+
+
+ <h2><a name="3">3. BASIC</a></h2>
+
+ <h3><a name="3.1">3.1. BASIC-Interpreter</a></h3>
+  Der H&uuml;bler-Grafik-MC ist als BASIC-Computer konzipiert.
+  Der dazugeh&ouml;rige BASIC-Interpreter ist im Original allerdings
+  nicht im ROM enthalten.
+  Er muss von Kassette geladen werden.
+ <br/><br/>
+  Damit man im Emulator diesen Interpreter nicht immer erst laden muss,
+  bietet JKCEMU in den <a href="settings.htm">Einstellungen</a>
+  die Option <em>BASIC-Interpreter im ROM enthalten</em> an.
+  Ist diese Option eingeschaltet,
+  dann enth&auml;lt der nun vergr&ouml;&szlig;erte ROM das Monitorprogramm,
+  den BASIC-Interpreter sowie eine mit dem Kommando <em>BASIC</em>
+  zu startende Laderoutine,
+  die den Interpreter vom ROM in den RAM kopiert und dort startet
+  (Kaltstart).
+ <br/><br/>
+  Der originale BASIC-Interpreter stellt aber auch ein Kommando
+  mit dem Namen <em>BASIC</em> zur Verf&uuml;gung.
+  Damit es nun zu keinen Verwechslungen kommt,
+  wurde dieses Kommando in der im JKCEMU enthaltenen BASIC-Version
+  in <em>WBASIC</em> umbenannt.
+  Damit ist mit <em>BASIC</em> ein Kaltstart und mit <em>WBASIC</em>
+  ein Warmstart des Interpreters m&ouml;glich.
+ <br/><br/>
+  Der R&uuml;cksprung vom BASIC-Interpreter zum Monitorprogramm
+  erfolgt mittels RESET.
+ <br/><br/>
+
+ <h3><a name="3.2">3.2. BASIC-Programme speichern und laden</a></h3>
+  JKCEMU bietet eine spezielle Unterst&uuml;tzung f&uuml;r das
+  <a href="loadsavebasic.htm">Speichern und Laden von BASIC-Programmen</a>.
+  Zum Speichern nutzen Sie bitte die Funktion
+  <em>BASIC-Programm speichern...</em> im Men&uuml; <em>Datei</em>
+  und speichern das jeweilige Programm als
+  <a href="fileformats.htm#basic">BASIC-/RBASIC-Programmdatei (*.bas)</a>.
+  Alternativ ist auch das Speichern als
+  <a href="fileformats.htm#headersave">Headersave-Datei (*.z80)</a>
+  mit dem Dateityp&nbsp;<em>B</em> m&ouml;glich.
+ <br/><br/>
+  Wenn Sie ein BASIC-Programm in einem anderen Dateiformat speichern,
+  erkennt JKCEMU sp&auml;ter beim Laden der Datei nicht mehr,
+  dass es sich um ein BASIC-Programm handelt und passt die
+  Systemzellen des BASIC-Interpreters nicht an.
+  Das geladene Programm l&auml;sst sich dann nicht nutzen.
+</body>
+</html>

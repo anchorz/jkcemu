@@ -1,0 +1,237 @@
+<html>
+<body>
+ <h1>Einstellungen</h1>
+  Die Einstellungen nehmen Sie in einem separaten Fenster vor,
+  dass Sie &uuml;ber das Men&uuml; <em>Extra</em> des Hauptfensters
+  aufrufen.
+  Die weiteren Ausf&uuml;hrungen beziehen sich auf dieses Fenster.
+ <br/><br/>
+  &Auml;nderungen an den Einstellungen werden erst wirksam,
+  nachdem sie &uuml;bernommen wurden.
+  Dr&uuml;cken Sie dazu auf den Knopf <em>&Uuml;bernehmen</em>.
+ <br/><br/>
+  <ul>
+   <li>
+    <a href="settings.htm#groups">1. Gruppierung der einzelnen Einstellungen</a>
+    <ul>
+     <li><a href="settings.htm#system">1.1. System</a></li>
+     <li><a href="settings.htm#speed">1.2. Geschwindigkeit</a></li>
+     <li>
+      <a href="settings.htm#screen">1.3. Bildschirmausgabe</a>
+      <ul>
+       <li>
+	<a href="settings.htm#margin">1.3.1. Rand um Bildschirmausgabe</a>
+       </li>
+       <li>
+	<a href="settings.htm#refresh">1.3.2. Zykluszeit f&uuml;r Bildschirmaktualisierung</a>
+       </li>
+      </ul>
+     </li>
+     <li><a href="settings.htm#confirm">1.4. Best&auml;tigungen</a></li>
+     <li><a href="settings.htm#laf">1.5. Erscheinungsbild</a></li>
+     <li><a href="settings.htm#net">1.6. Netzwerk</a></li>
+     <li>
+      <a href="settings.htm#etc">1.7. Sonstiges</a>
+      <ul>
+       <li>
+	<a href="settings.htm#filedialog">1.7.1. Dateiauswahldialog</a>
+       </li>
+       <li>
+	<a href="settings.htm#config_dir">1.7.2. Konfigurationsverzeichnis</a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li><a href="settings.htm#profiles">2. Einstellungen speichern</a></li>
+   <li>
+    <a href="settings.htm#reset">3. Einstellungen zur&uuml;cksetzen</a>
+   </li>
+  </ul>
+ <br/>
+
+ <h2><a name="groups">1. Gruppierung der einzelnen Einstellungen</a></h2>
+  Die einzelnen Einstellm&ouml;glichkeiten sind thematisch gruppiert.
+  Jede einzelne Gruppe finden Sie auf einer separaten Unterseite,
+  die Sie &uuml;ber die Reiter am oberen Rand erreichen.
+ <br/><br/>
+
+ <h3><a name="system">1.1. System</a></h3>
+  In diesem Bereich legen Sie das zu emulierende System,
+  d.h. den zu emulierenden Computer-Typ, fest.
+  Bei einigen Systemen gibt es unterschiedliche
+  Konfigurationsm&ouml;glichkeiten, die Sie auf der rechten Seite
+  im Bereich Optionen beeinflussen k&ouml;nnen.
+  Hinweise zu der Art und Weise,
+  wie die einzelnen Computer-Typen emuliert werden,
+  finden Sie unter <a href="emusys.htm">Emulierte Systeme</a>.
+ <br/><br/>
+
+ <h3><a name="speed">1.2. Geschwindigkeit</a></h3>
+  Hier legen Sie fest, welche Taktfrequenz emuliert werden soll.
+  Standardm&auml;&szlig;ig wird die Originalgeschwindigkeit
+  des emulierten Systems nachgeahmt.
+  Sie k&ouml;nnen aber auch einen anderen Wert angeben.
+ <br/><br/>
+  Der Emulator versucht, die gew&uuml;nschte Geschwindigkeit zu erreichen,
+  aber nicht zu &uuml;berschreiten.
+  Sollte jedoch die zur Verf&uuml;gung stehende Rechenleistung
+  daf&uuml;r nicht ausreichen,
+  wird eine entsprechend geringere Taktfrequenz emuliert.
+ <br/><br/>
+
+ <h3><a name="screen">1.3. Bildschirmausgabe</a></h3>
+  Helligkeit, Rand und alle anderen Einstellungen,
+  die sich ausschlie&szlig;lich auf die Bildschirmausgabe beziehen,
+  finden Sie in dieser Gruppe.
+ <br/><br/>
+
+ <h3><a name="margin">1.3.1. Rand um Bildschirmausgabe</a></h3>
+  Sie k&ouml;nnen einen Rand um die Bildschrirmausgabe erzeugen,
+  indem Sie das Hauptfenster gr&ouml;&szlig;er ziehen.
+  Wenn Sie nun jedoch eine andere Skalierung der Bildschirmausgabe
+  w&auml;hlen oder in den Einstellungen ein anderes zu emulierendes
+  System ausw&auml;hlen,
+  passt der Emulator das Hauptfenster an die neuen Erfordernisse an,
+  womit der Rand wieder verschwindet.
+  Mit dieser Option k&ouml;nnen Sie einen Standardrand festlegen,
+  der in solchen F&auml;llen automatisch angelegt wird.
+ <br/><br/>
+
+ <h3>
+  <a name="refresh">1.3.2. Zykluszeit f&uuml;r Bildschirmaktualisierung</a>
+ </h3>
+  Der Emulator aktualisiert zyklisch die Bildschirmausgabe
+  entsprechend den &Auml;nderungen im Bildwiederholspeicher
+  bzw. im Video-RAM.
+  Eine k&uuml;rzere Zykluszeit bewirkt eine fl&uuml;ssigere
+  Bildschirmausgabe.
+  Allerdings steigt damit auch der Bedarf an Rechenleistung.
+ <br/><br/>
+
+ <h3><a name="confirm">1.4. Best&auml;tigungen</a></h3>
+  Hier geben Sie an, welche Aktionen erst nach der Bejahung einer
+  Sicherheitsabfrage ausgef&uuml;hrt werden sollen.
+ <br/><br/>
+
+ <h3><a name="laf">1.5. Erscheinungsbild</a></h3>
+  JKCEMU wurde mit der Programmiersprache Java entwickelt,
+  der ein plattform&uuml;bergreifendes Konzept zu Grunde liegt.
+  Manche Leute w&uuml;nschen,
+  dass eine Applikation unter jedem Betriebssystem gleich aussieht,
+  andere wiederum bevorzugen, dass sich eine Applikation
+  an das Aussehen der jeweiligen Plattform anpasst.
+  Java wird diesen unterschiedlichen Anspr&uuml;chen gerecht,
+  indem es sich in verschiedenen Erscheinungsbildern pr&auml;sentieren kann.
+  JKCEMU bietet deshalb diese M&ouml;glichkeit auch an.
+ <br/><br/>
+  Welche Erscheinungsbilder auf welcher Plattform unterst&uuml;tzt werden,
+  h&auml;ngt von der jeweiligen Java-Version ab.
+  In der Regel sind das aber mindestens das plattform&uuml;bergreifende
+  Erscheinungsbild <em>Metal</em> und ein auf das lokale Betriebssystem
+  angepasstes Erscheinungsbild.
+ <br/><br/>
+  Steht nur ein einziges Erscheinungsbild zur Verf&uuml;gung,
+  d.h. wenn keine Auswahl m&ouml;glich ist,
+  wird das Unterfenster <em>Erscheinungsbild</em> in den Einstellungen
+  erst gar nicht angeboten.
+ <br/><br/>
+
+ <h3><a name="net">1.6. Netzwerk</a></h3>
+  Das Netzwerk muss konfiguriert werden, um es nutzen zu k&ouml;nnen
+  (siehe <a href="kcnet.htm#cfg">hier</a>).
+  Im Original geschieht das mit einem speziellen Programm.
+  In der Emulation kann Ihnen JKCEMU die Arbeit abnehmen.
+  Die dazu notwendigen Einstellungen finden Sie hier.
+ <br/><br/>
+  M&ouml;chten Sie m&ouml;glichst nah am Original bleiben
+  und auf das Konfigurieren durch JKCEMU verzichten,
+  dann lassen Sie die Eingabefelder leer und schalten die Option
+  <em>IP-Adressen der leer gelassenen Felder automatisch ermitteln</em> aus.
+ <br/><br/>
+
+ <h3><a name="etc">1.7. Sonstiges</a></h3>
+  In dieser Gruppe finden Sie die Einstellungen,
+  die sich in keine andere Gruppe sinnvoll einordnen lassen.
+ <br/><br/>
+
+ <h3><a name="filedialog">1.7.1. Dateiauswahldialog</a></h3>
+  JKCEMU kommt mit einem eigenen Dateiauswahldialog daher.
+  Dieser hat den Vorteil,
+  dass er auf die Bed&uuml;rfnisse des Emulators zugeschnitten ist.
+  So k&ouml;nnen Sie z.B. gleich in dem Dialog w&auml;hlen,
+  ob eine Datei nur geladen oder auch gestartet werden soll.
+  Ein anderer Vorteil ist, dass beim Anklicken einer Datei,
+  deren Typ von JKCEMU unterst&uuml;tzt wird,
+  die relevanten Informationen in der Statuszeile angezeigt werden.
+ <br/><br/>
+  M&ouml;glicherweise ist aber der JKCEMU-Dateiauswahldialog
+  nicht so gut auf die spezifischen Eigenheiten des Systems angepasst ist
+  wie die standardm&auml;&szlig;ige Dateiauswahlbox des Betriebssystems.
+  Aus diesem Grund haben Sie hier die M&ouml;glichkeit,
+  zwischen beiden zu w&auml;hlen.
+ <br/><br/>
+
+ <h3>
+  <a name="config_dir">1.7.2. Konfigurationsverzeichnis</a>
+ </h3>
+  Hier sehen Sie zur Information den vollst&auml;ndigen Pfad
+  des Konfigurationsverzeichnisses, d.h. des Verzeichnisses,
+  in dem JKCEMU seine Einstellungen und Profile sowie 
+  unter Windows auch eine DLL speichert.
+  Der Emulator wertet zur Festlegung dieses Verzeichnisses
+  die Umgebungsvariable <em>APPDATA</em> aus.
+  Ist diese Umgebungsvariable nicht gesetzt,
+  wird der Speicherort f&uuml;r die eigenen Dateien verwendet.
+ <br/><br/>
+  Sie k&ouml;nnen das Verzeichnis auch l&ouml;schen.
+  JKCEMU meldet sich dann beim n&auml;chsten Start so,
+  als w&uuml;rde er auf dem Computer das erste mal gestartet werden.
+ <br/><br/>
+
+ <h2><a name="profiles">2. Einstellungen speichern</a></h2>
+  Sie k&ouml;nnen Ihre Einstellungen in Form von Profilen
+  speichern und wieder laden.
+  Das Speichern ist erst m&ouml;glich, nachdem die Einstellungen
+  &uuml;bernommen wurden.
+ <br/><br/>
+  Wird beim Start des Emulators der Name eines solchen Profils
+  als Argument angegeben, startet JKCEMU gleich mit diesen Einstellungen.
+  Anderenfalls versucht der Emulator, das Profil &quot;standard&quot; zu laden.
+  Sie sollten deshalb Ihre am h&auml;ufigsten verwendeten Einstellungen
+  unter diesem Namen speichern.
+ <br/><br/>
+  Ein Profil kann auch noch angewendet werden,
+  nachdem der Emulator gestartet wurde.
+  Den entsprechenden Men&uuml;punkt daf&uuml;r finden Sie
+  im JKCEMU-Hauptfenster, Men&uuml; <em>Extra</em>.
+ <br/><br/>
+  Beim Speichern eines Profils werden auch die Positionen
+  und Gr&ouml;&szlig;en der gerade ge&ouml;ffneten Fenster gespeichert.
+  Wenn Sie sp&auml;ter so ein Profil anwenden,
+  &ouml;ffnen die Fenster dann wieder an den gespeicherten Positionen.
+  Fenster, die bereits offen sind,
+  werden davon allerdings nicht ber&uuml;hrt.
+ <br/><br/>
+
+ <h2><a name="reset">3. Einstellungen zur&uuml;cksetzen</a></h2>
+  Sollten Sie einmal Einstellungen verstellt haben und Sie wissen nicht,
+  wie diese richtig zu stellen sind,
+  dann m&uuml;ssen Sie die Einstellungen zur&uuml;cksetzen.
+  Das erledigen Sie durch L&ouml;schen des entsprechenden Profils
+  und anschlie&szlig;endem Schlie&szlig;en des Emulators.
+  Das gilt insbesondere auch f&uuml;r das Profil &quot;standard&quot;.
+ <br/><br/>
+  Zum L&ouml;schen eines Profils dr&uuml;cken Sie auf den Knopf
+  <em>Profil laden...</em>.
+  In dem dann erscheinenden Auswahldialog finden Sie den Knopf
+  zum l&ouml;schen.
+ <br/><br/>
+  Eine weitergehende M&ouml;glichkeit zum Zur&uuml;cksetzen
+  der Einstellungen ist das L&ouml;schen des gesamten
+  Konfigurationsverzeichnisses.
+  Wenn Sie dieses Verzeichnis l&ouml;schen,
+  startet JKCEMU beim n&auml;chsten Mal so,
+  als w&uuml;rde er das erste Mal auf dem Computer gestartet werden.
+</body>
+</html>

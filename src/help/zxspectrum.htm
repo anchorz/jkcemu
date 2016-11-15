@@ -1,0 +1,260 @@
+<html>
+<body>
+ <h1>ZX&nbsp;Spectrum</h1>
+  F&uuml;r den Sinclair ZX&nbsp;Spectrum gab es in der DDR mehrere
+  Nachbauprojekte, z.B. KUB64, Spectral, ZX-HFO und ZX-Jena.
+  Insbesondere der von der Erfurter Firma H&uuml;bner Elektronik
+  vertriebene Spectral erreichte eine gr&ouml;&szlig;ere Verbreitung,
+  u.a. weil er vollst&auml;ndig zu einem ZX&nbsp;Spectrum&nbsp;48K
+  kompatibel ist und auch zu einem ZX&nbsp;Spectrum&nbsp;128K
+  erweitert werden konnte.
+ <br/><br/>
+
+ <h2>Hinweise zur Emulation</h2>
+  <ul>
+   <li>
+    <a href="zxspectrum.htm#hardware">1. Emulierte Hardware</a>
+    <ul>
+     <li><a href="zxspectrum.htm#keyboard">1.1. Tastatur</a></li>
+    </ul>
+    <a href="zxspectrum.htm#etc">2. Sonstiges</a>
+    <ul>
+     <li>
+      <a href="zxspectrum.htm#audio">2.1. Sound-/Kassettenausgabe</a>
+     </li>
+     <li>
+      <a href="zxspectrum.htm#fileformats">2.2. Unterst&uuml;tzte Dateiformate</a>
+     </li>
+     <li>
+      <a href="zxspectrum.htm#save_basic">2.3. BASIC-Programm in einer Sound- oder Tape-Datei speichern</a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ <br/>
+
+ <h2><a name="hardware">1. Emulierte Hardware</a></h2>
+  Je nach Einstellung werden emuliert:
+  <ul>
+   <li>
+    ZX&nbsp;Spectrum&nbsp;48K:
+    <ul>
+     <li>48&nbsp;KByte RAM</li>
+     <li>Lautsprecher- und Kassettenrecorderanschluss</li>
+     <li>Kempston Joystick Interface</li>
+    </ul>
+   </li>
+   <li>
+    ZX&nbsp;Spectrum+&nbsp;128K:
+    <ul>
+     <li>128&nbsp;KByte RAM</li>
+     <li>Lautsprecher- und Kassettenrecorderanschluss</li>
+     <li>Sound-Generator AY-3-8912</li>
+     <li>Kempston Joystick Interface</li>
+    </ul>
+   </li>
+  </ul>
+ <br/>
+
+ <h3><a name="keyboard">1.1. Tastatur</a></h3>
+  Beim ZX&nbsp;Spectrum sind die Tasten mehrfach benutzt.
+  Dem entsprechend gibt es auch in der Emulation mehrere Eingabemodi:
+ <br/><br/>
+  <table border="1">
+   <tr>
+    <th>Zeichen/Text auf der originalen Tastatur</th>
+    <th>Zu dr&uuml;ckende Taste(n) auf der Tastaur des Emulatorrechners</th>
+   </tr>
+   <tr>
+    <td valign="top">Gro&szlig;es wei&szlig;es Zeichen auf der Taste</td>
+    <td valign="top">Gleich bezeichnete Buchstabentaste</td>
+   </tr>
+   <tr>
+    <td valign="top">
+     Kleiner wei&szlig;er Text auf der Taste (BASIC-Kommando)
+    </td>
+    <td valign="top">
+     Gleich bezeichnete Buchstabentaste (nur beim K-Cursor relevant)
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">Roter Text auf der Taste</td>
+    <td valign="top">
+     Wenn das Zeichen auf der Emulatortastatur vorhanden ist,
+     dann dieses eingeben,<br/>
+     sonst <em>Strg</em> + gleich bezeichnete Buchstabentaste</td>
+   </tr>
+   <tr>
+    <td valign="top">
+     Wei&szlig;er Text &uuml;ber der Taste (nur erste Tastenreihe)
+    </td>
+    <td valign="top">
+     <em>F1</em> bis <em>F4</em>, <em>F9</em>, <em>Entf (Del)</em>
+     oder Cursor-Tasten
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">
+     Gr&uuml;ner Text &uuml;ber der Taste (ab zweiter Tastenreihe)
+    </td>
+    <td valign="top">
+     Zuerst <em>Strg / CTRL</em> + <em>Shift</em>,
+     danach nur die gleich bezeichnete Buchstabentaste
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">Roter Text unter der Taste</td>
+    <td valign="top">
+     Zuerst <em>Strg / CTRL</em> + <em>Shift</em>,
+     danach <em>Strg</em> + gleich bezeichnete Buchstabentaste
+    </td>
+   </tr>
+  </table>
+ <br/>
+  Beim gleichzeitigen Dr&uuml;cken von <em>Strg</em> bzw. <em>CTRL</em>
+  und <em>Shift</em> wird das gleichzeitige Dr&uuml;cken von
+  <em>CAPS&nbsp;SHIFT</em> und <em>SYMBOL&nbsp;SHIFT</em> emuliert,
+  woraufhin &uuml;blicherweise der E-Cursor erscheint.
+ <br/><br/>
+  Die beiden Tasten <em>CAPS&nbsp;SHIFT</em> und <em>SYMBOL&nbsp;SHIFT</em>
+  k&ouml;nnen auch einzeln mit den Funktionstasten <em>F5</em>
+  und <em>F6</em> bet&auml;tigt werden.
+ <br/><br/>
+  Zus&auml;tzlich zu den o.a. Eingabemodi k&ouml;nnen einige
+  Symbole/Funktionen auch einfacher eingegeben werden:
+ <br/><br/>
+  <table border="1">
+   <tr>
+    <th>Text/Symbol auf der originalen Tastatur</th>
+    <th>Zu dr&uuml;ckende Taste(n) auf der Tastaur des Emulatorrechners</th>
+   </tr>
+   <tr>
+    <td valign="top">&larr;</td>
+    <td valign="top">Cursor&nbsp;links</td>
+   </tr>
+   <tr>
+    <td valign="top">&darr;</td>
+    <td valign="top">Cursor&nbsp;runter</td>
+   </tr>
+   <tr>
+    <td valign="top">&uarr;</td>
+    <td valign="top">Cursor&nbsp;rauf</td>
+   </tr>
+   <tr>
+    <td valign="top">&rarr;</td>
+    <td valign="top">Cursor&nbsp;rechts</td>
+   </tr>
+   <tr><td valign="top">EDIT</td><td valign="top"><em>F1</em></td></tr>
+   <tr>
+    <td valign="top">CAPS&nbsp;LOCK</td>
+    <td valign="top"><em>F2</em></td>
+   </tr>
+   <tr>
+    <td valign="top">TRUE&nbsp;VIDEO</td>
+    <td valign="top"><em>F3</em></td>
+   </tr>
+   <tr>
+    <td valign="top">INV.&nbsp;VIDEO</td>
+    <td valign="top"><em>F4</em></td>
+   </tr>
+   <tr>
+    <td valign="top">CAPS&nbsp;SHIFT</td>
+    <td valign="top">
+     <em>F5</em> (wenn CAPS&nbsp;SHIFT als einzelne Taste
+     gedr&uuml;ckt werden soll),<br/>
+     sonst <em>Shift</em> + ...
+     </td>
+   </tr>
+   <tr>
+    <td valign="top">SYMBOL&nbsp;SHIFT</td>
+    <td valign="top">
+     <em>F6</em> (wenn SYMBOL&nbsp;SHIFT als einzelne Taste
+     gedr&uuml;ckt werden soll),<br/>
+     sonst <em>Strg / CTRL</em> + ...
+    </td>
+   </tr>
+   <tr><td valign="top">GRAPHICS</td><td valign="top"><em>F9</em></td></tr>
+   <tr>
+    <td valign="top">DELETE</td>
+    <td valign="top"><em>Entf / Del</em></td>
+   </tr>
+  </table>
+ <br/><br/>
+
+ <h2><a name="etc">2. Sonstiges</a></h2>
+
+ <h3><a name="audio">2.1. Sound-/Kassettenausgabe</a></h3>
+  Zum H&ouml;ren, Ausgeben oder Aufzeichnen der Ton- bzw. Kassettenausgabe
+  m&uuml;ssen Sie eine <a href="audio.htm">Audio</a>-Funktion aktivieren.
+  Die Funktion <a href="audio.htm#sound_out">T&ouml;ne ausgeben</a>
+  unterscheidet sich dabei bei den beiden emulierten Spectrum-Modellen.
+  Beim ZX&nbsp;Spectrum&nbsp;48K h&ouml;ren Sie nur die T&ouml;ne,
+  die &uuml;ber das Bit&nbsp;<em>EAR</em> (Bit&nbsp;4)
+  des Ausgabetors&nbsp;FEh ausgegeben werden.
+  Beim ZX&nbsp;Spectrum+&nbsp;128K h&ouml;ren Sie dagegen
+  die Ausgaben des Sound-Generators AY-3-8912.
+ <br/><br/>
+  Die Funktionen
+  <a href="audio.htm#data_out">Daten am Audioausgang ausgeben</a>
+  und <a href="audio.htm#file_out">Sound- oder Tape-Datei speichern</a>
+  sind bei beiden emulierten Spectrum-Modellen gleich.
+  Es werden sowohl die mit dem Bit&nbsp;<em>MIC</em>
+  (Bit&nbsp;3, gew&ouml;hnlich benutzt zum Speichern auf Kassette)
+  als auch die mit dem Bit&nbsp;<em>EAR</em>
+  (Bit&nbsp;4, gew&ouml;hnlich benutzt f&uuml;r Tonausgaben)
+  erzeugten Signale ausgegeben bzw. gespeichert.
+  Wenn Sie also einen ZX&nbsp;Spectrum+&nbsp;128K emulieren lassen
+  und darin Programme ausf&uuml;hren,
+  die zur Tonausgabe den Port&nbsp;FEh nutzen
+  (z.B. Programme f&uuml;r den ZX&nbsp;Spectrum&nbsp;48K),
+  m&uuml;ssen Sie zum H&ouml;ren dieser T&ouml;ne die Audiofunktion
+  <a href="audio.htm#data_out">Daten am Audioausgang ausgeben</a>
+  aktivieren.
+ <br/><br/>
+
+ <h3><a name="fileformats">2.2. Unterst&uuml;tzte Dateiformate</a></h3>
+  Die vorallem bei ZX-Sprectrum-Emulatoren gebr&auml;uchlichen Dateiformate
+  <a href="fileformats.htm#csw">CSW</a> (*.csw),
+  <a href="fileformats.htm#tzx">TZX</a> (*.tzx) und
+  <a href="fileformats.htm#tap">ZX-TAP</a> (*.tap)
+  werden hier Tape-Dateien genannt
+  und k&ouml;nnen &uuml;ber die Audiofunktion
+  <a href="audio.htm#file_in">Sound- oder Tape-Datei lesen</a>
+  in JKCEMU geladen werden.
+  Schreibunterst&uuml;tzung gibt es f&uuml;r CSW- und TZX-Dateien
+  &uuml;ber die Audiofunktion
+  <a href="audio.htm#file_out">Sound- oder Tape-Datei speichern</a>.
+ <br/><br/>
+
+ <h3>
+  <a name="save_basic">2.3. BASIC-Programm in einer Sound- oder Tape-Datei speichern</a>
+ </h3>
+  Beim Speichern eines BASIC-Programms in eine Sound- oder Tape-Datei
+  wird folgende Vorgehensweise empfohlen:
+  <ol>
+   <li>
+    Kommando zum Speichern auf Kassette eingeben (<tt>SAVE "name"</tt>)
+    und <em>Enter</em> dr&uuml;cken,<br/>
+    Es erscheint die Meldung, dass man den Kassettenrecorder starten
+    und anschlie&szlig;end eine Taste dr&uuml;cken soll.
+   </li>
+   <li>
+    Audiofunktion <a href="audio.htm#file_out">Sound-oder Tape-Datei speichern</a>
+    aktivieren
+   </li>
+   <li>
+    Fenster mit dem emulierten ZX&nbsp;Spectrum wieder aktiviern
+    und eine Taste dr&uuml;cken.
+   </li>
+   <li>
+    Nachdem der emulierte ZX&nbsp;Spectrum mit dem Speichern fertig ist,
+    die Audiofunktion deaktivieren
+   </li>
+  </ol>
+ <br/>
+  Bei einer anderen Vorgehensweise kann es bei langsamer Bedienung vorkommen,
+  dass der Emulator das Ende der Datenausgabe erkennt,
+  bevor Sie das Kommando zum Speichern eingegeben haben
+  und dadurch die Audiofunktion automatisch beendet wird.
+</body>
+</html>

@@ -1,0 +1,245 @@
+<html>
+<body>
+ <h1><a href="../basicc.htm">BASIC-Compiler</a></h1>
+
+ <h2>Compiler-Optionen</h2>
+  Beim erstmaligen Compilieren eines Quelltextes oder
+  wenn Sie den Men&uuml;punkt <em>BASIC-Programm compilieren mit...</em>
+  aufrufen, erscheint ein Fenster,
+  in dem Sie Optionen einstellen k&ouml;nnen.
+  Diese Optionen beeinflussen die Arbeitsweise des Compilers.
+ <br/><br/>
+  Haben Sie mehrere BASIC-Quelltexte im
+  <a href="../texteditor.htm">Texteditor</a> ge&ouml;ffnet,
+  werden die Compiler-Optionen f&uuml;r jeden Quelltext separat verwaltet.
+ <br/><br/>
+  Die BASIC-Compiler-Optionen unterteilen sich in mehrere Gruppen,
+  die nachfolgend beschrieben werden.
+ <br/><br/>
+
+ <h3>1. Optionen in der Gruppe <em>Allgemein</em></h3>
+  <ul>
+   <li>
+    <b>Zielsystem</b><br/>
+    Diese Einstellung gibt an, f&uuml;r welches
+    <a href="targets.htm">Zielsystem</a> der Programmcode erzeugt werden soll.
+    Standardm&auml;&szlig;ig ist ein Zielsystem voreingestellt,
+    dass dem gerade emulierten System entspricht, vorausgesetzt,
+    dieses wird vom Compiler auch unterst&uuml;tzt.
+    <br/><br/>
+   </li>
+   <li>
+    <b>Name des Programms</b><br/>
+    Diese Einstellung gibt es nur bei bestimmten Zielsystemen.
+    Damit wird der Name angegeben, mit dem das Programm gestartet wird.
+    <br/><br/>
+   </li>
+   <li>
+    <b>Anfangsadresse</b><br/>
+    Mit der Anfangsadresse legen Sie den Programmstandort im Adressbereich
+    des Arbeitsspeichers fest.
+    Ein f&uuml;r das Zielsystem passenden Wert ist voreingestellt.
+    Der Wert kann beliebig ge&auml;ndert werden.
+    Allerdings m&uuml;ssen Sie selbst darauf achten,
+    dass das compilierte Programm vollst&auml;ndig in einem geeigneten
+    Adressbereich liegt bzw. dort hineinpasst.
+    <br/><br/>
+   </li>
+   <li>
+    <b>Variablen/Speicherzellen</b><br/>
+    Hiermit legen Sie fest, wo die Variablen, die Speicherzellen und,
+    sofern gew&uuml;nscht, der eigene Stack-Bereich im Adressbereich
+    des Arbeitsspeichers liegen sollen.
+    Dieser Bereich muss RAM sein.
+    Wenn Sie f&uuml;r die Variablen und Speicherzellen keine Adresse angeben,
+    liegen sie direkt hinter dem Programmcode.
+    Das bedeutet aber auch, dass das compilierte Programm
+    nur im RAM lauff&auml;hig ist.
+    M&ouml;chten Sie ROM-f&auml;higen Programmcode erzeugen,
+    m&uuml;ssen Sie eine im RAM liegende Adresse f&uuml;r
+    die Variablen und Speicherzellen angeben.
+    <br/><br/>
+   </li>
+   <li>
+    <b>Gr&ouml;&szlig;e Zeichenkettenspeicher</b><br/>
+    Im Zeichenkettenspeicher werden die Zeichenketten abgelegt,
+    die in String-Variablen gespeichert sind.
+    Die ben&ouml;tigte Gr&ouml;&szlig;e des Speichers h&auml;ngt
+    wesentlich von der Anzahl der String-Variablen und
+    der L&auml;nge der darin gespeicherten Zeichenketten ab,
+    aber auch von der Anzahl der get&auml;tigten Wertzuweisungen.
+    <br/><br/>
+   </li>
+   <li>
+    <b>Stack</b><br/>
+    Hier wird die Gr&ouml;&szlig;e des Stack-Bereichs festgelegt.
+    Dieser muss um so gr&ouml;&szlig;er sein,
+    je mehr Unterprogramme geschachtelt aufgerufen werden.
+    Insbesondere bei
+    <a href="usersubs.htm">benutzerdefinierten Funktionen und Prozeduren</a>
+    ist ein gro&szlig;er Stack-Bereich erforderlich,
+    da die Argumente und lokalen Variablen auf dem Stack abgelegt werden.
+    Die Verwendung des System-Stacks ist auch m&ouml;glich,
+    aber nur dann zu empfehlen, wenn das BASIC-Programm kaum Unterprogramme
+    aufruft und man sich auch sonst sicher ist,
+    dass der System-Stack ausreichend gro&szlig; ist.
+    <br/><br/>
+   </li>
+   <li>
+    <b>Sprache der Laufzeitausschriften</b><br/>
+    Hier geben Sie an, in welcher Sprache Fehlermeldungen und sonstige
+    Ausschriften im compilierten Programms erscheinen sollen.
+   </li>
+  </ul>
+ <br/><br/>
+
+ <h3>2. Optionen in der Gruppe <em>Laufzeiteigenschaften</em></h3>
+  <ul>
+   <li>
+    <b>Compilieren f&uuml;r Test und Debugging</b><br/>
+    Diese Option sollte aktiviert sein,
+    wenn sich das BASIC-Programm noch in der Entwicklung befindet.
+    Dabei werden in das Programm diverse Laufzeitpr&uuml;fungen
+    hineincompiliert, die bei Programmfehlern daf&uuml;r sorgen,
+    dass das Programmm nicht unkontrolliert abst&uuml;rzt,
+    sondern mit einer Fehlerausschrift kontrolliert beendet wird.
+    Durch diese zus&auml;tzlichen Laufzeitpr&uuml;fungen
+    wird das compilierte Programm entsprechend gr&ouml;&szlig;er
+    und auch etwas langsamer.
+    <br/><br/>
+   </li>
+   <li>
+    <b>Compilieren f&uuml;r Produktiveinsatz</b><br/>
+    Bei dieser Option werden keine zus&auml;tzlichen Laufzeitpr&uuml;fungen
+    hineincompiliert.
+    Programmfehler k&ouml;nnen zu einem unkontrollierten Absturz f&uuml;hren.
+    Die Option sollte dann eingeschaltet werden,
+    wenn das BASIC-Programm fertig entwickelt und ausreichend
+    getestet ist und man den k&uuml;rzesten und schnellsten Programmcode
+    erzeugen m&ouml;chte.
+    <br/><br/>
+   </li>
+   <li>
+    <b>Benutzerdefiniert</b><br/>
+    Bei dieser Option legen Sie selbst fest,
+    welche einzelnen Laufzeitpr&uuml;fungen in das Programm
+    hineincompiliert werden.
+   </li>
+  </ul>
+ <br/><br/>
+
+ <h3>3. Optionen in der Gruppe <em>Treiber</em></h3>
+  <ul>
+   <li>
+    <b>Bei Verwendung der OPEN-Anweisung folgende Treiber einbinden: ...</b>
+    <br/>
+    Mit der <a href="instructions.htm#open">OPEN</a>-Anweisung werden
+    Ein-/Ausgabekan&auml;le ge&ouml;ffnet.
+    Dazu m&uuml;ssen bestimmte Treiber im kompilierten Programm
+    enthalten sein.
+    Der Compiler bindet standardm&auml;&szlig;ig alle Treiber ein,
+    die er entsprechend des BASIC-Programms und des Zielsystems
+    als ben&ouml;tigt erachtet.
+    Es kann jedoch sein,
+    dass ein bestimmter Treiber gar nicht ben&ouml;tigt wird,
+    weil z.B. das Programm so geschrieben ist,
+    dass es niemals einen Ein-/Ausgabekanal zu dem betreffenden Ger&auml;t
+    &ouml;ffnen wird.
+    Wenn Sie das wissen, k&ouml;nnen Sie die nicht ben&ouml;tigten Treiber
+    ausschalten und so die Gr&ouml;&szlig;e des kompilierten Programms
+    verringern.
+    <br/><br/>
+   </li>
+  </ul>
+ <br/><br/>
+
+ <h3>4. Optionen in der Gruppe <em>Erzeugter Programmcode</em></h3>
+  <ul>
+   <li>
+    <b>Programmcode in Emulator laden</b><br/>
+    Ist die Option eingeschaltet, wird nach jedem erfolgreichen
+    Compiler-Lauf der erzeugte Programmcode in den Arbeitsspeicher
+    des Emulators geladen.
+    Das Programm kann dann im Emulator gestartet werden.
+    <br/><br/>
+   </li>
+   <li>
+    <b>Programmcode in Datei speichern</b><br/>
+    Bei dieser Option wird der erzeugte Programmcode in eine Datei
+    geschrieben, deren Namen Sie angeben m&uuml;ssen.
+    Das Format der Datei h&auml;ngt von der angegebenen Dateiendung ab.
+    <br/><br/>
+    <b>Achtung!</b> Bei KCC-, KCM- und TAP-Dateien gibt es abh&auml;ngig
+    vom Zielsystem Unterschiede im Dateiformat .
+    Wenn ein Zielsystem f&uuml;r KC85/1, KC87 oder Z9001 ausgew&auml;hlt
+    ist, wird im Dateikopf der Dateityp <em>COM</em> eingetragen
+    sowie bei TAP-Dateien mit der Blocknummer&nbsp;0 begonnen.
+    Bei allen anderen Zielsystemen wird kein Dateityp eingetragen.
+    Au&szlig;erdem beginnen dann TAP-Dateien entsprechend den HC900-
+    und KC85/2..5-Konventionen mit der Blocknummer&nbsp;1.
+   </li>
+  </ul>
+ <br/><br/>
+
+ <h3>5. Optionen in der Gruppe <em>Sonstiges</em></h3>
+  <ul>
+   <li>
+    <b>Bei Nicht-ASCII-Zeichen warnen</b><br/>
+    Der Zeichensatz des Texteditor kann sich
+    (und wird es in den meisten F&auml;llen wohl auch)
+    vom Zeichensatz des Zielsystems unterscheiden.
+    Wenn Sie im BASIC-Programm in einer Zeichenkette ein Nicht-ASCII-Zeichen
+    schreiben (z.B. einen deutschen Umlaut),
+    wird dieses Zeichen auf dem Zielsystem wahrscheinlich anders aussehen.
+    Ist die Option eingeschaltet, werden Sie auf solche Zeichen
+    aufmerksam gemacht.
+    <br/><br/>
+   </li>
+   <li>
+    <b>Bei nicht verwendeten Funktionen, Prozeduren und Variablen warnen</b>
+    <br/>
+    Haben Sie Funktionen, Prozeduren oder Variablen deklariert oder
+    implementiert, die nirgends aufgerufen oder verwendet werden,
+    meldet der Compiler ein Warnung.
+    H&auml;ufig ist das ein Indiz f&uuml;r einen Schreibfehler
+    im Namen der betreffenden Funktion, Prozedur oder Variable.
+    <br/><br/>
+   </li>
+   <li>
+    <b>Relative Spr&uuml;nge bevorzugen</b><br/>
+    Spr&uuml;nge zu bestimmten Anweisungen werden als absolute Spr&uuml;nge
+    mit drei Bytes &uuml;bersetzt,
+    da beim Compilieren die Sprungdistanz nicht bekannt ist.
+    Wird die Option eingeschaltet,
+    &uuml;bersetzt der Compiler die Spr&uuml;nge,
+    die wahrscheinlich nur eine kurze Sprungweite haben,
+    mit relativen Sprungbefehlen, die nur zwei Bytes lang sind
+    und auch schneller ausgef&uuml;hrt werden als absolute Spr&uuml;nge.
+   <br/><br/>
+    Spr&uuml;nge mit einer wahrscheinlich kurzen Sprungweite
+    sind z.B. Spr&uuml;nge zum ELSE-Zweig innerhalb einer
+    einzeiligen IF-Anweisung.
+   <br/><br/>
+    In seltenen F&auml;llen kann es vorkommen,
+    dass die Sprungdistanz f&uuml;r einen relativen Sprung zu gro&szlig; ist,
+    z.B. wenn sehr viele Anweisungen in einer Programmzeile
+    mit einer IF-Anweisung stehen.
+    In dem Fall meldet dann der Assembler,
+    der automatisch nach dem eigentlichen Compiler gestartet wird,
+    &quot;Relative Sprungdistanz zu gro&szlig;&quot;.
+    F&uuml;r Sie bedeutet das nur,
+    dass Sie die Option ausschalten m&uuml;ssen,
+    wenn die besagte Fehlermeldung erscheint.
+    <br/><br/>
+   </li>
+   <li>
+    <b>Erzeugten Assembler-Code anzeigen</b><br/>
+    Schalten Sie die Option ein, wenn Sie sich f&uuml;r den
+    vom BASIC-Compiler erzeugten Programmcode interessieren.
+    Dieser wird dann in einem neuen Unterfenster
+    im <a href="../texteditor.htm">Texteditor</a> angezeigt.
+   </li>
+  </ul>
+ <br/>
+</body>
+</html>

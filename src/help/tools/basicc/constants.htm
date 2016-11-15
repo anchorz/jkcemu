@@ -1,0 +1,403 @@
+<html>
+<body>
+ <h1><a href="../basicc.htm">BASIC-Compiler</a></h1>
+
+ <h2>Konstanten</h2>
+  Konstanten enthalten einen numerischen Wert,
+  der sich w&auml;hrend der Programmlaufs nicht ver&auml;ndern kann.
+  Es ist aber m&ouml;glich, dass der Wert einer Konstante
+  von einem zum anderen Zielsystem unterschiedlich ist
+  (z.B. bei den Farben) oder auch von einem zum n&auml;chsten
+  Compiler-Lauf (z.B. bei den Adressen).
+ <br/><br/>
+  <ul>
+   <li><a href="constants.htm#boolean">1. Boolsche Werte</a></li>
+   <li><a href="constants.htm#color">2. Farben</a></li>
+   <li><a href="constants.htm#pen">3. Grafikstifte</a></li>
+   <li><a href="constants.htm#joyst">4. Joystick</a></li>
+   <li><a href="constants.htm#error">5. Fehlercodes</a></li>
+   <li><a href="constants.htm#target">6. Zielsysteme</a></li>
+   <li><a href="constants.htm#system">7. Systemkonstanten</a></li>
+  </ul>
+ <br/>
+
+ <h3><a name="boolean">1. Boolsche Werte</a></h3>
+  <table border="1">
+   <tr><th>Konstante</th><th>Wert</th><th>Bedeutung</th></tr>
+   <tr>
+    <td valign="top">FALSE</td>
+    <td valign="top">0</td>
+    <td valign="top">
+     Wert f&uuml;r &quot;falsch&quot; (kein Bit gesetzt)
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">TRUE</td>
+    <td valign="top">-1</td>
+    <td valign="top">
+     Wert f&uuml;r &quot;wahr&quot; (alle Bits gesetzt)
+    </td>
+   </tr>
+  </table>
+ <br/>
+
+ <h3><a name="color">2. Farben</a></h3>
+  Die Konstanten f&uuml;r die Farben sind f&uuml;r die Anwendung
+  bei den Anweisungen
+  <a href="instructions.htm#border">BORDER</a>,
+  <a href="instructions.htm#color">COLOR</a>,
+  <a href="instructions.htm#ink">INK</a> und
+  <a href="instructions.htm#paper">PAPER</a> gedacht.
+  Damit muss man zumindest f&uuml;r die acht Hauptfarben
+  nicht die konkreten Farbnummern des Zielsystems kennen und
+  kann somit plattform&uuml;bergreifende BASIC-Programme schreiben.
+ <br/><br/>
+  <table border="1">
+   <tr><th>Konstante</th><th>Bedeutung</th></tr>
+   <tr>
+    <td valign="top">BLACK</td>
+    <td valign="top">Code f&uuml;r die Farbe schwarz</td>
+   </tr>
+   <tr>
+    <td valign="top">BLINKING</td>
+    <td valign="top">
+     Code f&uuml;r Blinken,<br/>
+     BLINKING wird nur in Verbindung mit einer Vordergrundfarbe
+     eingesetzt, z.B.:<br/><br/>
+     <tt>
+      &nbsp;INK RED+BLINKING: &nbsp;PRINT "Ich blinke rot";<br/>
+      &nbsp;INK WHITE: &nbsp;PRINT "weiss ohne blinken";
+     </tt>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">BLUE</td>
+    <td valign="top">Code f&uuml;r die Farbe blau</td>
+   </tr>
+   <tr>
+    <td valign="top">CYAN</td>
+    <td valign="top">Code f&uuml;r die Farbe t&uuml;rkis</td>
+   </tr>
+   <tr>
+    <td valign="top">GREEN</td>
+    <td valign="top">Code f&uuml;r die Farbe gr&uuml;n</td>
+   </tr>
+   <tr>
+    <td valign="top">MAGENTA</td>
+    <td valign="top">Code f&uuml;r die Farbe magenta</td>
+   </tr>
+   <tr>
+    <td valign="top">RED</td>
+    <td valign="top">Code f&uuml;r die Farbe rot</td>
+   </tr>
+   <tr>
+    <td valign="top">WHITE</td>
+    <td valign="top">Code f&uuml;r die Farbe wei&szlig;</td>
+   </tr>
+   <tr>
+    <td valign="top">YELLOW</td>
+    <td valign="top">Code f&uuml;r die Farbe gelb</td>
+   </tr>
+  </table>
+ <br/>
+
+ <h3><a name="pen">3. Grafikstifte</a></h3>
+  Die Konstanten f&uuml;r die Grafikstifte werden als Parameter f&uuml;r die
+  <a href="instructions.htm#pen">PEN</a>-Anweisung verwendet.
+  und sind auch dort beschrieben.
+ <br/><br/>
+  <table border="1">
+   <tr><th>Konstante</th><th>Bedeutung</th></tr>
+   <tr>
+    <td valign="top"><tt>PEN_NONE</tt></td>
+    <td>Stift angehoben</td>
+   </tr>
+   <tr>
+    <td valign="top"><tt>PEN_NORMAL</tt></td>
+    <td>normaler Zeichenmodus</td>
+   </tr>
+   <tr>
+    <td valign="top"><tt>PEN_RUBBER</tt></td>
+    <td>L&ouml;schmodus</td>
+   </tr>
+   <tr>
+    <td valign="top"><tt>PEN_XOR</tt></td>
+    <td>XOR-Modus</td>
+   </tr>
+  </table>
+ <br/>
+ 
+ <h3><a name="joyst">4. Joystick</a></h3>
+  Die Joystick-Konstanten dienen zur Auswertung des R&uuml;ckgabewertes
+  der <a href="functions.htm#joyst">JOYST</a>-Funktion.
+  Dazu ist der R&uuml;ckgabewert mit der jeweiligen Konstante mit
+  <a href="expressions.htm#operators2"><tt>AND</tt></a> zu verkn&uuml;pfen.
+ <br/><br/>
+  <table border="1">
+   <tr><th>Konstante</th><th>Bedeutung</th></tr>
+   <tr>
+    <td valign="top"><tt>JOYST_LEFT</tt></td>
+    <td>Joystick nach links gedr&uuml;ckt</td>
+   </tr>
+   <tr>
+    <td valign="top"><tt>JOYST_RIGHT</tt></td>
+    <td>Joystick nach rechts gedr&uuml;ckt</td>
+   </tr>
+   <tr>
+    <td valign="top"><tt>JOYST_UP</tt></td>
+    <td>Joystick nach nach oben gedr&uuml;ckt</td>
+   </tr>
+   <tr>
+    <td valign="top"><tt>JOYST_DOWN</tt></td>
+    <td>Joystick nach nach unten gedr&uuml;ckt</td>
+   </tr>
+   <tr>
+    <td valign="top"><tt>JOYST_BUTTON1</tt></td>
+    <td>Aktionsknopf&nbsp;1 gedr&uuml;ckt</td>
+   </tr>
+   <tr>
+    <td valign="top"><tt>JOYST_BUTTON2</tt></td>
+    <td>Aktionsknopf&nbsp;2 gedr&uuml;ckt</td>
+   </tr>
+   <tr>
+    <td valign="top"><tt>JOYST_BUTTONS</tt></td>
+    <td>Aktionsknopf&nbsp;1 oder 2 gedr&uuml;ckt</td>
+   </tr>
+  </table>
+ <br/>
+
+ <h3><a name="error">5. Fehlercodes</a></h3>
+  Die Fehlercodekonstanten dienen zur Auswertung der Systemvariable
+  <a href="functions.htm#err">ERR</a>.
+ <br/><br/>
+  <table border="1">
+   <tr><th>Konstante</th><th>Bedeutung</th></tr>
+   <tr>
+    <td valign="top">E_CHANNEL_ALREADY_OPEN</td>
+    <td valign="top">
+     Es wurde versucht, einen Ein-/Ausgabekanal zu &ouml;ffnen,
+     der bereits offen ist.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_CHANNEL_CLOSED</td>
+    <td valign="top">
+     Es wurde eine Anweisung oder eine Funktion zur Ein-/Ausgabe
+     an einem Kanal aufgerufen, der nicht offen ist.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_DEVICE_LOCKED</td>
+    <td valign="top">
+     Das Ein-/Ausgabeger&auml;t ist bereits in Benutzung und
+     kann nicht gleichzeitig mehrfach benutzt werden.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_DEVICE_NOT_FOUND</td>
+    <td valign="top">
+     Das angegebene Ein-/Ausgabeger&auml;t wurde nicht gefunden.
+     Entweder ist das Ger&auml;t nicht vorhanden oder nicht betriebsbereit
+     oder f&uuml;r das Zielsystem wird das Ger&auml;t nicht unterst&uuml;tzt
+     oder der Ger&auml;tename wurde falsch geschrieben.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_DISK_FULL</td>
+    <td valign="top">
+     Die Datei konnte nicht zum Schreiben ge&ouml;ffnet oder
+     die Ausgabeoperation nicht ausgef&uuml;hrt werden,
+     weil das Speichermedium voll ist.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_EOF</td>
+    <td valign="top">
+     Es wurde versucht, &uuml;ber das Dateiende hinaus zu lesen.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_ERROR</td>
+    <td valign="top">
+     Es ist ein allgemeiner bzw. nicht n&auml;her spezifizierter Fehler
+     aufgetreten.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_FILE_NOT_FOUND</td>
+    <td valign="top">
+     Die angegebene Datei wurde nicht gefunden.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_INVALID</td>
+    <td valign="top">
+     Die Operation ist nicht erlaubt oder ein Parameter
+     enth&auml;lt einen ung&uuml;ltigen Wert.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_IO_ERROR</td>
+    <td valign="top">Die Ein-/Ausgabeoperation ist fehlgeschlagen.</td>
+   </tr>
+   <tr>
+    <td valign="top">E_IO_MODE</td>
+    <td valign="top">
+     Die Operation ist mit der Betriebsart nicht m&ouml;glich,
+     mit der der Kanal ge&ouml;ffnet wurde.
+     Der Fehler tritt z.B. auf, wenn versucht wird,
+     von einem Ausgabekanal zu lesen oder
+     in einen Eingabekanal zu schreiben.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_NO_DISK</td>
+    <td valign="top">
+     Das Speichermedium ist nicht vorhanden,
+     z.B. Diskette nicht eingelegt oder USB-Speicher nicht angeschlossen.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_OK</td>
+    <td valign="top">
+     Die betreffende Anweisung oder Funktion wurde erfolgreich
+     ausgef&uuml;hrt, d.h., es ist kein Fehler aufgetreten.
+     E_OK hat den numerischen Wert&nbsp;0.
+     Dadurch kann auf einen Fehler auch ohne Vergleichsoperator
+     getestet werden:
+     <br/><br/>
+     <tt>IF ERR THEN PRINT "Fehler"</tt>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_OVERFLOW</td>
+    <td valign="top">
+     Es ist ein numerischer &Uuml;berlauf aufgetreten.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_PATH_NOT_FOUND</td>
+    <td valign="top">
+     Der angegebene Pfad wurde nicht gefunden.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">E_READ_ONLY</td>
+    <td valign="top">
+     Es wurde versucht, eine schreibgesch&uuml;tzte Datei oder
+     eine Datei auf einem schreibgesch&uuml;tzten Speichermedium
+     zum Schreiben zu &ouml;ffnen.
+    </td>
+   </tr>
+  </table>
+ <br/>
+
+ <h3><a name="target">6. Konstanten f&uuml;r Zielsysteme</a></h3>
+  <table border="1">
+   <tr><th>Konstante</th><th>Zielsystem</th></tr>
+   <tr>
+    <td valign="top">TARGET_AC1</td>
+    <td valign="top">
+     <a href="targets.htm#ac1">AC1-2010, AC1-SCCH mit optionaler Farbgrafikkarte</a>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">TARGET_CPM</td>
+    <td valign="top">
+     <a href="targets.htm#cpm">CP/M-kompatibel</a>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">TARGET_HUEBLER</td>
+    <td valign="top">
+     <a href="targets.htm#huebler">H&uuml;bler-Grafik-MC</a>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">TARGET_KC85</td>
+    <td valign="top">
+     <a href="targets.htm#kc85">KC85/2..5, HC900</a>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">TARGET_KC85_4</td>
+    <td valign="top">
+     <a href="targets.htm#kc85_4">KC85/4..5 mit Unterst&uuml;tzung beider Bildspeicher</a>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">TARGET_KRAMER</td>
+    <td valign="top">
+     <a href="targets.htm#kramer">Kramer-MC</a>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">TARGET_LLC2</td>
+    <td valign="top">
+     <a href="targets.htm#llc2">LLC2 mit HIRES-Grafik</a>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">TARGET_SCCH</td>
+    <td valign="top">
+     <a href="targets.htm#scch">SCCH (AC1-2010, AC1-SCCH, LLC2)</a>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">TARGET_Z1013</td>
+    <td valign="top">
+     <a href="targets.htm#z1013">Z1013</a>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">TARGET_Z1013_64X16</td>
+    <td valign="top">
+     <a href="targets.htm#z1013_64x16">Z1013 mit Peters-Platine</a>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">TARGET_Z9001</td>
+    <td valign="top">
+     <a href="targets.htm#z9001">KC85/1, KC87, Z9001</a>
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">TARGET_Z9001_KRT</td>
+    <td valign="top">
+     <a href="targets.htm#z9001krt">KC85/1, KC87, Z9001 mit KRT-Grafik</a>
+    </td>
+   </tr>
+  </table>
+ <br/>
+
+ <h3><a name="system">7. Systemkonstanten</a></h3>
+  <table border="1">
+   <tr><th>Konstante</th><th>Bedeutung</th></tr>
+   <tr>
+    <td valign="top">GRAPHICSCREEN</td>
+    <td valign="top">
+     Die Konstante ist als Parameter f&uuml;r die
+     <a href="instructions.htm#screen">SCREEN</a>-Anweisung gedacht
+     und enth&auml;lt die Nummer des grafikf&auml;higen Bildschirms.
+     Unterst&uuml;tzt das Zielsystem keine Grafik,
+     hat die Konstante den Wert&nbsp;-1.
+   </tr>
+   <tr>
+    <td valign="top">LASTSCREEN</td>
+    <td valign="top">
+     H&ouml;chstm&ouml;gliche Bildschirmnummer,
+     die mit der <a href="instructions.htm#screen">SCREEN</a>-Anweisung
+     eingestellt werden kann
+   </tr>
+   <tr>
+    <td valign="top">TOP</td>
+    <td valign="top">
+     Adresse des ersten freien Bytes hinter dem vom compiliertem
+     BASIC-Programm belegten bzw. benutzten Speicher
+    </td>
+   </tr>
+  </table>
+ <br/>
+</body>
+</html>
+

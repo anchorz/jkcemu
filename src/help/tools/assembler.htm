@@ -1,0 +1,1195 @@
+<html>
+<body>
+ <h1>Assembler</h1>
+  Im Emulator ist ein Assembler integriert,
+  den Sie &uuml;ber den <a href="texteditor.htm">Texteditor</a>
+  aufrufen k&ouml;nnen, d.h., den Assembler-Quelltext
+  &ouml;ffnen, bearbeiten und assemblieren Sie im Texteditor.
+  Alternativ kann der Assembler auch als eigenst&auml;ndiges
+  Kommandozeilenprogramm aufgerufen werden
+  (siehe <a href="assembler.htm#cmdline">Kommandozeile</a>).
+ <br/><br/>
+  Die Beschreibung des Assemblers unterteilt sich in folgende Rubriken:
+  <ul>
+   <li><a href="assembler.htm#options">1. Assembler-Optionen</a></li>
+   <li>
+    <a href="assembler.htm#msg">2. Assembler-Ausgaben und Fehlermeldungen</a>
+   </li>
+   <li><a href="assembler.htm#general_syntax">3. Allgemeine Syntax</a></li>
+   <li>
+    &nbsp;&nbsp; <a href="assembler.htm#case">3.1. Gro&szlig;- und Kleinschreibung</a>
+   </li>
+   <li>
+    &nbsp;&nbsp; <a href=assembler.htm#line_syntax">3.2. Aufbau einer Assembler-Quelltextzeile</a>
+   </li>
+   <li>
+    &nbsp;&nbsp; <a href="assembler.htm#instructions">3.4. Assembler-Befehle</a>
+   </li>
+   <li>
+    &nbsp;&nbsp; <a href="assembler.htm#comments">3.5. Kommentare</a>
+   </li>
+   <li><a href="assembler.htm#pseudo_inst">4. Pseudobefehle</a></li>
+   <li>
+    <a href="assembler.htm#special_syntax">5. Mnemonik und Syntax: Zilog oder Robotron?</a>
+   </li>
+   <li>
+    <a href="assembler.htm#undoc">6. Undokumentierte Prozessorbefehle</a>
+   </li>
+   <li>
+    &nbsp;&nbsp; <a href="assembler.htm#ixy8">6.1. Zugriff auf die einzelnen Bytes der Index-Register</a>
+   </li>
+   <li>
+    &nbsp;&nbsp; <a href="assembler.htm#inf">6.2. Eingabebefehl: Nur Flag-Register setzen</a>
+   </li>
+   <li>
+    &nbsp;&nbsp; <a href="assembler.htm#sll">6.3. Logischer Linksschiebebefehl</a>
+   </li>
+   <li>
+    &nbsp;&nbsp;
+    <a href="assembler.htm#undoc_single_bit">
+     6.4. Rotations-, Schiebe- und Einzelbitbefehle mit Indexregistern,
+          die auch auf ein anderes Register wirken</a>
+   </li>
+   <li><a href="assembler.htm#expr">7. Numerische Ausdr&uuml;cke</a></li>
+   <li>
+    &nbsp;&nbsp; <a href="assembler.htm#num_literal">7.1. Zahlenliteral</a>
+   </li>
+   <li>
+    &nbsp;&nbsp; <a href="assembler.htm#char_literal">7.2. Zeichenliteral</a>
+   </li>
+   <li>
+    &nbsp;&nbsp; <a href="assembler.htm#functions">7.3. Funktionen</a>
+   </li>
+   <li>
+    &nbsp;&nbsp; <a href="assembler.htm#unary_op">7.4. Un&auml;re Operatoren</a>
+   </li>
+   <li>
+    &nbsp;&nbsp; <a href="assembler.htm#binary_op">7.5. Bin&auml;re Operatoren</a>
+   </li>
+   <li>
+    &nbsp;&nbsp; <a href="assembler.htm#cur_addr">7.6. Aktuelle Adresse</a>
+   </li>
+   <li><a href="assembler.htm#string_literal">8. Zeichenketten</a></li>
+   <li>
+    <a href="assembler.htm#conditional_asm">9. Bedingte Assemblierung</a>
+   </li>
+   <li><a href="assembler.htm#cmdline">10. Kommandozeile</a></li>
+  </ol>
+ <br/><br/>
+
+
+ <h2><a name="options">1. Assembler-Optionen</a></h2>
+  Mit den Assembler-Optionen beeinflussen Sie die Arbeitsweise
+  des Assemblers, insbesondere hinsichtlich der unterst&uuml;tzten
+  Mnemonik und Syntax sowie was mit dem erzeugten Programmcode
+  geschehen soll.
+  Die Assembler-Optionen stellen Sie in einem Fenster ein,
+  dass beim erstmaligen Starten des Assemblers erscheint.
+  Au&szlig;erdem k&ouml;nnen Sie die Optionen jederzeit
+  mit dem Men&uuml;punkt <em>Assemblieren mit...</em>
+  aufrufen und ver&auml;ndern.
+ <br/><br/>
+  In den Assembler-Optionen k&ouml;nnen Sie u.a. auch eine Datei angeben,
+  in der der erzeugte Programmcode geschrieben wird.
+  Das Format der Datei ergibt sich dabei aus der Dateiendung
+  (*.tap ergibt eine <a href="../fileformats.htm#kctap">KC-TAP</a>-Datei).
+ <br/><br/>
+  <b>Achtung!</b>
+  Bei <a href="../fileformats.htm#kcc">KCC</a>-,
+  <a href="../fileformats.htm#kcm">KCM</a>- und
+  <a href="../fileformats.htm#kctap">KC-TAP</a>-Dateien gibt es Unterschiede
+  zwischen KC85/1, KC87 und Z9001 auf der einen sowie HC900 und KC85/2..5
+  auf der anderen Seite.
+  Damit der Assembler das richtige Dateiformat erzeugt,
+  orientiert er sich am gerade emulierten System.
+  Emuliert JKCEMU gerade einen KC85/1, KC87 oder Z9001,
+  wird in den Dateikopf der Dateityp <em>COM</em> eingetragen
+  und bei KC-TAP-Dateien mit der Blocknummer&nbsp;0 begonnen.
+  In allen anderen F&auml;llen wird kein Dateityp eingetragen.
+  Au&szlig;erdem beginnen dann KC-TAP-Dateien entsprechend den HC900-
+  und KC85/2..5-Konventionen mit der Blocknummer&nbsp;1.
+ <br/><br/>
+  Wenn Sie mehrere Assembler-Quelltexte im Texteditor ge&ouml;ffnet haben,
+  werden die Assembler-Optionen f&uuml;r jeden Quelltext separat verwaltet.
+ <br/><br/>
+
+
+ <h2><a name="msg">2. Assembler-Ausgaben und Fehlermeldungen</a></h2>
+  Alle Assembler-Ausgaben, d.h. Meldungen &uuml;ber den
+  Abarbeitungsfortschritt, Fehlermeldungen, Warnungen
+  und, sofern in den Assembler-Optionen angegeben,
+  die Ausgabe der Markentabelle erscheinen in einem separaten Fenster,
+  dass mit jedem Start des Assembler ge&ouml;ffnet beziehungsweise
+  auf dem Desktop nach vorn geholt wird.
+  Auf Fehlermeldungen und Warnungen k&ouml;nnen sie doppelt klicken,
+  um direkt zu der betreffenden Stelle im Quelltext zu gelangen.
+ <br/><br/>
+
+
+ <h2><a name="general_syntax">3. Allgemeine Syntax</a></h2>
+
+ <h3><a name="case">3.1. Gro&szlig;- und Kleinschreibung</a></h3>
+  Der Assembler unterscheidet au&szlig;er bei Zeichen- und
+  Zeichenkettenliteralen nicht zwischen Gro&szlig;- und Kleinschreibung,
+  d.h., die Mnemonik der Befehle und die Register k&ouml;nnen
+  sowohl gro&szlig; als auch klein geschrieben werden.
+  Bei den Marken gibt man in den Assembler-Optionen an,
+  ob zwischen Gro&szlig;- und Kleinschreibung unterschieden werden soll.
+ <br/><br/>
+
+ <h3><a name="line_syntax">3.2. Aufbau einer Assembler-Quelltextzeile</a></h3>
+  Die allgemeine Syntax einer Quelltextzeile lautet:
+  <p>
+   <tt>[Marke[:]] [Mnemonik [Argument_1[,Argument_2[,...]]]] [;Kommentar]</tt>
+  </p>
+  <br/>
+  In eckigen Klammern stehende Ausdr&uuml;cke sind optional.
+  Eine Marke muss am Anfang einer Zeile beginnen.
+  Ein Assembler-Befehl (angegeben durch eine Mnemonik) darf nicht
+  am Anfang einer Zeile beginnen, d.h.,
+  wenn die Zeile keine Marke enth&auml;lt,
+  muss vor der Mnemonik mindestens ein Leerzeichen oder ein Tabulator stehen.
+  Eine Ausnahme bilden die Anweisungen f&uuml;r die bedingte Assemblierung.
+  Diese k&ouml;nnen am Zeilenanfang stehen, aber auch einger&uuml;ckt werden.
+ <br/><br/>
+
+ <h3><a name="labels">3.3. Marken</a></h3>
+  Marken haben einen numerischen Wert und werden definiert,
+  indem sie am Anfang einer Assembler-Zeile stehen.
+  Wenn diese Zeile den Pseudobefehl <em>EQU</em> enth&auml;lt,
+  bekommt die Marke den Wert des hinter <em>EQU</em> stehenden Ausdrucks,
+  anderenfalls den Wert der aktuellen Adresse.
+ <br/><br/>
+  Marken k&ouml;nnen als Sprungziele oder in numerischen Ausdr&uuml;cken
+  verwendet werden.
+ <br/><br/>
+  Marken k&ouml;nnen Buchstaben, Ziffern, den Unterstrich,
+  das @-Zeichen sowie Fragezeichen enthalten.
+  Ziffern und das Fragezeichen sind aber nicht am Anfang der Marke erlaubt.
+ <br/><br/>
+  <b>Achtung!</b> Der Assembler legt zur Unterst&uuml;tzung der
+  <a href="assembler.htm#conditional_asm">bedingten Assemblierung</a>
+  automatisch immer die Marke <em>__JKCEMU__</em> mit dem Wert&nbsp;-1
+  (alle Bits gesetzt) an.
+ <br/><br/>
+
+ <h3><a name="instructions">3.4. Assembler-Befehle</a></h3>
+  Die Assembler-Befehle werden in Form einer Mnemonik geschrieben.
+  Der Assembler versteht folgende Befehle:
+  <ul>
+   <li>Pseudobefehle</li>
+   <li>
+    Prozessorbefehle entsprechend der Zilog-Syntax (wenn in den
+    <a href="assembler.htm#options">Assembler-Optionen</a> erlaubt)
+   </li>
+   <li>
+    Prozessorbefehle entsprechend der Robotron-Syntax (wenn in den
+    <a href="assembler.htm#options">Assembler-Optionen</a> erlaubt)
+   </li>
+   <li>
+    Undokumentierte Prozessorbefehle (wenn in den
+    <a href="assembler.htm#options">Assembler-Optionen</a> erlaubt)
+   </li>
+  </ul>
+ <br/>
+
+ <h3><a name="comments">3.5. Kommentare</a></h3>
+  Kommentare beginnen mit einem Semikolon.
+  Alles ab dem Semikolon bis zum Ende der Quelltextzeile wird
+  als Kommentar gewertet und vom Assembler nicht ausgewertet.
+  Dies gilt jedoch nicht, wenn das Semikolon in einen
+  <a href="assembler.htm#char_literal">Zeichenliteral</a> oder einem
+  <a href="assembler.htm#string_literal">Zeichenkettenliteral</a> steht.
+  In dem Fall markiert das Semikolon keinen Kommentar.
+ <br/><br/>
+
+
+ <h2><a name="pseudo_inst">4. Pseudobefehle</a></h2>
+  Der Assembler versteht folgende Pseudobefehle:
+  <table border="1">
+   <tr>
+    <th nowrap>Mnemonik</th>
+    <th nowrap>Anzahl der Argumente</th>
+    <th nowrap>Typ der Argumente</th>
+    <th nowrap>Beschreibung</th>
+   </tr>
+   <tr>
+    <td valign=top><tt>BINCLUDE</tt></td>
+    <td valign=top>1</td>
+    <td valign=top>Zeichenkette</td>
+    <td valign=top>
+     Einbinden einer Bin&auml;rdatei,<br/>
+     Die angegebene Datei wird unver&auml;ndert an der aktuellen Stelle
+     in den erzeugten Programmcode eingef&uuml;gt.
+     Der Dateiname kann ohne oder mit Pfad angegeben werden,
+     wobei sowohl ein absoluter als auch ein relativer Pfad erlaubt sind.
+     Die Pfadaangabe muss den Regeln des Betriebssystems entsprechen,
+     auf dem JKCEMU l&auml;uft.
+     Unabh&auml;ngig davon kann aber ein relativer Pfad auch in einer
+     betriebssystemunabh&auml;ngigen Form (also auch unter Windows)
+     mit einem Slash&nbsp;(/) als Pfadtrennzeichen angegeben werden.
+    </td>
+   <tr>
+    <td valign=top><tt>CPU</tt></td>
+    <td valign=top>1</td>
+    <td valign=top>Schl&uuml;sselwort <tt>U880</tt> oder <tt>Z80</tt></td>
+    <td valign=top>
+     Angabe des Prozessortyps,<br/>
+     Dieser Pseudobefehl ist aus Kompatibilit&auml;tsgr&uuml;nden
+     vorhanden und hat keine Wirkung,
+     da der Assembler sowieso nur diesen einen Prozessortyp unterst&uuml;tzt.
+    </td>
+   </tr>
+   <tr>
+    <td valign=top>
+     <tt>DB</tt><br/>
+     <tt>DEFB</tt><br/>
+     <tt>DEFM</tt><br/>
+     <tt>DFB</tt>
+    </td>
+    <td valign=top>mindestens 1</td>
+    <td valign=top>Numerische Ausdr&uuml;cke oder Zeichenketten</td>
+    <td valign=top>Datenbytes erzeugen</td>
+   </tr>
+   <tr>
+    <td valign=top>
+     <tt>DEFH</tt><br/>
+     <tt>DFH</tt><br/>
+     <tt>HEX</tt>
+    </td>
+    <td valign=top>mindestens 1</td>
+    <td valign=top>
+     Hexadezimalzahlen,<br/>
+     Es k&ouml;nnen Hexadezimalzahlen
+     auch ohne f&uuml;hrende Null und ohne abschlie&szlig;endes
+     <tt>H</tt> angegeben werden.<br/>
+     Beispiel: <tt>DEFH AB</tt>
+    </td>
+    <td valign=top>Datenbytes erzeugen</td>
+   </tr>
+   <tr>
+    <td valign=top>
+     <tt>DEFS</tt><br/>
+     <tt>DFS</tt><br/>
+     <tt>DS</tt>
+    </td>
+    <td valign=top>mindestens 1</td>
+    <td valign=top>Numerische Ausdr&uuml;cke</td>
+    <td valign=top>
+     Speicherbereich reservieren,<br/>
+     Steht der Befehl am Anfang oder am Ende des Quelltextes,
+     wird der Speicherbereich zwar reserviert,
+     d.h. die Adressen mitgez&auml;hlt,
+     jedoch wird kein Programmcode erzeugt.
+     Steht dagegen der Befehl mitten im Quelltext,
+     wird der Bereich mit Null-Bytes aufgef&uuml;llt.
+    </td>
+   </tr>
+   <tr>
+    <td valign=top>
+     <tt>DA</tt><br/>
+     <tt>DEFW</tt><br/>
+     <tt>DFW</tt><br/>
+     <tt>DW</tt>
+    </td>
+    <td valign=top>mindestens 1</td>
+    <td valign=top>Numerische Ausdr&uuml;cke</td>
+    <td valign=top>Datenw&ouml;rter (jeweils 2 Bytes) erzeugen</td>
+   </tr>
+   <tr>
+    <td valign=top><tt>END</tt></td>
+    <td valign=top>0</td>
+    <td></td>
+    <td valign=top>
+     Ende des Quelltextes,<br/>
+     Alle weiteren Quelltextzeilen werden ignoriert.
+    </td>
+   </tr>
+   <tr>
+    <td valign=top><tt>ENT</tt></td>
+    <td valign=top>0</td>
+    <td></td>
+    <td valign=top>
+     Eintrittspunkt in das Programms,<br/>
+     Die aktuelle Adresse wird als Startadresse verwendet.
+     Fehlt der Befehl im Quelltext,
+     gilt die Anfangsadresse als Startadresse.
+    </td>
+   </tr>
+   <tr>
+    <td valign=top><tt>EQU</tt></td>
+    <td valign=top>1</td>
+    <td valign=top>Numerischer Ausdruck</td>
+    <td valign=top>
+     Marke definieren,<br/>
+     Die Quelltextzeile muss eine Marke enthalten,
+     die mit dem angegebenen Wert definiert wird.
+    </td>
+   </tr>
+   <tr>
+    <td valign=top><tt>INCLUDE</tt></td>
+    <td valign=top>1</td>
+    <td valign=top>Zeichenkette</td>
+    <td valign=top>
+     Einbinden einer Quelltextdatei,<br/>
+     Die angegebene Datei wird an der aktuellen Stelle in den Quelltext
+     eingef&uuml;gt und mit assembliert.
+     Bzgl. des Dateinamens gelten die die gleichen Regeln wie beim
+     weiter oben beschriebenen Pseudobefehl BINCLUDE.
+    </td>
+   </tr>
+   <tr>
+    <td valign=top><tt>ORG</tt></td>
+    <td valign=top>1</td>
+    <td valign=top>Numerischer Ausdruck</td>
+    <td valign=top>
+     Programmz&auml;hler (Adresse) auf den angegebenen Wert setzen,<br/>
+     Steht der Befehl mitten im Quelltext,
+     wird der Bereich zwischen der letzten und der neuen Adresse
+     mit Null-Bytes aufgef&uuml;llt.
+    </td>
+   </tr>
+   <tr>
+    <td valign=top><tt>Z80</tt></td>
+    <td valign=top>0</td>
+    <td valign=top></td>
+    <td valign=top>
+     Angabe des Prozessortyps,<br/>
+     Dieser Pseudobefehl ist aus Kompatibilit&auml;tsgr&uuml;nden
+     vorhanden und hat keine Wirkung,
+     da der Assembler sowieso nur einen Prozessortyp unterst&uuml;tzt.
+    </td>
+   </tr>
+  </table>
+ <br/>
+  Alle Pseudobefehle k&ouml;nnen auch mit einem vorangestellten Punkt
+  geschrieben werden, z.B. <tt>.ORG</tt>, <tt>.DB</tt> und so weiter.
+  In dem Fall darf der Pseudobefehl auch am Zeilenanfang stehen.
+ <br/><br/>
+
+
+ <h2>
+  <a name="special_syntax">5. Mnemonik und Syntax: Zilog oder Robotron?</a>
+ </h2>
+  Robotron hat bei einigen Assembler-Befehlen eine von Zilog
+  abweichende Mnemonik eingef&uuml;hrt,
+  teilweise auch eine abweichende Syntax.
+  Der JKCEMU-Assembler unterst&uuml;tzt beide Varianten.
+  In den <a href="assembler.htm#options">Assembler-Optionen</a>
+  k&ouml;nnen Sie aber auch einstellen, dass entweder nur die Zilog-
+  oder nur die Robotron-Mnemonik/-Syntax zugelassen ist.
+ <br/><br/>
+  Die Mnemonik unterscheidet sich bei folgenden Befehlen:
+  <table border="1">
+   <tr>
+    <th nowrap>Assembler-Befehl</th>
+    <th nowrap>Zilog-Mnemonik</th>
+    <th nowrap>Robotron-Mnemonik</th>
+   </tr>
+   <tr>
+    <td valign=top>bedingte CALL-Befehle</td>
+    <td valign=top>
+     <tt>CALL Z</tt><br/>
+     <tt>CALL NZ</tt><br/>
+     <tt>CALL C</tt><br/>
+     <tt>CALL NC</tt><br/>
+     <tt>CALL PE</tt><br/>
+     <tt>CALL PO</tt><br/>
+     <tt>CALL M</tt><br/>
+     <tt>CALL P</tt>
+    </td>
+    <td valign=top>
+     <tt>CAZ</tt><br/>
+     <tt>CANZ</tt><br/>
+     <tt>CAC</tt><br/>
+     <tt>CANC</tt><br/>
+     <tt>CAPE</tt><br/>
+     <tt>CAPO</tt><br/>
+     <tt>CAM</tt><br/>
+     <tt>CAP</tt>
+    </td>
+   </tr>
+   <tr>
+    <td valign=top>Vergleichsbefehle</td>
+    <td valign=top><tt>CP</tt></td>
+    <td valign=top><tt>CMP</tt></td>
+   </tr>
+   <tr>
+    <td valign=top>Austauschbefehl mit AF</td>
+    <td valign=top><tt>EX AF,AF'</tt></td>
+    <td valign=top><tt>EXAF</tt></td>
+   </tr>
+   <tr>
+    <td valign=top>Eingabebefehl: Nur Flag-Register</td>
+    <td valign=top>von Zilog nicht dokumentiert</td>
+    <td valign=top><tt>INF</tt></td>
+   </tr>
+   <tr>
+    <td valign=top>unbedingter absoluter Sprung</td>
+    <td valign=top><tt>JP</tt></td>
+    <td valign=top><tt>JMP</tt></td>
+   </tr>
+   <tr>
+    <td valign=top>bedingte absolute Spr&uuml;nge</td>
+    <td valign=top>
+     <tt>JP Z</tt><br/>
+     <tt>JP NZ</tt><br/>
+     <tt>JP C</tt><br/>
+     <tt>JP NC</tt><br/>
+     <tt>JP PE</tt><br/>
+     <tt>JP PO</tt><br/>
+     <tt>JP M</tt><br/>
+     <tt>JP P</tt>
+    </td>
+    <td valign=top>
+     <tt>JPZ</tt><br/>
+     <tt>JPNZ</tt><br/>
+     <tt>JPC</tt><br/>
+     <tt>JPNC</tt><br/>
+     <tt>JPPE</tt><br/>
+     <tt>JPPO</tt><br/>
+     <tt>JPM</tt><br/>
+     <tt>JPP</tt>
+    </td>
+   </tr>
+   <tr>
+    <td valign=top>bedingte relative Spr&uuml;nge</td>
+    <td valign=top>
+     <tt>JR Z</tt><br/>
+     <tt>JR NZ</tt><br/>
+     <tt>JR C</tt><br/>
+     <tt>JR NC</tt>
+    </td>
+    <td valign=top>
+     <tt>JRZ</tt><br/>
+     <tt>JRNZ</tt><br/>
+     <tt>JRC</tt><br/>
+     <tt>JRNC</tt>
+    </td>
+   </tr>
+   <tr>
+    <td valign=top>bedingte R&uuml;ckkehrbefehle</td>
+    <td valign=top>
+     <tt>RET Z</tt><br/>
+     <tt>RET NZ</tt><br/>
+     <tt>RET C</tt><br/>
+     <tt>RET NC</tt><br/>
+     <tt>RET PE</tt><br/>
+     <tt>RET PO</tt><br/>
+     <tt>RET M</tt><br/>
+     <tt>RET P</tt>
+    </td>
+    <td valign=top>
+     <tt>RZ</tt><br/>
+     <tt>RNZ</tt><br/>
+     <tt>RC</tt><br/>
+     <tt>RNC</tt><br/>
+     <tt>RPE</tt><br/>
+     <tt>RPO</tt><br/>
+     <tt>RM</tt><br/>
+     <tt>RP</tt>
+    </td>
+   </tr>
+  </table>
+ <br/><br/>
+  Die Syntax unterscheidet sich bei folgenden Befehlen:
+  <table border="1">
+   <tr>
+    <th nowrap>Assembler-Befehl</th>
+    <th nowrap>Zilog-Syntax</th>
+    <th nowrap>Robotron-Syntax</th>
+    <th nowrap>Erl&auml;uterung</th>
+   </tr>
+   <tr>
+    <td valign=top>Eingabebefehle</td>
+    <td valign=top><tt>IN r,(C)</tt></td>
+    <td valign=top><tt>IN r</tt></td>
+    <td valign=top><tt>r</tt>: Register A, B, C, D, E, H oder L</td>
+   </tr>
+   <tr>
+    <td valign=top>Ausgabebefehle</td>
+    <td valign=top>
+     <tt>OUT (C),r</tt><br/>
+     <tt>OUT (n),A</tt>
+    </td>
+    <td valign=top>
+     <tt>OUT r</tt><br/>
+     <tt>OUT n</tt>
+    </td>
+    <td valign=top>
+     <tt>r</tt>: Register A, B, C, D, E, H oder L<br/>
+     <tt>n</tt>: numerischer Ausdruck
+    </td>
+   </tr>
+   <tr>
+    <td valign=top>
+     8-Bit-Befehle:
+     <ul>
+      <li>ADD
+      <li>ADC
+      <li>SBC
+     </ul>
+    </td>
+    <td valign=top>
+     <tt>ADD A,x<br/></tt>
+     <tt>ADC A,x<br/></tt>
+     <tt>SBC A,x</tt>
+    </td>
+    <td valign=top>
+     <tt>ADD x</tt><br/>
+     <tt>ADC x</tt><br/>
+     <tt>SBC x</tt>
+    </td>
+    <td valign=top>
+     <tt>x</tt>: entweder:
+     <ul>
+      <li>numerischer Ausdruck oder
+      <li>Register A, B, C, D, E, H, L oder
+      <li><tt>(HL)</tt> oder
+      <li><tt>(IX+d)</tt> oder
+      <li><tt>(IY+d)</tt>
+     </ul>
+    </td>
+   </tr>
+  </table>
+ <br/><br/>
+
+
+ <h2><a name="undoc">6. Undokumentierte Prozessorbefehle</a></h2>
+  Einige Operationscodes f&uuml;hren im Mikroprozessor Befehle aus,
+  die vom Hersteller nicht dokumentiert sind.
+  Dabei verh&auml;lt sich der Prozessor U880 genau so wie die Z80 CPU.
+ <br/><br/>
+  Der Assembler unterst&uuml;tzt diese undokumentierten Befehle,
+  wenn Sie das in den <a href="assembler.htm#options">Assembler-Optionen</a>
+  so festlegen.
+  Da die Befehle weder von Zilog noch von Robotron dokumentiert sind,
+  existiert auch keine offizielle Mnemonik beziehungsweise Syntax.
+  Aus diesem Grund sind Mnemonik und Syntax dieser undokumentierten
+  Prozessorbefehle spezifische Eigenheiten des JKCEMU-Assemblers
+  und werden nachfolgend beschrieben.
+ <br/><br/>
+
+ <h3>
+  <a name="ixy8">6.1. Zugriff auf die einzelnen Bytes der Index-Register</a>
+ </h3>
+  Viele 8-Bit-Register-Befehle k&ouml;nnen auch auf das niederwertige
+  beziehungsweise h&ouml;herwertige Byte der beiden Indexregister
+  angewendet werden.
+  Dabei versteht der Assembler folgende Namen f&uuml;r die
+  Index-Teilregister:
+  <table border="1">
+   <tr><th nowrap>Teilregister</th><th>Name</th></tr>
+    <tr>
+     <td valign=top>Niederwertiges Byte von IX:</td>
+     <td valign=top><tt>IXL</tt> oder <tt>LX</tt></td>
+    </tr>
+    <tr>
+     <td valign=top>H&ouml;herwertiges Byte von IX:</td>
+     <td valign=top><tt>IXH</tt> oder <tt>HX</tt></td>
+    </tr>
+    <tr>
+     <td valign=top>Niederwertiges Byte von IY:</td>
+     <td valign=top><tt>IYL</tt> oder <tt>LY</tt></td>
+    </tr>
+    <tr>
+     <td valign=top>H&ouml;herwertiges Byte von IY:</td>
+     <td valign=top><tt>IYH</tt> oder <tt>HY</tt></td>
+   </tr>
+  </table>
+ <br/><br/>
+  Folgende Befehle sind m&ouml;glich:
+  <table border="1">
+   <tr>
+    <th nowrap>Mnemonik und Syntax mit IXH</th>
+    <th nowrap>Erl&auml;uterung</th>
+   </tr>
+   <tr>
+    <td valign=top>
+     <tt>LD IXH,n</tt><br/>
+     <tt>LD IXH,r</tt><br/>
+     <tt>LD IXH,IXH</tt><br/>
+     <tt>LD IXH,IXL</tt>
+    </td>
+    <td valign=top>
+     <tt>n</tt>: numerischer Ausdruck<br/>
+     <tt>r</tt>: Register A, B, C, D oder E
+    </td>
+   </tr>
+   <tr>
+    <td valign=top>
+     <tt>LD r,IXH</tt>
+    </td>
+    <td valign=top>
+     <tt>r</tt>: Register A, B, C, D oder E
+    </td>
+   </tr>
+   <tr>
+    <td valign=top>
+     <tt>ADD A,IXH</tt><br/>
+     <tt>ADC A,IXH</tt><br/>
+     <tt>SUB IXH</tt><br/>
+     <tt>SBC A,IXH</tt><br/>
+     <tt>AND IXH</tt><br/>
+     <tt>XOR IXH</tt><br/>
+     <tt>OR IXH</tt><br/>
+     <tt>CP IXH</tt>
+    </td>
+    <td valign=top></td>
+   </tr>
+   <tr>
+    <td valign=top>
+     <tt>INC IXH</tt><br/>
+     <tt>DEC IXH</tt>
+    </td>
+    <td valign=top></td>
+   </tr>
+  </table>
+ <br/>
+  Anstelle von <tt>IXH</tt> sind auch <tt>IXL</tt>, <tt>IYH</tt>,
+  <tt>IYL</tt> sowie die alternativen Schreibweisen
+  <tt>HX</tt>, <tt>LX</tt>, <tt>HY</tt> und <tt>LY</tt> m&ouml;glich.
+ <br/><br/>
+
+ <h3><a name="inf">6.2. Eingabebefehl: Nur Flag-Register setzen</a></h3>
+  Der Befehl liest ein Byte vom Eingabetor, dessen Adresse im Register C
+  steht und setzt das Flag-Register entsprechend.
+  Der eingelesene Wert selbst wird nicht behalten.
+  <table border="1">
+   <tr><th nowrap>Mnemonik und Syntax</th></tr>
+   <tr><td valign=top>IN F,(C)<br/> IN (C)</td></tr>
+  </table>
+  <br/>
+  <b>Achtung:</b> Robotron hat diesen Befehl mit der Mnemonik <tt>INF</tt>
+  dokumentiert. Diese Mnemonik wird vom Assembler somit auch als ein
+  offizieller Befehl verstanden.
+ <br/><br/>
+
+ <h3><a name="sll">6.3. Logischer Linksschiebebefehl</a></h3>
+  Der Befehl schiebt das Argument um ein Bit nach links,
+  wobei das Bit 0 danach auf 1 gesetzt ist.
+  <table border="1">
+   <tr>
+    <th nowrap>Mnemonik und Syntax</th>
+     <th nowrap>Erl&auml;uterung</th>
+   </tr>
+   <tr>
+    <td valign=top>
+     <tt>SLL r</tt><br/>
+     <tt>SLL (HL)</tt><br/>
+     <tt>SLL (IX+d)</tt><br/>
+     <tt>SLL (IY+d)</tt>
+    </td>
+    <td valign=top>
+     <tt>r</tt>: Register A, B, C, D, E, H oder L
+    </td>
+   </tr>
+  </table>
+ <br/><br/>
+
+ <h3>
+  <a name="undoc_single_bit">
+   6.4. Rotations-, Schiebe- und Einzelbitbefehle mit Indexregistern,
+        die auch auf ein anderes Register wirken
+  </a>
+ </h3>
+  Die offiziell dokumentierten Rotations-, Schiebe- und Einzelbitbefehle,
+  die auf ein Byte im Arbeitsspeicher angewendet werden,
+  welches durch indirekte Adressierung mit einem Indexregister
+  und Distanzangabe bestimmt wird,
+  k&ouml;nnen auch auf ein Register wirken,
+  welches als zus&auml;tzliches Argument anzugegeben ist.
+  Das gilt auch f&uuml;r den undokumentierten SLL-Befehl.
+
+  <table border="1">
+   <tr>
+    <th nowrap>Mnemonik und Syntax</th>
+    <th nowrap>Erl&auml;uterung</th>
+   </tr>
+   <tr>
+    <td valign=top>
+     <tt>RLC (IX+d),r</tt><br/>
+     <tt>RRC (IX+d),r</tt><br/>
+     <tt>RL (IX+d),r</tt><br/>
+     <tt>RR (IX+d),r</tt><br/>
+     <tt>SLA (IX+d),r</tt><br/>
+     <tt>SRA (IX+d),r</tt><br/>
+     <tt>SLL (IX+d),r</tt><br/>
+     <tt>SRL (IX+d),r</tt><br/>
+     <tt>RES b,(IX+d),r</tt><br/>
+     <tt>SET b,(IX+d),r</tt>
+    </td>
+    <td valign=top>
+     <tt>r</tt>: Register A, B, C, D, E, H oder L<br/>
+     <tt>b</tt>: 0 bis 7
+    </td>
+   </tr>
+  </table>
+ <br/>
+  Anstelle von <tt>IX</tt> kann auch <tt>IY</tt> angegeben werden.
+  Die Befehle haben die gleiche Wirkung wie die offiziell dokumentierten
+  Befehle ohne die zus&auml;tzliche Registerangabe, nur mit dem Unterschied,
+  dass sie auch auf das zus&auml;tzlich angegebene 8-Bit-Register wirken.
+ <br/><br/>
+
+ <h2><a name="expr">7. Numerische Ausdr&uuml;cke</a></h2>
+  Numerischen Ausdr&uuml;cke kommen &uuml;berall dort zur Anwendung,
+  wo ein numerischer Wert ben&ouml;trigt wird.
+  Beim Assemblerbefehl
+ <br/><br/>
+  &nbsp;&nbsp;<tt>LD A,3</tt>
+ <br/><br/>
+  ist z.B. die 3 ein numerischer Ausdruck,
+  und zwar konkret ein Zahlenliteral.
+  Numerische Ausdr&uuml;cke k&ouml;nnen aber auch komplexer sein
+  und Operationen, Funktionen, Zeichenliterale und Marken enthalten.
+  Au&szlig;erdem k&ouml;nnen numerische Ausdr&uuml;cke mit runden Klammern
+  beliebig geschachtelt werden.
+ <br/><br/>
+
+ <h3><a name="num_literal">7.1. Zahlenliteral</a></h3>
+  Zahlenliterale beginnen mit einer Ziffer und k&ouml;nnen mit
+  einem Buchstaben enden, der die Basis der Zahl angibt.
+  Folgende Buchstaben sind dabei m&ouml;glich:
+  <table border="1">
+   <tr>
+    <th>Abschlie&szlig;ender Buchstabe</th>
+    <th>Basis der Zahl</th>
+    <th>Bemerkung</th>
+   </tr>
+   <tr><td>nicht vorhanden</td><td>10</td><td>Dezimalzahl</td></tr>
+   <tr><td>B, oder b</td><td>2</td><td>Bin&auml;rzahl</td></tr>
+   <tr><td>O, o, Q oder q</td><td>8</td><td>Oktalzahl</td></tr>
+   <tr>
+    <td>H oder h</td>
+    <td>16</td>
+    <td>Hexadezimalzahl, muss mit einer Ziffer (z.B. 0) beginnen!</td>
+   </tr>
+  </table>
+ <br/>
+  Hexadezimalzahlen k&ouml;nnen auch in einer anderen Syntax
+  geschrieben werden: X gefolgt von der in einfachen Hochkommas
+  eingeschlossenen Hexadezimalzahl.
+ <br/><br/>
+  Beispiele:
+  <table border="1">
+   <tr><th>Beispiel</th><th>Dezimaler Wert</th></tr>
+   <tr><td>123</td><td>123</td></tr>
+   <tr><td>101b</td><td>5</td></tr>
+   <tr><td>123q</td><td>83</td></tr>
+   <tr><td>0AFh</td><td>175</td></tr>
+   <tr><td>X'AF'</td><td>175</td></tr>
+  </table>
+ <br/><br/>
+
+ <h3><a name="char_literal">7.2. Zeichenliteral</a></h3>
+  Ein Zeichenliteral ist ein in einfachen Hochkommas
+  eingeschlossenes Zeichen, z.B. <tt>'A'</tt>.
+  Ein Zeichenliteral kann innerhalb eines numerischen Ausdrucks
+  verwendet werden.
+ <br/><br/>
+
+ <h3><a name="functions">7.3. Funktionen</a></h3>
+  Der Assembler bietet Funktionen f&uuml;r den Zugriff auf das
+  niederwerte und h&ouml;herwertige Byte eines numerischen Wertes.
+ <br/>
+  <table border="1">
+   <tr><th>Zugriff auf</th><th>Syntax</th></tr>
+   <tr>
+    <td valign="top" nowrap="nowrap">
+     <tt>HIGH(...)</tt>
+    </td>
+    <td valign="top">Zugriff auf h&ouml;herwertiges Byte</td>
+   </tr>
+   <tr>
+    <td valign="top" nowrap="nowrap">
+     <tt>LOW(...)</tt>
+    </td>
+    <td valign="top">Zugriff auf niederwertiges Byte</td>
+   </tr>
+  </table>
+ <br/><br/>
+
+ <h3><a name="unary_op">7.4. Un&auml;re Operatoren</a></h3>
+  Un&auml;re Operatoren wirken auf den nachfolgenden Ausdruck.
+ <br/>
+  <table border="1">
+   <tr><th>Operator</th><th>Beschreibung</th></tr>
+   <tr>
+    <td valign="top">+</td>
+    <td valign="top">
+     Vorzeichen<br/>
+     Der nachfolgende Wert wird nicht ver&auml;ndert.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">-</td>
+    <td valign="top">
+     Vorzeichen<br/>
+     Der nachfolgende Wert wird mathematisch negiert.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">NOT</td>
+    <td valign="top">Der nachfolgende Wert wird bitweise negiert</td>
+   </tr>
+  </table>
+ <br/><br/>
+
+ <h3><a name="binary_op">7.5. Bin&auml;re Operatoren</a></h3>
+  Bin&auml;re Operatoren stehen zwischen zwei Ausdr&uuml;cken.
+ <br/>
+  <table border="1">
+   <tr><th>Operator</th><th>Beschreibung</th></tr>
+   <tr><td valign="top">+</td><td valign="top">Addition</td></tr>
+   <tr><td valign="top">-</td><td valign="top">Subtraktion</td></tr>
+   <tr><td valign="top">*</td><td valign="top">Multiplikation</td></tr>
+   <tr><td valign="top">/</td><td valign="top">Division</td></tr>
+   <tr>
+    <td valign="top">MOD</td>
+    <td valign="top">Module - Rest der Division</td>
+   </tr>
+   <tr>
+    <td valign="top">AND</td>
+    <td valign="top">bitweise UND-Verkn&uuml;pfung</td>
+   </tr>
+   <tr>
+    <td valign="top">OR</td>
+    <td valign="top">bitweise Inklusiv-ODER-Verkn&uuml;pfung</td>
+   </tr>
+   <tr>
+    <td valign="top">XOR</td>
+    <td valign="top">bitweise Exklusiv-ODER-Verkn&uuml;pfung</td>
+   </tr>
+   <tr>
+    <td valign="top">
+     &lt;&lt;<br/>
+     SHL
+    </td>
+    <td valign="top">
+     links schieben<br/>
+     Der vor dem Operator stehende Wert wird um soviele Bits nach links
+     geschoben, wie der Wert hinter dem Operator angibt.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">
+     &gt;&gt;<br/>
+     SHR
+    </td>
+    <td valign="top">
+     links schieben<br/>
+     Der vor dem Operator stehende Wert wird um soviele Bits nach rechts
+     geschoben, wie der Wert hinter dem Operator angibt.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">
+     &lt;<br/>
+     LT
+    </td>
+    <td valign="top">
+     Vergleich auf kleiner als<br/>
+     Ist der erste Wert kleiner als der zweite,
+     ergibt das den Wert&nbsp;-1 (alle Bits gesetzt), anderenfalls&nbsp;0.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">
+     &lt;=<br/>
+     LE
+    </td>
+    <td valign="top">
+     Vergleich auf kleiner oder gleich<br/>
+     Ist der erste Wert kleiner oder gleich dem zweiten,
+     ergibt das den Wert&nbsp;-1 (alle Bits gesetzt), anderenfalls&nbsp;0.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">
+     &gt;<br/>
+     GT
+    </td>
+    <td valign="top">
+     Vergleich auf gr&ouml;&szlig;er als<br/>
+     Ist der erste Wert gr&ouml;&szlig;er als der zweite,
+     ergibt das den Wert&nbsp;-1 (alle Bits gesetzt), anderenfalls&nbsp;0.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">
+     &gt;=<br/>
+     GE
+    </td>
+    <td valign="top">
+     Vergleich auf gr&ouml;&szlig;er oder gleich<br/>
+     Ist der erste Wert gr&ouml;&szlig;er oder gleich dem zweiten,
+     ergibt das den Wert&nbsp;-1 (alle Bits gesetzt), anderenfalls&nbsp;0.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">
+     =<br/>
+     EQ
+    </td>
+    <td valign="top">
+     Vergleich auf Gleichheit<br/>
+     Ist der erste Wert gleich dem zweiten,
+     ergibt das den Wert&nbsp;-1 (alle Bits gesetzt), anderenfalls&nbsp;0.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">
+     &lt;&gt;<br/>
+     NE
+    </td>
+    <td valign="top">
+     Vergleich auf Ungleichheit<br/>
+     Ist der erste Wert ungleich dem zweiten,
+     ergibt das den Wert&nbsp;-1 (alle Bits gesetzt), anderenfalls&nbsp;0.
+    </td>
+   </tr>
+  </table>
+ <br/>
+  Bin&auml;re Operatoren haben eine geringere Bindungskraft als un&auml;re.
+  Innerhalb der bin&auml;re Operatoren gibt folgende Tabelle Auskunft
+  &uuml;ber die Bindungskraft.
+  Je weiter oben ein Operator steht, desto h&ouml;her ist die Bindungskraft.
+ <br/>
+  <table border="1">
+   <tr><td valign="top">* / MOD</td></tr>
+   <tr><td valign="top">+ -</td></tr>
+   <tr><td valign="top">&lt;&lt; &gt;&gt; SHL SHR</td></tr>
+   <tr><td valign="top">&lt; &lt;= &gt; &gt;= LT LE GT GE</td></tr>
+   <tr><td valign="top">= &lt;&gt; EQ NE</td></tr>
+   <tr><td valign="top">AND</td></tr>
+   <tr><td valign="top">XOR</td></tr>
+   <tr><td valign="top">OR</td></tr>
+  </table>
+ <br/><br/>
+
+ <h3><a name="cur_addr">7.6. Aktuelle Adresse</a></h3>
+  Die aktuelle Adresse wird durch das $-Zeichen repr&auml;sentiert.
+  Wenn Sie also in einem Ausdruck den Wert des Programm Counters
+  (Register&nbsp;PC) zu Beginn der aktuellen Assembler-Zeile ben&ouml;tigen,
+  schreiben Sie daf&uuml;r das Zeichen:&nbsp;$
+ <br/><br/>
+
+ <h2><a name="string_literal">8. Zeichenketten</a></h2>
+  Eine Zeichenkette (Zeichenkettenliteral) umfasst ein oder mehrere
+  in einfachen oder doppelten Hochkommas eingeschlossene Zeichen.
+  Zeichenkettenliterale k&ouml;nnen nur bei den Pseudobefehlen
+  <tt>BINCLUDE</tt>, <tt>DB</tt>, <tt>DEFB</tt>, <tt>DEFM</tt>,
+  <tt>DFB</tt> und <tt>INCLUDE</tt> verwendet werden.
+ <br/><br/>
+
+
+ <h2>
+  <a name="conditional_asm">9. Bedingte Assemblierung</a>
+ </h2>
+  Unter bedingter Assemblierung versteht man,
+  dass Teile des Quelltextes nur dann assembliert werden,
+  wenn eine bestimmte Bedingung erf&uuml;llt ist.
+ <br/><br/>
+  Ein der bedingten Assemblierung unterliegender Quelltextabschnitt
+  beginnt mit einer <em>IF</em>-Anweisung,
+  die es in mehreren Varianten gibt.
+  Die Anweisung <em>ENDIF</em> markiert das Ende dess betreffenden
+  Quelltextabschnitts und schlie&szlig;t somit die <em>IF</em>-Anweisung ab.
+ <br/><br/>
+  Zwischen <em>IF</em> und <em>ENDIF</em> kann optional auch
+  die Anwisung <em>ELSE</em> stehen.
+  Der Quelltext zwischen <em>ELSE</em> und <em>ENDIF</em> wird nur
+  dann assembliert, wenn der Bereich zwischen <em>IF</em> und <em>ELSE</em>
+  nicht assembliert wird und umgekehrt.
+ <br/><br/>
+  Die Tabelle beschreibt die verschiedenen IF-Anweisungen
+  f&uuml;r die bedingte Assemblierung:
+  <table border="1">
+   <tr><th>Anweisungen/Syntax</th><th>Beschreibung</th></tr>
+   <tr>
+    <td valign="top" nowrap="nowrap">
+     IF&nbsp;&lt;numersicher_Ausdruck&gt;<br/>
+     IFT&nbsp;&lt;numersicher_Ausdruck&gt;<br/>
+    </td>
+    <td valign="top">
+     Der nachfolgende Quelltext wird assembliert,
+     wenn der Wert des numerischen Ausdrucks ungleich&nbsp;0 ist.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top" nowrap="nowrap">
+     IFE&nbsp;&lt;numersicher_Ausdruck&gt;<br/>
+     IFF&nbsp;&lt;numersicher_Ausdruck&gt;<br/>
+    </td>
+    <td valign="top">
+     Der nachfolgende Quelltext wird assembliert,
+     wenn der Wert des numerischen Ausdrucks gleich&nbsp;0 ist.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top" nowrap="nowrap">
+     IFDEF&nbsp;&lt;Marke&gt;
+    </td>
+    <td valign="top">
+     Der nachfolgende Quelltext wird assembliert,
+     wenn die angegebene Marke existiert.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top" nowrap="nowrap">
+     IFNDEF&nbsp;&lt;Marke&gt;
+    </td>
+    <td valign="top">
+     Der nachfolgende Quelltext wird assembliert,
+     wenn die angegebene Marke nicht existiert.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top" nowrap="nowrap">
+     IF1
+    </td>
+    <td valign="top">
+     Der nachfolgende Quelltext wird im ersten Assembler-Lauf assembliert.
+    </td>
+   </tr>
+   <tr>
+    <td valign="top" nowrap="nowrap">
+     IF2
+    </td>
+    <td valign="top">
+     Der nachfolgende Quelltext wird im zweiten Assembler-Lauf assembliert.
+    </td>
+   </tr>
+  </table>
+ <br/>
+  Die Anweisungen f&uuml;r die bedingte Assemblierung k&ouml;nnen
+  sowohl am Zeilenanfang stehen als auch einger&uuml;ckt werden.
+  Des Weiteren k&ouml;nnen bedingte Assemblierungen auch in sich
+  geschachtelt werden.
+ <br/><br/>
+  Der JKCEMU-Assembler legt automatisch die Marke <em>__JKCEMU__</em>
+  mit dem Wert&nbsp;-1 (alle Bits gesetzt) an.
+  Damit kann erkannt werden,
+  ob das Programm mit dem JKCEMU-Assembler assembliert wird.
+ <br/><br/>
+  Beispiel:
+ <br/><br/>
+  <tt>&nbsp;&nbsp;DB&nbsp;'Dieses Programm wurde mit'</tt>&#10;<br/>
+  <tt>IFDEF&nbsp;__JKCEMU__</tt>&#10;<br/>
+  <tt>&nbsp;&nbsp;DB&nbsp;' dem JKCEMU-'</tt>&#10;<br/>
+  <tt>ELSE</tt>&#10;<br/>
+  <tt>&nbsp;&nbsp;DB&nbsp;' einem anderen '</tt>&#10;<br/>
+  <tt>ENDIF</tt>&#10;<br/>
+  <tt>&nbsp;&nbsp;DB&nbsp;'Assembler assembliert'</tt>&#10;<br/>
+ <br/><br/>
+
+
+ <h2><a name="cmdline">10. Kommandozeile</a></h2>
+  Der Assembler kann mit einer Kommandozeile auch ohne den Emulator
+  als eigenst&auml;ndiges Programm aufgerufen werden.
+  Unter Windows m&uuml;ssen Sie dazu die Eingabeaufforderung starten.
+  Die Kommandozeile zum Aufruf des Assemblers sieht folgenderma&szlig;en
+  aus (Name und Pfad der JKCEMU-JAR-Datei sind entsprechend anzupassen):
+ <br/><br/>
+  <tt>java -jar jkcemu.jar --as [Optionen] &lt;Quelltextdatei&gt;</tt>
+ <br/><br/>
+   oder
+ <br/><br/>
+  <tt>java -jar jkcemu.jar --assembler [Optionen] &lt;Quelltextdatei&gt;</tt>
+ <br/><br/>
+  Folgende Optionen k&ouml;nnen angegeben werden
+  (Gro&szlig;-/Kleinschreibung beachten!):
+ <br/>
+  <table border="1">
+   <tr><th>Option</th><th>Bedeutung</th></tr>
+   <tr>
+    <td valign="top">-h</td>
+    <td>Hilfe zu den Assembler-Optionen anzeigen</td>
+   </tr>
+   <tr>
+    <td valign="top" nowrap="nowrap">-f&nbsp;&lt;Datei&gt;</td>
+    <td>
+     weitere Kommandozeile aus Datei lesen
+     <br/><br/>
+     Die Kommandozeile kann recht lang sein,
+     m&ouml;glicherweise l&auml;nger als von der Eingabeaufforderung
+     oder dem Betriebssystem unterst&uuml;tzt.
+     Aus diesem Grund kann die Kommandozeile aus einer Datei gelesen werden.
+     <br/><br/>
+     Beim Erreichen der Option <em>-f</em> &ouml;ffnet der Assembler
+     die angegebene Datei und liest daraus die weitere Kommandozeile.
+     Wenn das Ende der Datei erreicht wurde,
+     wird der Rest der urspr&uuml;nglichen Kommandozeile weiter verarbeitet.
+     Der Assembler tut also so, als ob der Inhalt der Datei anstelle
+     der Option <em>-f</em> in der Kommandozeile stehen w&uuml;rde.
+     <br/><br/>
+     In der Datei m&uuml;ssen die einzelnen Kommandozeilenargumente
+     nicht in einer Zeile stehen, sondern k&ouml;nnen auf mehrere Zeilen
+     aufgeteilt werden.
+     Wenn ein Kommandozeilenargument Leerzeichen enth&auml;lt,
+     muss dieses in doppelte Hochkommas eingeschlossen werden,
+     damit der Assembler es als ein Argument verarbeitet.
+    <td/>
+   </tr>
+   <tr>
+    <td valign="top">-l</td>
+    <td>Markentabelle ausgeben</td>
+   </tr>
+   <tr>
+    <td valign="top" nowrap="nowrap">-o&nbsp;&lt;Ausgabedatei&gt;</td>
+    <td>
+     Der erzeugte Programmcode wird in die angegebene Datei geschrieben.
+     Das Format der Ausgabedatei h&auml;ngt von der Endung
+     (*.bin; *.hex; *.kcc; *.kcm; *.tap; *.z80) und von der Angabe
+     der Option <em>-9</em> ab.
+     <br/>
+     Fehlt die Option <em>-o</em>, hat die Ausgabedatei mit Ausnahme
+     der Endung den gleichen Namen wie die Quelltextdatei.
+     Die Endung lautet: <em>*.bin</em>
+   </tr>
+   <tr>
+    <td valign="top" nowrap="nowrap">-9</td>
+    <td>
+     Wurde mit der Option <em>-o</em> eine
+     <a href="../fileformats.htm#kcc">KCC</a>-,
+     <a href="../fileformats.htm#kcm">KCM</a>- oder
+     <a href="../fileformats.htm#kctap">TAP</a>-Datei
+     angegeben, wird diese im Format f&uuml;r einen Z9001,
+     KC85/1 und KC87 erzeugt (Dateityp <em>COM</em> eingetragen und
+     bei TAP-Dateien hat der erste Block die Nummer&nbsp;0).
+     Fehlt die Option <em>-9</em>, werden KCC-, KCM- und TAP-Dateien
+     im Format f&uuml;r HC900 und KC85/2..5 erzeugt.
+   </tr>
+   <tr>
+    <td valign="top">-C</td>
+    <td>Gro&szlig;-/Kleinschreibung bei Marken beachten</td>
+   </tr>
+   <tr>
+    <td valign="top">-D&nbsp;&lt;Marke&gt;</td>
+    <td>Marke mit dem Wert&nbsp;-1 (alle Bits gesetzt) definieren</td>
+   </tr>
+   <tr>
+    <td valign="top">-D&nbsp;&lt;Marke=Wert&gt;</td>
+    <td>
+     Marke mit dem angegebenen Wert definieren<br/>
+     Der Wert wird in Form einer Dezimal-, Hexadezimal-, Oktal-
+     oder Bin&auml;rzahl angegeben
+     (siehe <a href="assembler.htm#num_literal">Zahlenliteral</a>).
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">-U</td>
+    <td>Undokumentierte Befehle erlauben</td>
+   </tr>
+   <tr>
+    <td valign="top">-R</td>
+    <td>Nur Robotron-Mnemonik/-Syntax erlauben</td>
+   </tr>
+   <tr>
+    <td valign="top">-Z</td>
+    <td>Nur Zilog-Mnemonik/-Syntax erlauben</td>
+   </tr>
+  </table>
+</body>
+</html>

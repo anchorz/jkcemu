@@ -1,0 +1,125 @@
+<html>
+<body>
+ <h1>Kramer-MC</h1>
+  Manfred Kramer ver&ouml;ffentlichte in seinem 1987 erschienenen Buch
+  <em>Praktische Mikrocomputertechnik</em> die Bauanleitung
+  eines Selbstbaucomputers.
+  Da er diesem Computer keinen speziellen Namen gab,
+  wird er hier <em>Kramer-MC</em> genannt.
+ <br/><br/>
+  Das Besondere an dem Computer ist, dass neben der Hardware
+  auch viel Augenmerk auf die Software gelegt wurde.
+  So enth&auml;lt der Kramer-MC in seinem ROM alle wesentlichen Werkzeuge
+  zur Softwareentwicklung in Assembler und BASIC.
+ <br/><br/>
+
+ <h2>Hinweise zur Emulation</h2>
+  <ul>
+   <li>
+    <a href="kramermc.htm#hardware">1. Emulierte Hardware</a>
+    <ul>
+     <li><a href="kramermc.htm#printer">1.1. Drucker</a></li>
+    </ul>
+   </li>
+   <li><a href="kramermc.htm#software">2. Im ROM enthaltene Software</a></li>
+   <li><a href="kramermc.htm#mem">3. Speicheraufteilung</a></li>
+   <li>
+    <a href="kramermc.htm#basic_io">4. BASIC-Programme speichern und laden</a>
+   </li>
+  </ul>
+ <br/>
+
+
+ <h2><a name="hardware">1. Emulierte Hardware</a></h2>
+  <ul>
+   <li>23&nbsp;KByte ROM</li>
+   <li>41&nbsp;KByte RAM inklusive 1 KByte Bildwiederholspeicher</li>
+   <li>64x16&nbsp;Zeichen Bildschirmgr&ouml;&szlig;e</li>
+  </ul>
+ <br/><br/>
+
+ <h3><a name="printer">1.1. Drucker</a></h3>
+  Es wird ein Drucker emuliert,
+  indem JKCEMU die Betriebssystemaufrufe f&uuml;r Druckausgaben
+  abf&auml;ngt und die Daten an den aktuellen Druckauftrag anh&auml;ngt.
+  Diese Funktion ist jedoch standardm&auml;&szlig;ig deaktiviert
+  und muss bei Bedarf in den <a href="settings.htm">Einstellungen</a>
+  eingeschaltet werden.
+ <br/><br/>
+  Der Hintergrund dieser Ma&szlig;nahme ist,
+  dass der logische Druckerkanal nach einem RESET auf den Bildschirm
+  zeigt und das Monitorprogramm dar&uuml;ber auch noch die Startmeldung
+  ausgibt.
+  Ist das Abfangen der Druckausgaben aktiviert,
+  wird somit mit jedem RESET ein Druckauftrag angelegt,
+  der die kurze Startmeldung enth&auml;lt.
+  Um diese Unsch&ouml;nheit zu vermeiden,
+  ist die Emulation des Druckers standardm&auml;&szlig;ig deaktiviert
+ <br/><br/>
+
+
+ <h2><a name="software">2. Im ROM enthaltene Software</a></h2>
+  <ul>
+   <li><a href="kramermc/monitor.htm">Monitorprogramm</a></li>
+   <li><a href="kramermc/assembler.htm">Assembler</a></li>
+   <li>Reassembler</li>
+   <li>Debugger</li>
+   <li>BASIC-Interpreter</li>
+   <li><a href="kramermc/editor.htm">Editor</a></li>
+  </ul>
+ <br/><br/>
+
+
+ <h2><a name="mem">3. Speicheraufteilung</a></h2>
+  <table border="1">
+   <tr>
+    <td>0000h-03FFh</td>
+    <td><a href="kramermc/monitor.htm">Monitorprogramm</a></td>
+   </tr>
+   <tr><td>0400h-07FFh</td><td>Debugger</td></tr>
+   <tr><td>0800h-0BFFh</td><td>Reassembler</td></tr>
+   <tr><td>0C00h-0FFFh</td><td>System-RAM</td></tr>
+   <tr>
+    <td>1000h-3FFFh</td>
+    <td>RAM, Programmspeicher f&uuml;r BASIC</td>
+   </tr>
+   <tr>
+    <td>4000h-7FFFh</td>
+    <td>
+     RAM, Textspeicher f&uuml;r <a href="kramermc/editor.htm">Editor</a>
+    </td>
+   </tr>
+   <tr><td>8000h-AFFFh</td><td>BASIC-Interpreter</td></tr>
+   <tr><td>B000h-BFFFh</td><td>RAM</td></tr>
+   <tr>
+    <td>C000h-C3FFh</td>
+    <td><a href="kramermc/editor.htm">Editor</a></td>
+   </tr>
+   <tr>
+    <td>C400h-DFFFh</td>
+    <td><a href="kramermc/assembler.htm">Assembler</a></td>
+   </tr>
+   <tr><td>E000h-FBFFh</td><td>RAM</td></tr>
+   <tr><td>FC00h-FFFFh</td><td>Bildwiederholspeicher</td></tr>
+  </table>
+ <br/><br/>
+
+
+ <h2><a name="basic_io">4. BASIC-Programme speichern und laden</a></h2>
+  JKCEMU bietet eine spezielle Unterst&uuml;tzung f&uuml;r das
+  <a href="loadsavebasic.htm">Speichern und Laden von BASIC-Programmen</a>.
+  Zum Speichern nutzen Sie bitte die Funktion
+  <em>BASIC-Programm speichern...</em> im Men&uuml; <em>Datei</em>
+  und speichern das jeweilge Programm als
+  <a href="fileformats.htm#basic">BASIC-/RBASIC-Programmdatei (*.bas)</a>.
+  Alternativ ist auch das Speichern als
+  <a href="fileformats.htm#headersave">Headersave-Datei (*.z80)</a>
+  mit dem Dateityp&nbsp;<em>B</em> m&ouml;glich.
+ <br/><br/>
+  Wenn Sie ein BASIC-Programm in einem anderen Dateiformat speichern,
+  erkennt JKCEMU sp&auml;ter beim Laden der Datei nicht mehr,
+  dass es sich um ein BASIC-Programm handelt und passt die
+  Systemzellen des BASIC-Interpreters nicht an.
+  Das geladene Programm l&auml;sst sich dann nicht nutzen.
+</body>
+</html>

@@ -1,0 +1,580 @@
+<html>
+<body>
+ <h1>HC900 und KC85/2...5</h1>
+  Die Computer HC900, KC85/2, KC85/3 und KC85/4 wurden im
+  VEB Mikroelektronik M&uuml;hlhausen hergestellt.
+  Beim KC85/2 handelt es sich eigentlich nur um einen umbenannten HC900.
+  Da aber im Laufe der Zeit das Betriebssystem weiterentwickelt wurde,
+  enthielten die als KC85/2 produzierten Ger&auml;te
+  meistens eine neuere Betriebssystemversion, n&auml;mlich
+  CAOS&nbsp;2.2 anstelle von HC900-CAOS.
+  Aus diesem Grund werden beide Ger&auml;te auch als
+  separate Systeme emuliert.
+ <br/><br/>
+  Der KC85/3 ist ein um zus&auml;tzlichen ROM erweiterter KC85/2.
+  Neben der neuen Betriebssystemversion CAOS&nbsp;3.1 ist der im ROM
+  enthaltene BASIC-Interpreter das Hauptunterscheidungsmerkmal.
+ <br/><br/>
+  Eine wirkliche Weiterentwicklung in der Hardware ist der KC85/4.
+  RAM und ROM wurden vergr&ouml;&szlig;ert und die Video-Hardware
+  &uuml;berarbeitet.
+  Letzteres f&uuml;hrte in Verbindung mit der wiederum neuen
+  Betriebssystemversion CAOS&nbsp;4.x zu einer deutlichen Steigerung
+  der Grafik-Performance.
+ <br/><br/>
+  Den KC85/5 hat es dagegen nie offiziell gegeben.
+  Die Leiterplatte des KC85/4 ist bereits f&uuml;r Speicherschaltkreise
+  mit einer gr&ouml;&szlig;eren Kapazit&auml;t ausgelegt.
+  Unter einem KC85/5 versteht man deshalb einen KC85/4 mit auf
+  320&nbsp;KByte (256&nbsp;+&nbsp;64) ausgebautem RAM
+  und 48&nbsp;KByte ROM sowie einer neuen Betriebssystemversion,
+  die diesen zus&auml;tzlichen Speicher verwalten kann.
+ <br/><br/>
+
+ <h2>Hinweise zur Emulation</h2>
+  <ul>
+   <li>
+    <a href="kc85.htm#hardware">1. Emulierte Hardware</a>
+    <ul>
+     <li>
+      <a href="kc85.htm#keyboard">1.1. Tastatur</a>
+      <ul>
+       <li>
+	<a href="kc85.htm#keys_direct">1.1.1. Schnellere Tastatureingaben durch direktes Schreiben in den Tastaturpuffer</a>
+       </li>
+      </ul>
+     </li>
+     <li><a href="kc85.htm#modules">1.2. Module</a></li>
+     <li><a href="kc85.htm#printer">1.3. Drucker</a></li>
+     <li>
+      <a href="kc85.htm#sound">1.4. Tongeneratoren und Kassettenrecorderanschluss</a>
+     </li>
+     <li><a href="kc85.htm#d004">1.5. Diskettenerweiterung D004</a></li>
+    </ul>
+   </li>
+   <li><a href="kc85.htm#software">2. Im ROM enthaltene Software</a></li>
+   <li>
+    <a href="kc85.htm#disks">3. Enthaltene Diskettenabbilder</a>
+    <ul>
+     <li><a href="kc85.htm#caos_disk">3.1. CAOS-Systemdiskette</a></li>
+     <li><a href="kc85.htm#mdos_disk">3.2. MicroDOS-Systemdiskette</a></li>
+    </ul>
+   </li>
+   <li>
+    <a href="kc85.htm#etc">4. Sonstiges</a>
+    <ul>
+     <li>
+      <a href="kc85.htm#load_file">4.1. Laden von Dateien</a>
+     </li>
+     <li>
+      <a href="kc85.htm#basic_io">4.2. BASIC-Programme speichern und laden</a>
+     </li>
+     <li>
+      <a href="kc85.htm#paste">4.3. Einf&uuml;gen von Text aus der Zwischenablage</a>
+     </li>
+     <li>
+      <a href="kc85.htm#video_timing">4.4. Zeitverhalten der Bildschirmsteuerung</a>
+     </li>
+     <li>
+      <a href="kc85.htm#d004memerror">4.5. Vermeintlicher D004-Speicherfehler</a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ <br/>
+
+ <h2><a name="hardware">1. Emulierte Hardware</a></h2>
+  Emuliert werden die Grundger&auml;te sowie optional die
+  <a href="disk/floppydiskintro.htm">Disketten</a>-Erweiterung
+  <a href="kc85.htm#d004">D004</a> inkl. der Festplattenerweiterung
+  <a href="gide.htm">GIDE</a>
+  und einige <a href="kc85.htm#modules">Module</a>.
+ <br/><br/>
+  Der emulierte Speicher betr&auml;gt bei:
+  <ul>
+   <li>
+    HC900, KC85/2:<br/>
+    <ul>
+     <li>4&nbsp;KByte ROM</li>
+     <li>32&nbsp;KByte RAM inklusive Bildwiederholspeicher</li>
+    </ul>
+   </li>
+   <li>
+    KC85/3:<br/>
+    <ul>
+     <li>16&nbsp;KByte&nbsp;ROM</li>
+     <li>32&nbsp;KByte&nbsp;RAM inklusive Bildwiederholspeicher</li>
+    </ul>
+   </li>
+   <li>
+    KC85/4:<br/>
+    <ul>
+     <li>20&nbsp;KByte&nbsp;ROM</li>
+     <li>128&nbsp;KByte&nbsp;RAM inklusive Bildwiederholspeicher</li>
+    </ul>
+   </li>
+   <li>
+    KC85/5:<br/>
+    <ul>
+     <li>48&nbsp;KByte&nbsp;ROM</li>
+     <li>320&nbsp;KByte&nbsp;RAM inklusive Bildwiederholspeicher</li>
+    </ul>
+   </li>
+  </ul>
+  Beim KC85/4 kann der normalerweise nur 4&nbsp;KByte gro&szlig;e
+  CAOS-ROM&nbsp;C000h-CFFFh auch mit 8&nbsp;KByte (C000h-DFFFh)
+  emuliert werden,
+  indem in den Einstellungen eine ROM-Datei eingebunden wird,
+  die gr&ouml;&szlig;er als 4&nbsp;Kbyte ist.
+  Damit ist in der KC85/4-Emulation z.B. auch CAOS&nbsp;4.5 lauff&auml;hig.
+ <br/><br/>
+
+ <h3><a name="keyboard">1.1. Tastatur</a></h3>
+  Die KC85-Tastatur enth&auml;lt in der oberen Reihe einige Tasten,
+  f&uuml;r die es &uuml;blicherweise keine gleichnamigen Tasten
+  auf der Tastatur des Emulatorrechners gibt.
+  Die Tabelle zeigt das Mapping der Tasten in der oberen Tastaturreihe:
+ <br/>
+  <table border="1">
+   <tr>
+    <th>KC85-Taste</th>
+    <th>JKCEMU-Taste</th>
+    <th>Bedeutung bei Shift</th>
+   </tr>
+   <tr>
+    <td>Cursor links</td>
+    <td>Cursor links</td>
+    <td>CCR</td>
+   </tr>
+   <tr>
+    <td>Cursor rechts</td>
+    <td>Cursor rechts</td>
+    <td>CEL (Taste&nbsp;<em>End</em>)</td>
+   </tr>
+   <tr>
+    <td>Cursor nach unten</td>
+    <td>Cursor nach unten</td>
+    <td>SCROL (Taste&nbsp;<em>Page&nbsp;Down</em>)</td>
+   </tr>
+   <tr>
+    <td>Cursor nach oben</td>
+    <td>Cursor nach oben</td>
+    <td>PAGE (Taste&nbsp;<em>Page&nbsp;Up</em>)</td>
+   </tr>
+   <tr><td>F1</td><td>F1</td><td>F7</td></tr>
+   <tr><td>F2</td><td>F2</td><td>F8</td></tr>
+   <tr><td>F3</td><td>F3</td><td>F9</td></tr>
+   <tr><td>F4</td><td>F4</td><td>FA</td></tr>
+   <tr><td>F5</td><td>F5</td><td>FB</td></tr>
+   <tr><td>F6</td><td>F6</td><td>FC</td></tr>
+   <tr><td>BRK</td><td>F7</td><td></td></tr>
+   <tr><td>STOP</td><td>F8</td><td>ESC</td></tr>
+   <tr>
+    <td valign="top">CLR</td>
+    <td>Back Space<br/>F9</td><td><br/>HCOPY</td>
+   </tr>
+   <tr><td>INS</td><td>Einfg</td><td>CLICK</td></tr>
+   <tr><td>DEL</td><td>Entf</td><td></td></tr>
+   <tr>
+    <td>HOME</td>
+    <td>HOME bzw. Pos1</td>
+    <td>CLS</td>
+   </tr>
+  </table>
+ <br/>
+  Weitere Steuertasten werden auf KC85-Tastenkombinationen gemappt:
+  <ul>
+   <li>Esc</li>
+   <li>Tab</li>
+   <li>Page&nbsp;Up</li>
+   <li>Page&nbsp;Down</li>
+   <li>F11&nbsp;(LIST)</li>
+   <li>F12&nbsp;(RUN)</li>
+  </ul>
+ <br/>
+
+ <h3>
+  <a name="keys_direct">1.1.1. Schnellere Tastatureingaben durch direktes Schreiben in den Tastaturpuffer</a>
+ </h3>
+  Die originale Tastatursteuerung ist aufgrund der speziellen Hardware
+  und der Interrupt-gesteuerten Tastencode-Dekodierung relativ tr&auml;ge.
+  JKCEMU emuliert die originale Tastatursteuerung vollst&auml;ndig,
+  weshalb diese in der Emulation ebenfalls recht tr&auml;ge wirkt.
+  Mit Einschalten der Option
+  <em>Schnellere Tastatureingaben durch direktes Schreiben in den
+  Tastaturpuffer</em>
+  wird die Emulation der Tastatursteuerung umgangen und die
+  eingegebenen Zeichen unter Ber&uuml;cksichtigung des in der CAOS-
+  bzw. MicroDOS-/ML-DOS-Tastaturtabelle eingetragenen Tastencode-Mappings
+  direkt in den Tastaturpuffer geschrieben.
+  Dadurch wirkt die Tastatur deutlich fl&uuml;ssiger.
+ <br/><br/>
+  <b>Achtung!</b> Das Einschalten der Option bedeutet aber auch,
+  dass der Emulator nicht mehr exakt das originale Verhalten nachbildet.
+  Damit kommen m&ouml;glicherweise manche Programme nicht klar.
+  Wenn Sie also ein Programm benutzen,
+  bei dem es Probleme mit den Tastatureingaben gibt,
+  m&uuml;ssen Sie die Option ausschalten.
+ <br/><br/>
+
+ <h3><a name="modules">1.2. Module</a></h3>
+  Folgende Module werden optional emuliert:
+  <table border="1">
+   <tr><th>Modul</th><th>Bemerkung</th></tr>
+   <tr>
+    <td valign="top">M003</td>
+    <td>V.24-Modul mit einem an Kanal A angeschlossenen Drucker</td>
+   </tr>
+   <tr>
+    <td valign="top">M006</td>
+    <td>
+     BASIC-Modul f&uuml;r HC900 und KC85/2,<br/>
+     F&uuml;r KC85/3..5 steht das Modul nicht zur Verf&uuml;gung.
+    </td>
+   </tr>
+   <tr><td>M008</td><td>Joystick</td></tr>
+   <tr><td>M011</td><td>64&nbsp;KByte RAM</td></tr>
+   <tr><td>M012</td><td>TEXOR</td></tr>
+   <tr>
+     <td>M021</td>
+     <td>Joystick / Centronics mit angeschlossenem Drucker</td>
+   </tr>
+   <tr><td>M022</td><td>16&nbsp;KByte Expander RAM</td></tr>
+   <tr><td>M025</td><td>8&nbsp;KByte User PROM</td></tr>
+   <tr><td>M026</td><td>Forth</td></tr>
+   <tr><td>M027</td><td>Development</td></tr>
+   <tr><td>M028</td><td>16&nbsp;KByte User PROM</td></tr>
+   <tr><td>M032</td><td>256&nbsp;KByte Segmented RAM</td></tr>
+   <tr><td>M033</td><td>TypeStar</td></tr>
+   <tr><td>M034</td><td>512&nbsp;KByte Segmented RAM</td></tr>
+   <tr><td>M035</td><td>1&nbsp;MByte Segmented RAM</td></tr>
+   <tr><td>M035x4</td><td>4&nbsp;MByte Segmented RAM</td></tr>
+   <tr><td>M036</td><td>128&nbsp;KByte Segmented RAM</td></tr>
+   <tr><td>M040</td><td>8/16&nbsp;KByte User PROM</td></tr>
+   <tr><td>M045</td><td>4x8&nbsp;KByte Segmented User PROM</td></tr>
+   <tr><td>M046</td><td>8x8&nbsp;KByte Segmented User PROM</td></tr>
+   <tr><td>M047</td><td>16x8&nbsp;KByte Segmented User PROM</td></tr>
+   <tr><td>M048</td><td>16x16&nbsp;KByte Segmented User PROM</td></tr>
+   <tr><td>M052</td><td>USB/Netzwerk</td></tr>
+   <tr><td>M120</td><td>8&nbsp;KByte CMOS RAM</td></tr>
+   <tr><td>M122</td><td>16&nbsp;KByte CMOS RAM</td></tr>
+   <tr><td>M124</td><td>32&nbsp;KByte CMOS RAM</td></tr>
+  </table>
+ <br/>
+  Bei den User-PROM-Modulen M025, M028, M040 und M045 bis M048
+  m&uuml;ssen Sie eine ROM-Datei angeben,
+  die den Inhalt des Moduls enth&auml;lt.
+ <br/><br/>
+  Die CMOS-RAM-Module unterscheiden sich von den anderen RAM-Modulen
+  in der Form, dass die CMOS-RAM-Module beim emulierten
+  &quot;Einschalten&quot; ihren Inhalt nicht verlieren.
+ <br/><br/>
+  Mit dem Modul M052 wird USB- und Netzwerkunterst&uuml;tzung geboten.
+  Lesen Sie dazu bitte auch die Hinweise zur
+  <a href="kcnet.htm">Netzwerkemulation</a>.
+ <br/><br/>
+
+ <h3><a name="printer">1.3. Drucker</a></h3>
+  Mit dem V.24-Modul M003 wird auch ein Drucker emuliert.
+  Alle &uuml;ber Kanal A dieses Moduls ausgegebenen Bytes
+  werden an den aktiven Druckauftrag angeh&auml;ngt
+  (siehe <a href="print.htm#jobs">Drucken und Druckauftr&auml;ge</a>).
+  Schalten Sie dazu in den <a href="settings.htm">Einstellungen</a>
+  die Emulation des Moduls M003 ein.
+  Nun m&uuml;ssen Sie noch die datentechnische Verbindung vom
+  Betriebssystem zum Modul herstellen.
+  Das erledigt ein entsprechender Treiber.
+  Beim KC85/4 und KC85/5 ist ein Treiber f&uuml;r das Modul M003
+  bereits im Betriebssystem enthalten.
+  Starten Sie diesen mit dem Befehl <em>V24OUT</em> (CAOS&nbsp;4.2)
+  bzw. <em>LSTDEV</em> (CAOS&nbsp;4.5).
+  F&uuml;r die anderen KC85-Systeme m&uuml;ssen Sie selbst
+  einen geeigneten Treiber bereitstellen.
+ <br/><br/>
+  Eine weitere M&ouml;glichkeit zum Drucken besteht mit dem Modul M021,
+  bei dem eine Centronics-Schnittstelle mit angeschlossenem Drucker
+  emuliert wird.
+  Im CAOS&nbsp;4.5 ist auch daf&uuml;r ein Treiber enthalten:
+  F&uuml;hren Sie <em>LSTDEV&nbsp;0</em> aus.
+  Bei den anderen CAOS-Versionen m&uuml;ssen Sie wieder selbst
+  einen passenden Treiber bereitstellen.
+ <br/><br/>
+
+ <h3><a name="sound">1.4. Tongeneratoren und Kassettenrecorderanschluss</a></h3>
+  Welche T&ouml;ne vom Emulator ausgegeben werden,
+  legen Sie durch Auswahl einer entsprechenden Funktion in dem Fenster
+  <a href="audio.htm">Audio/Kassette</a> fest. Bei der Funktion
+  <a href="audio.htm#sound_out">T&ouml;ne ausgeben</a>
+  h&ouml;ren Sie je nach <a href="settings.htm">Einstellung</a>
+  entweder das Mischsignal aus beiden Tongeneratoren,
+  welches auch der Lautst&auml;rkesteuerung unterliegt (Mono)
+  oder die beiden Tongeneratoren links und rechts getrennt
+  ohne Lautst&auml;rkesteuerung (Stereo).
+  Bei allen anderen Audiofunktionen wird das Signal des Tongenerators&nbsp;1
+  (linker Kanal) ohne Lautst&auml;rkesteuerung ausgegeben,
+  d.h. das Signal, mit dem Dateien auf Kassette gespeichert werden.
+ <br/><br/>
+
+ <h3><a name="d004">1.5. Diskettenerweiterung D004</a></h3>
+  Die Diskettenerweiterung D004 ist ein Aufsatzger&auml;t,
+  welches ein ROM-Modul (ansprechbar &uuml;ber Modulsteckplatz&nbsp;FC)
+  und ein eigenes Prozessorsystem enth&auml;lt.
+ <br/><br/>
+  Den ROM-Inhalt des ROM-Moduls k&ouml;nnen Sie in den
+  <a href="settings.htm">Einstellungen</a> frei w&auml;hlen.
+  Zur Auswahl stehen die originale ROM-Version&nbsp;2.0 von Robotron und
+  die sp&auml;ter von Mario Leubner weiterentwickelte Version&nbsp;3.3,
+  oder Sie binden eine externe ROM-Datei ein.
+  Standardm&auml;&szlig;ig wird folgende ROM-Version verwendet:
+ <br/>
+  <table border="1">
+   <tr><th>Emuliertes System</th><th>D004-ROM</th></tr>
+   <tr>
+    <td valign="top">HC900<br/>KC85/2<br/>KC85/3<br/>KC85/4</td>
+    <td valign="top">Version&nbsp;2.0</td>
+   </tr>
+   <tr>
+    <td valign="top">KC85/5</td>
+    <td valign="top">Version&nbsp;3.3</td>
+   </tr>
+  </table>
+ <br/>
+  Einige im JKCEMU integrierte Werkzeuge sind auch mit dem D004-eigenen
+  Prozessorsystem benutzbar.
+  Beim Aufruf des Debuggers, Reassemblers und Speichereditors
+  werden Sie gefragt, ob Sie auf das Hauptprozessorsystem
+  (das im Grundger&auml;t) oder auf das D004-Prozessorsystem
+  zugreifen m&ouml;chten.
+  Es ist auch m&ouml;glich, ein Werkzeug zweimal zu &ouml;ffnen,
+  einmal f&uuml;r das Hauptprozessor- und einmal f&uuml;r das D004-System.
+ <br/><br/>
+  <b>Achtung!</b> Das D004-Prozessorsystem ist vom Hauptprozessorsystem
+  aus steuerbar.
+  So kann es z.B. auch zur&uuml;ckgesetzt (RESET) oder komplett deaktiviert
+  (Dauer-RESET) werden.
+  Wenn Sie den Debugger f&uuml;r das D004-Prozessorsystem ge&ouml;ffnet
+  und dort die Programmausf&uuml;hrung angehalten haben (z.B. Haltepunkt),
+  kann es trotzdem vorkommen,
+  dass das Hauptprozessorsystem die D004 zur&uuml;cksetzt oder gar
+  deaktiviert.
+  Um das zu verhindern, sollten Sie evtl. auch das Hauptprozessorsystem
+  anhalten, z.B. im Hauptfenster mit dem Men&uuml;punkt
+  <em>Datei</em> &rarr; <em>Pause</em>.
+ <br/><br/>
+
+
+ <h2><a name="software">2. Im ROM enthaltene Software</a></h2>
+  <table border="1">
+   <tr><th>System/Modul</th><th>Software</th></tr>
+   <tr><td valign="top">HC900</td><td>HC900-CAOS</td></tr>
+   <tr><td valign="top">KC85/2</td><td>HC-CAOS&nbsp;2.2</td></tr>
+   <tr>
+    <td valign="top">KC85/3</td>
+    <td>HC-CAOS&nbsp;3.1<br/>HC-BASIC</td>
+   </tr>
+   <tr>
+    <td valign="top">KC85/4</td>
+    <td>KC-CAOS&nbsp;4.2<br/>HC-BASIC</td>
+   </tr>
+   <tr>
+    <td valign="top">KC85/5</td>
+    <td>
+     KC-CAOS&nbsp;4.5<br/>
+     HC-BASIC<br/>
+     EDAS&nbsp;1.6b<br/>
+     KC-DEBUGGER&nbsp;1.0<br/>
+     KC-FORTH&nbsp;3.1
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">M006</td>
+    <td>HC901-CAOS<br/>HC-BASIC</td>
+   </tr>
+   <tr><td valign="top">M012</td><td>TEXOR&nbsp;2.3</td></tr>
+   <tr><td valign="top">M026</td><td>KC-FORTH&nbsp;3.1</td></tr>
+   <tr>
+    <td valign="top">M027</td>
+    <td>EDAS&nbsp;1.4<br/>DISASS<br/>TEMO</td>
+   </tr>
+   <tr><td valign="top">M033</td><td>TYPESTAR&nbsp;90</td></tr>
+   <tr>
+    <td valign="top">M052</td>
+    <td>
+     Vinculum Terminal&nbsp;2.2<br/>
+     ULOAD<br/>
+     USAVE<br/>
+     NCFG&nbsp;1.0<br/>
+     PING&nbsp;1.1<br/>
+     TFTP&nbsp;1.1
+    </td>
+   </tr>
+   <tr>
+    <td valign="top">D004</td>
+    <td>je nach Einstellung Version&nbsp;2.0 oder&nbsp;3.3</td>
+   </tr>
+  </table>
+ <br/>
+
+
+ <h2><a name="disks">3. Enthaltene Diskettenabbilder</a></h2>
+  JKCEMU enth&auml;lt f&uuml;r die KC85/3..5-Emulation
+  folgende Diskettenabbilder:
+  <ul>
+   <li>CAOS-Systemdiskette</li>
+   <li>MicroDOS-Systemdiskette</li>
+  </ul>
+  F&uuml;r die Nutzung der Diskettenabbilder muss die Emulation
+  der Floppy-Disk-Erweiterung&nbsp;D004 aktiviert und die entsprechende
+  Diskette in das erste emulierte Diskettenlaufwerk eingelegt werden.
+ <br/><br/>
+
+ <h3><a name="caos_disk">3.1. CAOS-Systemdiskette</a></h3>
+  Die CAOS-Systemdiskette enth&auml;lt die notwendigen Programme
+  zur Nutzung von Disketten unter dem Betriebssystem&nbsp;CAOS.
+  Mit
+ <br/><br/>
+  &nbsp;&nbsp;<tt>JUMP&nbsp;FC</tt>
+ <br/><br/>
+  wird die auf der Diskette befindliche Software aktiviert.
+  Das CAOS-Menu enth&auml;lt nun den neuen Eintrag <em>FLOAD</em>,
+  mit dem Systemprogramme von Diskette geladen werden k&ouml;nnen.
+  Eines dieser Systemprogramme ist <em>BASEX</em>.
+  Dieses stellt die Diskettenanbindung f&uuml;r den BASIC-Interpreter her.
+  Zum Speichern von Systemprogrammen auf Diskette gibt es das Programm
+  <em>FSAVE</em>.
+ <br/><br/>
+
+ <h3><a name="mdos_disk">3.2. MicroDOS-Systemdiskette</a></h3>
+  MicroDOS starten Sie mit
+ <br/><br/>
+  &nbsp;&nbsp;<tt>JUMP&nbsp;FC</tt>
+ <br/><br/>
+  Das Laufwerk <em>A:</em> ist eine RAM-Floppy,
+  Laufwerk&nbsp;<em>B:</em> das erste Diskettenlaufwerk.
+  Die Anzeige des Verzeichnisses erfolgt mit dem Kommando
+  <em>D</em>, und nicht wie bei CP/M-kompatiblen Betriebssystemen
+  sonst &uuml;blich mit <em>DIR</em>.
+ <br/><br/>
+
+
+ <h2><a name="etc">4. Sonstiges</a></h2>
+
+ <h3><a name="load_file">4.1. Laden von Dateien</a></h3>
+  Das CAOS-Betriebssystem blendet standardm&auml;&szlig;ig den Videospeicher
+  (IRM) in den Adressraum ein und &uuml;berdeckt somit einen ab
+  Adresse&nbsp;8000h liegenden RAM (bei HC900 und KC85/2..3 nur dann der Fall,
+  wenn dort ein RAM-Modul eingeblendet ist).
+  Damit man aber auch BASIC-Programme laden kann,
+  die gr&ouml;&szlig;er als 32&nbsp;KByte sind,
+  werden KC-BASIC-Dateien bzw. Dateien,
+  die &uuml;blicherweise ein KC-BASIC-Programm enthalten,
+  ab Adresse&nbsp;8000h nicht in den IRM,
+  sondern in den dahinter liegenden RAM geladen.
+  Alle anderen Dateien werden dagegen in den gerade eingeblendeten Speicher
+  geladen, ggf. auch in den IRM.
+  Damit verh&auml;lt sich die Ladefunktion des Emulators genauso
+  wie das CLOAD-Kommando des BASIC-Interpreters (im Fall einer KC-BASIC-Datei)
+  bzw. wie das LOAD-Kommando im CAOS (im Fall keiner KC-BASIC-Datei).
+ <br/><br/>
+
+ <h3><a name="basic_io">4.2. BASIC-Programme speichern und laden</a></h3>
+  JKCEMU bietet eine spezielle Unterst&uuml;tzung f&uuml;r das
+  <a href="loadsavebasic.htm">Speichern und Laden von BASIC-Programmen</a>.
+  Wird ein System mit im ROM enthaltenen BASIC-Interpreter emuliert,
+  d.h. ein HC900 bzw. KC85/2 mit aktiviertem BASIC-Modul M006
+  oder ein KC85/3...5,
+  dann sucht JKCEMU das BASIC-Programm im Adressbereich
+  des ROM-BASIC-Interpreters (ab Adresse 0401h).
+  Bei einem HC900 bzw. KC85/2 ohne BASIC-Modul wird dagegen
+  das BASIC-Programm gespeichert,
+  das im Adressbereich des RAM-BASIC-Interpreters liegt (ab Adresse 2C01h).
+ <br/><br/>
+
+ <h3>
+  <a name="paste">4.3. Einf&uuml;gen von Text aus der Zwischenablage</a>
+ </h3>
+  Das Einf&uuml;gen von Text aus der Zwichenablage erfolgt gew&ouml;hnlich
+  in der Form, dass f&uuml;r jedes einzuf&uuml;gende Zeichen
+  das Dr&uuml;cken der entsprechenden Taste bzw. Tastenkombination
+  simuliert wird. Dieses Prinzip ist recht langsam.
+  F&uuml;r HC900 und KC85/2..5 gibt es in den
+  <a href="settings.htm">Einstellungen</a> die Option
+  <em>Einf&uuml;gen von Text direkt in den Tastaturpuffer</em>.
+  Bei dieser Option werden die einzuf&uuml;genden Zeichen
+  direkt in den Tastaturpuffer geschrieben.
+  Das ist wesentlich schneller, da dadurch das Dr&uuml;cken der
+  entsprechenden Tasten nicht simuliert werden muss.
+  Dadurch wird aber auch das CAOS-interne Tastencode-Mapping umgangen.
+  Andererseits ist es damit aber auch m&ouml;glich, Zeichen einzuf&uuml;gen,
+  die mit der originalen Tastatur nicht eingebbar sind.
+ <br/><br/>
+  Sollten aufgrund spezieller Umst&auml;nde oder durch Verwendung
+  eines anderen Betriebssystems anstelle von CAOS das Einf&uuml;gen
+  von Zeichen nicht m&ouml;glich sein, m&uuml;ssen Sie die Option ausschalten.
+ <br/><br/>
+  Wenn Sie die Option
+  <a href="kc85.htm#keys_direct">Schnellere Tastatureingaben durch direktes Schreiben in den Tastaturpuffer</a>
+  eingeschaltet haben, ist die Option f&uuml;r das Einf&uuml;gen von Text
+  hinf&auml;llig und deshalb nicht mehr ausw&auml;hlbar,
+  da in dem Fall die Tastatureingaben ja sowieso direkt
+  in den Tastaturpuffer geschrieben werden.
+ <br/><br/>
+
+ <h3>
+  <a name="video_timing">4.4. Zeitverhalten der Bildschirmsteuerung</a>
+ </h3>
+  An den Eing&auml;ngen des Z&auml;hler-/Zeitgeberbausteins (CTC)
+  liegen der Bildsynchronimpuls und der doppelte Zeilensynchronimpuls an.
+  Dadurch ist es m&ouml;glich, Software zu schreiben,
+  die mit der Ausgabe der einzelnen Pixelzeilen auf dem Bildschirm
+  synchron l&auml;uft.
+  Manche Programmierer nutzen diese M&ouml;glichkeit aus,
+  um spezielle Effekte zu erzeugen (z.B. Farbscrolling).
+  Damit solche Effekte auch im Emulator zu sehen sind,
+  muss die Visualisierung mit dem Zeitregime an den CTC-Eing&auml;ngen
+  synchron emuliert werden.
+  Und genau das macht die Option
+  <em>Zeitverhalten der Bildschirmsteuerung emulieren</em>.
+ <br/><br/>
+  Die zeitsynchrone Emulation der Bildschirmsteuerung ist sehr rechenintensiv.
+  Au&szlig;erdem gibt es auch nur wenige Programme,
+  die diese M&ouml;glichkeit nutzen.
+  Aus diesem Grund ist die zeitsynchrone Emulation zwischen
+  Bildschirmausgabe und CTC in Form einer Option ein- und ausschaltbar.
+ <br/><br/>
+  Ist die Option eingeschaltet, wird auch die Bildschirmausgabe
+  sychron aktualisiert, d.h. der in den Einstellungen festgelegte
+  Aktualiserungszyklus findet keine Anwendung.
+ <br/><br/>
+
+ <h3><a name="d004memerror">4.5. Vermeintlicher D004-Speicherfehler</a></h3>
+  In den neueren D004-ROM-Versionen ist ein Speichertest enthalten,
+  so auch in der Version&nbsp;3.3, die im JKCEMU integriert ist.
+  Diesen Test k&ouml;nnen Sie mit <tt>JUMP&nbsp;FC&nbsp;FF</tt> starten.
+  Dabei kann es vorkommen,
+  dass der Speichertest im JKCEMU einen Fehler meldet.
+  Die Ursache liegt dabei nicht etwa in einer fehlerhaften Speicherzelle,
+  sondern in einem Timeout, der bedingt durch die Art und Weise
+  der Emulation auftreten kann.
+ <br/><br/>
+  Im JKCEMU werden die beiden Mikroprozessorsysteme
+  (Grundger&auml;t und D004) in separaten Threads emuliert.
+  Da der Emulator keinen Einfluss darauf hat,
+  wann das Betriebssystem welchen Thread zum Zuge kommen l&auml;sst,
+  kann die Emulation der beiden Mikroprozessoren zueinander zeitlich
+  wesentlich weiter auseinander liegen als bei einem
+  realen KC85/D004-Gespann.
+  Die Fehlermeldung erscheint nun deshalb, weil vom Grundger&auml;t aus
+  die Adresse der zu pr&uuml;fende Speicherzelle an die D004
+  &uuml;bergeben wird.
+  In der D004 wird nun die Speicherzelle getestet und das Ergebnis
+  an das Grundger&auml;t zur&uuml;ckgemeldet.
+  Das Grundger&auml;t wartet nur eine bestimmt Zeit auf die R&uuml;ckmeldung.
+  Ist diese Zeit abgelaufen, wird die Speicherzelle als fehlerhaft angesehen
+  und somit ein Fehler ausgegeben.
+  Wenn nun zuf&auml;llig der D004-Thread zeitlich etwas behindert wurde,
+  und deshalb in der D004 der Speichertest vielleicht noch gar nicht
+  begonnen hat, wird auch die R&uuml;ckmeldung zu sp&auml;lt erfolgen
+  und somit zu einer Fehlermeldung f&uuml;hren.
+</body>
+</html>
