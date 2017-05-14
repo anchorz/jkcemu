@@ -1,5 +1,5 @@
 /*
- * (c) 2009-2016 Jens Mueller
+ * (c) 2009-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -9,10 +9,18 @@
 package jkcemu.disk;
 
 import java.awt.Frame;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.lang.*;
-import java.nio.channels.*;
-import java.util.*;
+import java.nio.channels.FileLock;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 import jkcemu.base.EmuUtil;
 
@@ -46,18 +54,40 @@ public class AnaDisk extends AbstractFloppyDisk
 	  for( int i = 0; i < cylSectors; i++ ) {
 	    SectorData sector = disk.getSectorByIndex( cyl, head, i );
 	    if( sector != null ) {
-	      if( sector.isDeleted() ) {
-		hasDeleted = true;
+	      if( sector.checkError()
+		  || sector.hasBogusID()
+		  || sector.isDeleted() )
+	      {
 		if( msgBuf == null ) {
 		  msgBuf = new StringBuilder( 1024 );
 		}
 		msgBuf.append(
 			String.format(
-				"Seite %d, Spur %d: Sektor %d ist als"
-					+ " gel\u00F6scht markiert\n",
+				"Seite %d, Spur %d, Sektor %d:",
 				head + 1,
 				cyl,
 				sector.getSectorNum() ) );
+		boolean appended = false;
+		if( sector.hasBogusID() ) {
+		  msgBuf.append( " Sektor-ID generiert" );
+		  appended = true;
+		}
+		if( sector.checkError() ) {
+		  if( appended ) {
+		    msgBuf.append( (char) ',' );
+		  }
+		  msgBuf.append( " CRC-Fehler" );
+		  appended = true;
+		}
+		if( sector.isDeleted() ) {
+		  if( appended ) {
+		    msgBuf.append( (char) ',' );
+		  }
+		  msgBuf.append( " als gel\u00F6scht markiert" );
+		  appended   = true;
+		  hasDeleted = true;
+		}
+		msgBuf.append( (char) '\n' );
 	      }
 	      out.write( cyl );
 	      out.write( head );
@@ -80,14 +110,21 @@ public class AnaDisk extends AbstractFloppyDisk
       }
       out.close();
       out = null;
-      if( hasDeleted && (msgBuf != null) ) {
-	msgBuf.append( "\nGel\u00F6schte Sektoren werden"
+
+      if( msgBuf != null ) {
+	msgBuf.append( "\nDie angezeigten Informationen k\u00F6nnen"
+		+ " in einer AnaDisk-Datei nicht gespeichert werden\n"
+		+ "und sind deshalb in der erzeugten Datei"
+		+ " nicht mehr enthalten.\n" );
+	if( hasDeleted ) {
+	  msgBuf.append( "\nGel\u00F6schte Sektoren werden"
 		+ " in AnaDisk-Dateien nicht unterst\u00FCtzt\n"
 		+ "und sind deshalb als normale Sektoren enthalten.\n" );
+	}
       }
     }
     finally {
-      EmuUtil.doClose( out );
+      EmuUtil.closeSilent( out );
     }
     return msgBuf != null ? msgBuf.toString() : null;
   }
@@ -119,8 +156,8 @@ public class AnaDisk extends AbstractFloppyDisk
     }
     finally {
       if( rv == null ) {
-	EmuUtil.doRelease( fl );
-	EmuUtil.doClose( raf );
+	EmuUtil.releaseSilent( fl );
+	EmuUtil.closeSilent( raf );
       }
     }
     return rv;
@@ -139,8 +176,8 @@ public class AnaDisk extends AbstractFloppyDisk
     }
     finally {
       if( rv == null ) {
-	EmuUtil.doRelease( fl );
-	EmuUtil.doClose( raf );
+	EmuUtil.releaseSilent( fl );
+	EmuUtil.closeSilent( raf );
       }
     }
     return rv;
@@ -160,7 +197,7 @@ public class AnaDisk extends AbstractFloppyDisk
     }
     finally {
       if( rv == null ) {
-	EmuUtil.doClose( in );
+	EmuUtil.closeSilent( in );
       }
     }
     return rv;
@@ -179,10 +216,10 @@ public class AnaDisk extends AbstractFloppyDisk
 	/* --- ueberschriebene Methoden --- */
 
   @Override
-  public synchronized void doClose()
+  public synchronized void closeSilent()
   {
-    EmuUtil.doRelease( this.fileLock );
-    EmuUtil.doClose( this.raf );
+    EmuUtil.releaseSilent( this.fileLock );
+    EmuUtil.closeSilent( this.raf );
   }
 
 
@@ -214,11 +251,10 @@ public class AnaDisk extends AbstractFloppyDisk
 	  }
 	  map = this.side0;
 	}
-	Integer                    cylObj   = new Integer( physCyl );
-	java.util.List<SectorData> cylSects = map.get( cylObj );
+	java.util.List<SectorData> cylSects = map.get( physCyl );
 	if( cylSects == null ) {
 	  cylSects = new ArrayList<>( sectorIDs.length );
-	  map.put( cylObj, cylSects );
+	  map.put( physCyl, cylSects );
 	}
 	if( cylSects.isEmpty() ) {
 	  try {
@@ -327,12 +363,12 @@ public class AnaDisk extends AbstractFloppyDisk
   {
     if( (props != null) && (this.fileName != null) ) {
       if( this.resource ) {
-	props.setProperty( prefix + "resource", this.fileName );
+	props.setProperty( prefix + PROP_RESOURCE, this.fileName );
       } else {
-	props.setProperty( prefix + "file", this.fileName );
+	props.setProperty( prefix + PROP_FILE, this.fileName );
       }
       props.setProperty(
-		prefix + "readonly",
+		prefix + PROP_READONLY,
 		Boolean.toString( isReadOnly() ) );
     }
   }
@@ -489,15 +525,14 @@ public class AnaDisk extends AbstractFloppyDisk
 	map = side1;
       }
       if( map != null ) {
-	Integer keyObj                     = new Integer( physCyl );
-	java.util.List<SectorData> sectors = map.get( keyObj );
+	java.util.List<SectorData> sectors = map.get( physCyl );
 	if( sectors == null ) {
 	  if( (physCyl > 0) && (sectorsPerCyl > 0) ) {
 	    sectors = new ArrayList<>( sectorsPerCyl );
 	  } else {
 	    sectors = new ArrayList<>();
 	  }
-	  map.put( keyObj, sectors );
+	  map.put( physCyl, sectors );
 	}
 	// doppelte Sektoren herausfiltern
 	boolean found = false;
@@ -565,7 +600,7 @@ public class AnaDisk extends AbstractFloppyDisk
     Map<Integer,java.util.List<SectorData>> map = ((physHead & 0x01) != 0 ?
 							side1 : side0);
     if( map != null ) {
-      rv = map.get( new Integer( physCyl ) );
+      rv = map.get( physCyl );
     }
     return rv;
   }

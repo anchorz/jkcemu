@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2016 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,13 +8,12 @@
 
 package jkcemu.programming.basic;
 
-import java.awt.*;
-import java.io.*;
 import java.lang.*;
-import java.text.*;
-import java.util.*;
-import jkcemu.base.*;
-import jkcemu.programming.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 
 
 public class BasicLibrary
@@ -323,7 +322,7 @@ public class BasicLibrary
        *   HL: Anfangsadresse des Puffers
        *   C:  max. Anzahl einzugebender Zeichen (Pufferlaenge - 1)
        * Rueckgabewert:
-       *   HL: Zeiger auf das terminierende Null-Byte
+       *   HL: Zeiger auf das terminierende Nullbyte
        */
       buf.append( "INLNR:\tPUSH\tHL\n"
 		+ "\tLD\tB,C\n"
@@ -4298,7 +4297,7 @@ public class BasicLibrary
       /*
        * Umwandlung eines numerischen Wertes in eine Zeichenkette
        * mit einer Hexadezimalzahl.
-       * Es wird kein terminierendes Null-Byte geschrieben!
+       * Es wird kein terminierendes Nullbyte geschrieben!
        *
        * Parameter:
        *   HL: numerischer Wert (Ausgabe 4-stellig)
@@ -4315,7 +4314,7 @@ public class BasicLibrary
       /*
        * Umwandlung eines numerischen Wertes in eine Zeichenkette
        * mit einer Hexadezimalzahl.
-       * Es wird kein terminierendes Null-Byte geschrieben!
+       * Es wird kein terminierendes Nullbyte geschrieben!
        *
        * Parameter:
        *   S_HXA:  A: numerischer Wert (Ausgabe 2-stellig)
@@ -4643,7 +4642,7 @@ public class BasicLibrary
        *   HL: Zeiger auf die Zeichenkette
        * Rueckgabewerte:
        *   DE: Zeiger auf das Ende der kopierten Zeichenkette
-       *       (terminierendes Null-Byte) im Zielpuffer
+       *       (terminierendes Nullbyte) im Zielpuffer
        *   BC: Restgroesse des Zielpuffers - 1
        */
       buf.append( "STNCP:\tLD\tA,B\n"
@@ -5079,15 +5078,13 @@ public class BasicLibrary
        */
       buf.append( "S_STR:\tLD\tA,H\n"
 		+ "\tXOR\t80H\n"
-		+ "\tOR\tL\n"
+		+ "\tOR\tL\n"			// CY=0
 		+ "\tJR\tZ,S_STR4\n"
 		+ "\tLD\tA,20H\n"
 		+ "\tBIT\t7,H\n"
 		+ "\tJR\tZ,S_STR1\n"
 		+ "\tEX\tDE,HL\n"
-		+ "\tXOR\tA\n"			// CY=0
-		+ "\tLD\tH,A\n"
-		+ "\tLD\tL,A\n"
+		+ "\tLD\tHL,0000H\n"
 		+ "\tSBC\tHL,DE\n"
 		+ "\tLD\tA,2DH\n"		// Minuszeichen
 		+ "S_STR1:\tEXX\n"
@@ -5107,9 +5104,8 @@ public class BasicLibrary
 		+ "\tLD\tDE,0001H\n"		// 1
 		+ "\tLD\tB,01H\n"		// Null ausgeben
 		+ "\tCALL\tS_STR2\n"
-		+ "\tXOR\tA\n"
 		+ "\tEXX\n"
-		+ "\tLD\t(HL),A\n"
+		+ "\tLD\t(HL),00H\n"
 		+ "\tLD\tHL,M_STR\n"
 		+ "\tRET\n"
 		+ "S_STR2:\tLD\tA,0FFH\n"
@@ -5251,7 +5247,7 @@ public class BasicLibrary
     target.appendEtcPreXOutTo( buf );
     if( libItems.contains( LibItem.XOUTST ) ) {
       /*
-       * Ausgabe eines mit einem Null-Byte abgeschlossenen Textes
+       * Ausgabe eines mit einem Nullbyte abgeschlossenen Textes
        * auf dem Bildschirm,
        * der sich unmittelbar an den Funktionsaufruf anschliesst.
        */
@@ -5263,13 +5259,13 @@ public class BasicLibrary
     }
     if( libItems.contains( LibItem.XOUTS ) ) {
       /*
-       * Ausgabe eines mit einem Null-Byte abgeschlossenen Textes
+       * Ausgabe eines mit einem Nullbyte abgeschlossenen Textes
        * auf dem Bildschirm
        *
        * Parameter:
        *   HL: Adresse des Textes
        * Rueckgabe:
-       *   HL: erstes Byte hinter dem abschliessenden Null-Byte
+       *   HL: erstes Byte hinter dem abschliessenden Nullbyte
        */
       buf.append( "XOUTS:\tLD\tA,(HL)\n"
 		+ "\tINC\tHL\n"

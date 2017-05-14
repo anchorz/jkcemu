@@ -1,5 +1,5 @@
 /*
- * (c) 2009-2015 Jens Mueller
+ * (c) 2009-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -9,7 +9,7 @@
 package jkcemu.emusys.kc85;
 
 import java.lang.*;
-import java.util.*;
+import java.util.ArrayList;
 
 
 public class KC85ModuleTableModel extends javax.swing.table.AbstractTableModel
@@ -67,14 +67,16 @@ public class KC85ModuleTableModel extends javax.swing.table.AbstractTableModel
   @Override
   public Class<?> getColumnClass( int col )
   {
-    return (col >= 0) && (col < 3) ? String.class : Object.class;
+    return (col >= 0) && (col < colNames.length) ?
+					String.class
+					: Object.class;
   }
 
 
   @Override
   public int getColumnCount()
   {
-    return 3;
+    return colNames.length;
   }
 
 
@@ -115,6 +117,11 @@ public class KC85ModuleTableModel extends javax.swing.table.AbstractTableModel
   }
 
 
+  /*
+   * Obwohl isCellEditable(...) immer false zurueckliefert,
+   * muss die Methode setValueAt(...) implementiert werden,
+   * da sie ausserhalb von JTable direkt aufgerufen wird.
+   */
   @Override
   public void setValueAt( Object value, int row, int col )
   {
@@ -133,4 +140,3 @@ public class KC85ModuleTableModel extends javax.swing.table.AbstractTableModel
     }
   }
 }
-

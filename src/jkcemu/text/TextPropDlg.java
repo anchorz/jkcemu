@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2011 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,15 +8,20 @@
 
 package jkcemu.text;
 
-import java.awt.*;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.File;
 import java.lang.*;
 import java.util.EventObject;
-import javax.swing.*;
-import jkcemu.base.*;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JTextArea;
+import jkcemu.base.BaseDlg;
 
 
-public class TextPropDlg extends BasicDlg
+public class TextPropDlg extends BaseDlg
 {
   private JButton btnOK;
 
@@ -88,8 +93,9 @@ public class TextPropDlg extends BasicDlg
     gbc.gridy++;
     add( new JLabel( displayText ), gbc );
 
-    if( editText.getTrailing1A() ) {
-      displayText = "1Ah";
+    int eofByte = editText.getEofByte();
+    if( eofByte >= 0 ) {
+      displayText = String.format( "%02Xh", eofByte );
     } else {
       displayText = "Nicht vorhanden";
     }
@@ -134,4 +140,3 @@ public class TextPropDlg extends BasicDlg
     return rv;
   }
 }
-

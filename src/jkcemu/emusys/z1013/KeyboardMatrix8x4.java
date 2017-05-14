@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2011 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -273,6 +273,22 @@ public class KeyboardMatrix8x4 extends KeyboardMatrix
 	  rv = true;
 	  break;
       }
+
+      // F1 bis F4 als separates Betaetigen von S1 bis S4 emulieren
+      switch( keyCharCode ) {
+	case 0xF1:
+	  this.keyboardMatrix[ 0 ] |= 0x08;		// S1
+	  break;
+	case 0xF2:
+	  this.keyboardMatrix[ 1 ] |= 0x08;		// S2
+	  break;
+	case 0xF3:
+	  this.keyboardMatrix[ 2 ] |= 0x08;		// S3
+	  break;
+	case 0xF4:
+	  this.keyboardMatrix[ 3 ] |= 0x08;		// S4
+	  break;
+      }
     }
     if( rv ) {
       updShiftKeysPressed();
@@ -288,4 +304,3 @@ public class KeyboardMatrix8x4 extends KeyboardMatrix
     setShiftKeysPressed( isAnyControlKeyPressed() );
   }
 }
-

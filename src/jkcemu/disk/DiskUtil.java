@@ -1,5 +1,5 @@
 /*
- * (c) 2009-2016 Jens Mueller
+ * (c) 2009-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,15 +8,30 @@
 
 package jkcemu.disk;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Component;
+import java.awt.Frame;
+import java.awt.Window;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.lang.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
 import javax.swing.JOptionPane;
 import jkcemu.Main;
-import jkcemu.base.*;
+import jkcemu.base.BaseDlg;
+import jkcemu.base.DeviceIO;
+import jkcemu.base.EmuUtil;
+import jkcemu.base.FileEntry;
 import jkcemu.text.TextUtil;
 
 
@@ -210,7 +225,7 @@ public class DiskUtil
 		  blockSize = tmpBlkSize;
 		}
 	      } else {
-		rv        = new Boolean( tmp16Bit );
+		rv        = tmp16Bit;
 		blockSize = tmpBlkSize;
 	      }
 	    }
@@ -226,7 +241,7 @@ public class DiskUtil
 		&& ((maxBlkNum16 * DEFAULT_BLOCK_SIZE) >= diskSize)
 		&& ((maxBlkNum16 * halfBlkSize) < diskSize) )
 	    {
-	      blockSize = new Integer( halfBlkSize );
+	      blockSize = halfBlkSize;
 	    }
 	  } else {
 	    // 8-Bit-Blocknummern
@@ -234,7 +249,7 @@ public class DiskUtil
 		&& ((maxBlkNum8 * DEFAULT_BLOCK_SIZE) >= diskSize)
 		&& ((maxBlkNum8 * halfBlkSize) < diskSize) )
 	    {
-	      blockSize = new Integer( halfBlkSize );
+	      blockSize = halfBlkSize;
 	    }
 	  }
 	}
@@ -270,7 +285,7 @@ public class DiskUtil
       }
     }
     if( !rv ) {
-      rv = BasicDlg.showYesNoWarningDlg(
+      rv = BaseDlg.showYesNoWarningDlg(
 		owner,
 		"Die Dateiendung entspricht nicht der f\u00FCr"
 			+ " diesen Dateityp \u00FCblichen Endung.\n"
@@ -429,6 +444,35 @@ public class DiskUtil
   }
 
 
+  public static int getExtentNumByEntryPos( byte[] dirBytes, int entryPos )
+  {
+    int rv = 0;
+    if( dirBytes != null ) {
+      if( (entryPos + 14) < dirBytes.length ) {
+	rv = ((int) dirBytes[ entryPos + 12 ] & 0x001F)
+		| (((int) dirBytes[ entryPos + 14 ] << 5) & 0x07E0);
+      }
+    }
+    return rv;
+  }
+
+
+  /*
+   * Extents pro Directory-Eintrag ermitteln
+   *
+   * Da pro Extent die Groesse in 80h-Bloecken max. 4000h sein kann,
+   * muessen u.U. pro Directory-Eintrag mehrere Extents verwendet werden.
+   */
+  public static int getExtentsPerDirEntry(
+				int     blockSize,
+				boolean blockNum16Bit )
+  {
+    int sizePerDirEntry = blockSize * (blockNum16Bit ? 8 : 16);
+    return sizePerDirEntry > 0x4000 ?
+		((sizePerDirEntry + 0x4000 - 1) / 0x4000) : 1;
+  }
+
+
   public static boolean isFilledDir( byte[] dirBytes )
   {
     return getDirStatus( dirBytes ) == DirStatus.FILLED_DIR;
@@ -470,7 +514,7 @@ public class DiskUtil
       }
       catch( IOException ex ) {}
       finally {
-	EmuUtil.doClose( in );
+	EmuUtil.closeSilent( in );
       }
     }
     return rv;
@@ -592,6 +636,7 @@ public class DiskUtil
 			File               diskFile,
 			AbstractFloppyDisk disk,
 			boolean            forceAskLogicalFmt )
+							throws IOException
   {
     // Vorbelegung ermitteln
     int           sysTracks     = 0;
@@ -613,15 +658,41 @@ public class DiskUtil
 	sysTracks = rvSysBytes.get() / bytesPerTrack;
       }
     }
-    Boolean tmp16Bit = checkBlockNum16Bit(
-					dirBytes,
-					disk.getDiskSize(),
-					rvBlockSize );
+    int     diskSize = disk.getDiskSize();
+    Boolean tmp16Bit = checkBlockNum16Bit( dirBytes, diskSize, rvBlockSize );
     if( tmp16Bit != null ) {
       blockNum16Bit = tmp16Bit.booleanValue();
     }
     if( rvBlockSize.get() > 0 ) {
       blockSize = rvBlockSize.get();
+    } else {
+      /*
+       * Blockgroesse konnte nicht ermittelt werden.
+       * Deshalb andere Indizien suchen.
+       *
+       * zuerst CPC-AMSDOS-Format, dann minimale Blockgroesse pruefen
+       */
+      boolean done = false;
+      if( (disk.getCylinders() == 40)
+	  && (disk.getSides() == 1)
+	  && (disk.getSectorsPerCylinder() == 9)
+	  && (disk.getSectorSize() == 512) )
+      {
+	int sectorOffset = disk.getSectorOffset();
+	if( (sectorOffset == 0x40) || (sectorOffset == 0xC0) ) {
+	  blockSize = 1024;
+	  done      = true;
+	}
+      }
+      if( !done && (tmp16Bit != null) ) {
+	if( !tmp16Bit.booleanValue() ) {
+	  int minBlockSize = diskSize / 0x100;
+	  while( blockSize < minBlockSize ) {
+	    blockSize *= 2;
+	  }
+	  rvBlockSize.set( blockSize );
+	}
+      }
     }
     FloppyDiskFormatDlg dlg = null;
     if( forceAskLogicalFmt ) {
@@ -705,7 +776,7 @@ public class DiskUtil
       }
     }
     finally {
-      EmuUtil.doClose( rad );
+      EmuUtil.closeSilent( rad );
     }
   }
 
@@ -741,7 +812,7 @@ public class DiskUtil
       }
     }
     finally {
-      EmuUtil.doClose( raf );
+      EmuUtil.closeSilent( raf );
     }
   }
 
@@ -782,9 +853,9 @@ public class DiskUtil
 	      String eName = buf.toString();
 	      Long   value = entrySizes.get( eName );
 	      if( value != null ) {
-		value = new Long( value.longValue() + eLen );
+		value = Long.valueOf( value.longValue() + eLen );
 	      } else {
-		value = new Long( eLen );
+		value = Long.valueOf( eLen );
 	      }
 	      entrySizes.put( eName, value );
 	    }
@@ -969,6 +1040,20 @@ public class DiskUtil
 					rvBlockSize );
     if( rvBlockSize.get() > 0 ) {
       blockSize = rvBlockSize.get();
+    } else {
+      /*
+       * Blockgroesse konnte nicht ermittelt werden.
+       * Deshalb andere Indizien suchen.
+       */
+      if( blkNum16Bit != null ) {
+	if( !blkNum16Bit.booleanValue() ) {
+	  int minBlockSize = (int) (diskSize / 0x100);
+	  while( blockSize < minBlockSize ) {
+	    blockSize *= 2;
+	  }
+	  rvBlockSize.set( blockSize );
+	}
+      }
     }
     FloppyDiskFormatDlg dlg = new FloppyDiskFormatDlg(
 			owner,

@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2016 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,29 +8,107 @@
 
 package jkcemu.filebrowser;
 
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.dnd.*;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.EventQueue;
+import java.awt.Frame;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.FlavorEvent;
+import java.awt.datatransfer.FlavorListener;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceContext;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetContext;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
+import java.awt.dnd.InvalidDnDOperationException;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.lang.*;
-import java.net.*;
-import java.nio.file.*;
-import java.util.*;
-import java.util.zip.*;
-import javax.sound.sampled.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.EventObject;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Properties;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JMenuItem;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JToolBar;
+import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.TreeWillExpandListener;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.TableModel;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultTreeSelectionModel;
+import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import jkcemu.Main;
-import jkcemu.audio.*;
-import jkcemu.base.*;
-import jkcemu.disk.*;
+import jkcemu.base.AbstractFileWorker;
+import jkcemu.base.BaseDlg;
+import jkcemu.base.BaseFrm;
+import jkcemu.base.EmuUtil;
+import jkcemu.base.FileCopier;
+import jkcemu.base.FileEntry;
+import jkcemu.base.FileMover;
+import jkcemu.base.FileTableModel;
+import jkcemu.base.FileTreeNode;
+import jkcemu.base.FileTreeNodeComparator;
+import jkcemu.base.HelpFrm;
+import jkcemu.base.ScreenFrm;
 
 
 public class FileBrowserFrm
-			extends BasicFrm
+			extends BaseFrm
 			implements
 				AbstractFileWorker.PathListener,
 				DragGestureListener,
@@ -44,6 +122,7 @@ public class FileBrowserFrm
 {
   private static FileBrowserFrm instance = null;
 
+  private static final String HELP_PAGE = "/help/tools/filebrowser.htm";
   private static final String PROP_SHOW_HIDDEN_FILES
 				= "jkcemu.filebrowser.show_hidden_files";
   private static final String PROP_SORT_CASE_SENSITIVE
@@ -55,12 +134,14 @@ public class FileBrowserFrm
 
   private ScreenFrm            screenFrm;
   private FileActionMngr       fileActionMngr;
+  private FileSystemView       fsv;
   private JMenuItem            mnuFileCreateDir;
   private JMenuItem            mnuFileFind;
   private JMenuItem            mnuFileRefresh;
   private JMenuItem            mnuFileClose;
   private JMenuItem            mnuEditCut;
   private JMenuItem            mnuEditPaste;
+  private JCheckBoxMenuItem    mnuPhysFileSys;
   private JCheckBoxMenuItem    mnuHiddenFiles;
   private JCheckBoxMenuItem    mnuSortCaseSensitive;
   private JRadioButtonMenuItem mnuNoPreview;
@@ -84,7 +165,7 @@ public class FileBrowserFrm
   private FilePreviewFld       filePreviewFld;
   private Component            lastActiveFld;
   private Clipboard            clipboard;
-  private ArrayList<File>      cutFiles;
+  private java.util.List<File> cutFiles;
   private boolean              ignoreFlavorEvent;
   private boolean              pasteState;
 
@@ -183,7 +264,9 @@ public class FileBrowserFrm
 	  try {
 	    e.startDrag( null, new FileListSelection( files ), this );
 	  }
-	  catch( InvalidDnDOperationException ex ) {}
+	  catch( Exception ex ) {
+	    BaseDlg.showErrorDlg( this, ex );
+	  }
 	}
       }
     }
@@ -323,7 +406,7 @@ public class FileBrowserFrm
 	    if( o instanceof Collection ) {
 	      Collection files = (Collection) o;
 
-	      // Pruefung und Sicherheitsanfrage
+	      // Pruefung und Sicherheitsabfrage
 	      boolean status    = true;
 	      File    srcFile   = null;
 	      int     nSrcFiles = 0;
@@ -348,10 +431,36 @@ public class FileBrowserFrm
 		  if( srcDir != null ) {
 		    try {
 		      if( EmuUtil.equals( srcDir, dstPath.toFile() ) ) {
-			BasicDlg.showErrorDlg(
-			  this,
-			  "Verschieben im selben Verzeichnis"
-				  + " ist nicht m\u00F6glich." );
+			/*
+			 * Fehlermeldung nur anzeigen, wenn der Mauszeiger
+			 * nicht mehr ueber der Quelldatei steht.
+			 */
+			boolean msgState = true;
+			Point   point    = e.getLocation();
+			if( point != null ) {
+			  TreePath tp = this.tree.getPathForLocation(
+								point.x,
+								point.y );
+			  if( tp != null ) {
+			    Object o1 = tp.getLastPathComponent();
+			    if( o1 != null ) {
+			      if( o1 instanceof FileNode ) {
+				File tmpFile = ((FileNode) o1).getFile();
+				if( tmpFile != null ) {
+				  if( EmuUtil.equals( srcFile, tmpFile ) ) {
+				    msgState = false;
+				  }
+				}
+			      }
+			    }
+			  }
+			}
+			if( msgState ) {
+			  BaseDlg.showErrorDlg(
+			  	this,
+			  	"Verschieben im selben Verzeichnis"
+					  + " ist nicht m\u00F6glich." );
+			}
 			status = false;
 		      }
 		    }
@@ -399,7 +508,7 @@ public class FileBrowserFrm
 		  } else {
 		    buf.append( " kopieren?" );
 		  }
-		  status = BasicDlg.showYesNoDlg( this, buf.toString() );
+		  status = BaseDlg.showYesNoDlg( this, buf.toString() );
 		}
 		if( status ) {
 		  if( action == DnDConstants.ACTION_MOVE ) {
@@ -441,7 +550,7 @@ public class FileBrowserFrm
       }
       catch( UnsupportedFlavorException ex ) {}
       catch( IOException ex ) {
-	BasicDlg.showErrorDlg( this, ex );
+	BaseDlg.showErrorDlg( this, ex );
       }
       finally {
 	e.dropComplete( success );
@@ -571,16 +680,6 @@ public class FileBrowserFrm
   {
     boolean rv = super.applySettings( props, resizable );
     if( !isVisible() ) {
-      this.mnuHiddenFiles.setSelected(
-		EmuUtil.parseBooleanProperty(
-				props,
-				PROP_SHOW_HIDDEN_FILES,
-				false ) );
-      this.mnuSortCaseSensitive.setSelected(
-		EmuUtil.parseBooleanProperty(
-				props,
-				PROP_SORT_CASE_SENSITIVE,
-				false ) );
       String previewMaxFileSize = null;
       if( props != null ) {
 	previewMaxFileSize = props.getProperty(
@@ -603,10 +702,9 @@ public class FileBrowserFrm
       } else {
 	this.mnuPreviewNoFileSizeLimit.setSelected( true );
       }
-      int splitPos = EmuUtil.parseIntProperty(
+      int splitPos = EmuUtil.getIntProperty(
 				props,
 				PROP_SPLIT_POSITION,
-				-1,
 				-1 );
       if( splitPos >= 0 ) {
 	this.splitPane.setDividerLocation( splitPos );
@@ -624,7 +722,37 @@ public class FileBrowserFrm
 	  this.splitPane.setDividerLocation( xDiv );
 	}
       }
-      doFileRefresh();
+    }
+    boolean changed = false;
+    boolean state   = EmuUtil.getBooleanProperty(
+				props,
+				PROP_SHOW_HIDDEN_FILES,
+				false );
+    if( state != this.mnuHiddenFiles.isSelected() ) {
+      this.mnuHiddenFiles.setSelected( state );
+      changed = true;
+    }
+    state = EmuUtil.getBooleanProperty(
+				props,
+				PROP_SORT_CASE_SENSITIVE,
+				File.separatorChar == '/' );
+    if( state != this.mnuSortCaseSensitive.isSelected() ) {
+      this.mnuSortCaseSensitive.setSelected( state );
+      changed = true;
+    }
+    if( this.mnuPhysFileSys != null ) {
+      state = EmuUtil.getBooleanProperty(
+				props,
+				EmuUtil.PROP_SHOW_PHYS_FILESYS,
+				false );
+      if( state != this.mnuPhysFileSys.isSelected() ) {
+	this.mnuPhysFileSys.setSelected( state );
+	this.rootNode.setFileSystemView( state ? this.fsv : null );
+	changed = true;
+      }
+    }
+    if( changed ) {
+      refreshNode( this.rootNode );
     }
     return rv;
   }
@@ -674,15 +802,21 @@ public class FileBrowserFrm
 	    rv = true;
 	    doEditPaste();
 	  }
-	  else if( (src == this.mnuHiddenFiles)
-		   || (src == this.mnuSortCaseSensitive) )
-	  {
+	  else if( src == this.mnuHiddenFiles ) {
 	    rv = true;
-	    doFileRefresh();
+	    doSettingsHiddenFiles();
+	  }
+	  else if( src == this.mnuPhysFileSys ) {
+	    rv = true;
+	    doSettingsPhysFileSys();
+	  }
+	  else if( src == this.mnuSortCaseSensitive ) {
+	    rv = true;
+	    doSettingsSortCaseSensitive();
 	  }
 	  else if( src == this.mnuHelpContent ) {
 	    rv = true;
-	    HelpFrm.open( "/help/tools/filebrowser.htm" );
+	    HelpFrm.open( HELP_PAGE );
 	  }
 	  if( !rv && (e instanceof ActionEvent) ) {
 	    String actionCmd = ((ActionEvent) e).getActionCommand();
@@ -725,7 +859,7 @@ public class FileBrowserFrm
       }
     }
     catch( IOException ex ) {
-      BasicDlg.showErrorDlg( this, ex );
+      BaseDlg.showErrorDlg( this, ex );
     }
     return rv;
   }
@@ -806,7 +940,7 @@ public class FileBrowserFrm
 	      done = true;
 	    }
 	    catch( IOException ex ) {
-	      BasicDlg.showErrorDlg( this, ex );
+	      BaseDlg.showErrorDlg( this, ex );
 	    }
 	    e.consume();
 	  }
@@ -852,7 +986,6 @@ public class FileBrowserFrm
     if( fObjs != null ) {
       int n = fObjs.size();
       if( n > 0 ) {
-	this.cutFiles.ensureCapacity( n );
 	for( FileActionMngr.FileObject fObj : fObjs ) {
 	  File file = fObj.getFile();
 	  if( file != null ) {
@@ -923,10 +1056,10 @@ public class FileBrowserFrm
       catch( IllegalStateException ex ) {}
       catch( UnsupportedFlavorException ex ) {}
       catch( IOException ex ) {
-	BasicDlg.showErrorDlg( this, ex );
+	BaseDlg.showErrorDlg( this, ex );
       }
     } else {
-      BasicDlg.showErrorDlg(
+      BaseDlg.showErrorDlg(
 		this,
 		"Kein Verzeichnis ausgew\u00E4hlt,"
 			+ " in das eingef\u00FCgt werden soll" );
@@ -968,8 +1101,18 @@ public class FileBrowserFrm
       if( (parent != null) && (file != null) ) {
 	File dirFile = EmuUtil.createDir( this, file );
 	if( dirFile != null ) {
-	  if( parent instanceof FileNode ) {
-	    refreshNode( (FileNode) parent );
+	  boolean selected = false;
+	  try {
+	    this.rootNode.refreshNodeFor(
+				file.toPath(),
+				this.treeModel,
+				this.mnuHiddenFiles.isSelected(),
+				getFileTreeNodeComparator() );
+	  }
+	  catch( InvalidPathException ex ) {
+	    if( parent instanceof FileNode ) {
+	      refreshNode( (FileNode) parent );
+	    }
 	  }
 	  fireSelectNode( parent, dirFile );
 	  updActionButtons();
@@ -1001,12 +1144,47 @@ public class FileBrowserFrm
   }
 
 
+  private void doSettingsHiddenFiles()
+  {
+    EmuUtil.setProperty(
+		Main.getProperties(),
+		PROP_SHOW_HIDDEN_FILES,
+		this.mnuHiddenFiles.isSelected() );
+    refreshNode( this.rootNode );
+  }
+
+
+  private void doSettingsPhysFileSys()
+  {
+    if( this.mnuPhysFileSys != null ) {
+      boolean state = this.mnuPhysFileSys.isSelected();
+      EmuUtil.setProperty(
+		Main.getProperties(),
+		EmuUtil.PROP_SHOW_PHYS_FILESYS,
+		state );
+      this.rootNode.setFileSystemView( state ? null : this.fsv );
+      refreshNode( this.rootNode );
+    }
+  }
+
+
+  private void doSettingsSortCaseSensitive()
+  {
+    EmuUtil.setProperty(
+		Main.getProperties(),
+		PROP_SORT_CASE_SENSITIVE,
+		this.mnuSortCaseSensitive.isSelected() );
+    refreshNode( this.rootNode );
+  }
+
+
 	/* --- Konstruktor --- */
 
   private FileBrowserFrm( ScreenFrm screenFrm )
   {
     this.screenFrm             = screenFrm;
     this.fileActionMngr        = new FileActionMngr( this, screenFrm, this );
+    this.fsv                   = EmuUtil.getDifferentLogicalFileSystemView();
     this.ignoreFlavorEvent     = false;
     this.pasteState            = false;
     this.lastActiveFld         = null;
@@ -1086,15 +1264,26 @@ public class FileBrowserFrm
     JMenu mnuSettings = new JMenu( "Einstellungen" );
     mnuSettings.setMnemonic( KeyEvent.VK_E );
 
+    this.mnuPhysFileSys = null;
+    if( this.fsv != null ) {
+      this.mnuPhysFileSys = new JCheckBoxMenuItem(
+		"Physische Dateisystemstruktur anzeigen",
+		Main.getBooleanProperty(
+				EmuUtil.PROP_SHOW_PHYS_FILESYS,
+				false ) );
+      this.mnuPhysFileSys.addActionListener( this );
+      mnuSettings.add( this.mnuPhysFileSys );
+    }
+
     this.mnuHiddenFiles = new JCheckBoxMenuItem(
-					"Versteckte Dateien anzeigen",
-					false );
+		"Versteckte Dateien anzeigen",
+		Main.getBooleanProperty( PROP_SHOW_HIDDEN_FILES, false ) );
     this.mnuHiddenFiles.addActionListener( this );
     mnuSettings.add( this.mnuHiddenFiles );
 
     this.mnuSortCaseSensitive = new JCheckBoxMenuItem(
-			"Gro\u00DF-/Kleinschreibung bei Sortierung beachten",
-			true );
+		"Gro\u00DF-/Kleinschreibung bei Sortierung beachten",
+		Main.getBooleanProperty( PROP_SORT_CASE_SENSITIVE, false ) );
     this.mnuSortCaseSensitive.addActionListener( this );
     mnuSettings.add( this.mnuSortCaseSensitive );
     mnuSettings.addSeparator();
@@ -1186,7 +1375,11 @@ public class FileBrowserFrm
     selModel.setSelectionMode(
 		TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION );
 
-    this.rootNode = new FileNode( null, null, true );
+    this.rootNode = new FileNode( null, null, null, true, null );
+    if( this.mnuPhysFileSys != null ) {
+      this.rootNode.setFileSystemView(
+		this.mnuPhysFileSys.isSelected() ? null : this.fsv );
+    }
     this.rootNode.refresh(
 			null,
 			this.mnuHiddenFiles.isSelected(),
@@ -1701,19 +1894,21 @@ public class FileBrowserFrm
   private void refreshNodeFor( Path path )
   {
     if( path != null ) {
-      final FileNode node = this.rootNode.refreshNodeFor(
+      Collection<FileNode> nodes = this.rootNode.refreshNodeFor(
 				path,
 				this.treeModel,
-				false,
 				this.mnuHiddenFiles.isSelected(),
 				getFileTreeNodeComparator() );
 
-      if( node != null ) {
+      if( nodes != null ) {
 	if( this.tree.getSelectionCount() == 1 ) {
 	  Object o = this.tree.getLastSelectedPathComponent();
 	  if( o != null ) {
-	    if( o.equals( node ) ) {
-	      setPreviewedFileNode( node );
+	    for( FileNode node : nodes ) {
+	      if( o.equals( node ) ) {
+		setPreviewedFileNode( node );
+		break;
+	      }
 	    }
 	  }
 	}

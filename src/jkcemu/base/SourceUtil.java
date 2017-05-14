@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2016 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -141,7 +141,7 @@ public class SourceUtil
 	    b         = memory.getBasicMemByte( addr++ );
 	    tmpTokens = tokensFF;
 	  }
-	  if( b >= 0x80 ) {
+	  if( (tmpTokens != null) && (b >= 0x80) ) {
 	    int pos = b - 0x80;
 	    if( (pos >= 0) && (pos < tmpTokens.length) ) {
 	      String s = tmpTokens[ pos ];
@@ -161,6 +161,8 @@ public class SourceUtil
 		  }
 		}
 		b = 0;
+	      } else {
+		buf.append( (char) (b + 0x80) );
 	      }
 	    }
 	  }
@@ -258,7 +260,7 @@ public class SourceUtil
     if( text != null ) {
       Component owner = screenFrm.openText( text );
       if( (owner != null) && (begAddr != 0x0401) && (begAddr != 0x2C01) ) {
-	BasicDlg.showInfoDlg(
+	BaseDlg.showInfoDlg(
 		owner,
 		"Das BASIC-Programm befindet sich au\u00DFerhalb\n"
 			+ "des standardm\u00E4\u00DFigen Adressbereichs." );
@@ -296,7 +298,7 @@ public class SourceUtil
 		SaveDlg.BasicType.KCBASIC,
 		EmuUtil.getKCBasicFileFilter() )).setVisible( true );
       } else {
-	BasicDlg.showErrorDlg(
+	BaseDlg.showErrorDlg(
 		screenFrm,
 		"Es ist zwar ein BASIC-Programm vorhanden, jedoch befindet\n"
 			+ "es sich au\u00DFerhalb des"
@@ -346,7 +348,7 @@ public class SourceUtil
 	basicBegAddr = 0x2C01;
       }
       if( basicBegAddr >= 0 ) {
-	int topAddr = getBasicEndAddr( emuThread, basicBegAddr );
+	int topAddr = getBasicEndAddr( emuThread, basicBegAddr ) + 1;
 	if( topAddr > basicBegAddr ) {
 	  emuThread.setBasicMemWord( begAddr - 42, topAddr );
 	  emuThread.setBasicMemWord( begAddr - 40, topAddr );
@@ -369,7 +371,7 @@ public class SourceUtil
 
   private static void showNoBasic( Component owner )
   {
-    BasicDlg.showErrorDlg(
+    BaseDlg.showErrorDlg(
 	owner,
 	"Es ist kein BASIC-Programm im entsprechenden\n"
 		+ "Adressbereich des Arbeitsspeichers vorhanden." );

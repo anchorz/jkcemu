@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2013 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -110,7 +110,7 @@ public class KeyboardMatrix8x8 extends KeyboardMatrix
     boolean rv = true;
     reset();
     switch( keyCode ) {
-      case KeyEvent.VK_F1:
+      case KeyEvent.VK_F1:				// Graph E/A
 	this.keyboardMatrix[ 6 ] = 0x01;
 	break;
 
@@ -198,6 +198,9 @@ public class KeyboardMatrix8x8 extends KeyboardMatrix
       }
       updShiftKeysPressed();
     }
+    if( keyCharCode == 0xF1 ) {				// Graph E/A
+      this.keyboardMatrix[ 6 ] = 0x01;
+    }
     return rv;
   }
 
@@ -211,4 +214,3 @@ public class KeyboardMatrix8x8 extends KeyboardMatrix
 	|| ((this.keyboardMatrix[ 7 ] & 0x40) != 0) );
   }
 }
-

@@ -1,17 +1,24 @@
 /*
- * (c) 2008-2015 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
- * Dateiname fuer Drag&Drop-Operationen
+ * Klasse zur Uebertragung einer Dateiliste
  */
 
 package jkcemu.filebrowser;
 
-import java.awt.datatransfer.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
+import java.io.IOException;
 import java.lang.*;
-import java.util.*;
+import java.nio.file.InvalidPathException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 public class FileListSelection implements ClipboardOwner, Transferable
@@ -19,11 +26,29 @@ public class FileListSelection implements ClipboardOwner, Transferable
   private java.util.List<File> files;
 
 
-  public FileListSelection( Collection<File> files )
+  public FileListSelection( Collection<File> files ) throws IOException
   {
     int n = files.size();
     this.files = new ArrayList<>( n > 0 ? n : 1 );
-    this.files.addAll( files );
+    for( File file : files ) {
+      boolean failed = false;
+      try {
+	if( file.toPath() == null ) {
+	  failed = true;
+	}
+	this.files.add( file );
+      }
+      catch( InvalidPathException ex ) {
+	failed = true;
+      }
+      finally {
+	if( failed ) {
+	  throw new IOException(
+		"Kopieren/Verschieben von virtuellen Dateien"
+			+ " bzw. Verzeichnisse nicht m\u00F6glich" );
+	}
+      }
+    }
   }
 
 
@@ -63,4 +88,3 @@ public class FileListSelection implements ClipboardOwner, Transferable
     return flavor.equals( DataFlavor.javaFileListFlavor );
   }
 }
-

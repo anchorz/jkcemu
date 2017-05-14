@@ -1,5 +1,5 @@
 /*
- * (c) 2009-2015 Jens Mueller
+ * (c) 2009-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,17 +8,24 @@
 
 package jkcemu.disk;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.*;
-import java.util.*;
-import jkcemu.base.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import jkcemu.base.EmuUtil;
+import jkcemu.base.FileTimesView;
+import jkcemu.base.FileTimesViewFactory;
 
 
 public class DiskImgCreator
 {
   private FileTimesViewFactory ftvFactory;
   private boolean              blockNum16Bit;
-  private int                  extentBlocks;
   private int                  blockSize;
   private int                  dirBlocks;
   private int                  begDirArea;
@@ -54,7 +61,6 @@ public class DiskImgCreator
     this.begFileArea   = this.begDirArea + (this.dirBlocks * this.blockSize);
     this.dstDirPos     = this.begDirArea;
     this.dstFilePos    = this.begFileArea;
-    this.extentBlocks  = (this.blockNum16Bit ? 8 : 16);
     this.blockNum      = this.dirBlocks;
     this.begTimeFile   = -1;
     this.dstTimeFile   = -1;
@@ -106,11 +112,7 @@ public class DiskImgCreator
   }
 
 
-  /*
-   * Rueckgabewert:
-   *   Anzahl der Directory-Eintraege
-   */
-  public int addFile(
+  public void addFile(
 		int     userNum,
 		String  entryName,
 		File    file,
@@ -118,7 +120,6 @@ public class DiskImgCreator
 		boolean sysFile,
 		boolean archived ) throws IOException
   {
-    int rv = 0;
     if( (entryName != null) && (file != null) ) {
       if( (this.begTimeFile >= 0)
 	  && entryName.equals( DateStamper.FILENAME ) )
@@ -134,7 +135,7 @@ public class DiskImgCreator
       InputStream in = null;
       try {
 	in = new BufferedInputStream( new FileInputStream( file ) );
-	rv = addFile(
+	addFile(
 		userNum,
 		entryName,
 		in,
@@ -144,10 +145,9 @@ public class DiskImgCreator
 		this.ftvFactory.getFileTimesView( file ) );
       }
       finally {
-	EmuUtil.doClose( in );
+	EmuUtil.closeSilent( in );
       }
     }
-    return rv;
   }
 
 
@@ -169,7 +169,7 @@ public class DiskImgCreator
 	}
       }
       finally {
-	EmuUtil.doClose( in );
+	EmuUtil.closeSilent( in );
       }
     }
   }
@@ -265,11 +265,7 @@ public class DiskImgCreator
   }
 
 
-  /*
-   * Rueckgabewert:
-   *   Anzahl der Directory-Eintraege
-   */
-  private int addFile(
+  private void addFile(
 		int           userNum,
 		String        entryName,
 		InputStream   in,
@@ -278,9 +274,12 @@ public class DiskImgCreator
 		boolean       archived,
 		FileTimesView fileTimesView ) throws IOException
   {
-    int extentNum = 0;
-    int b         = in.read();
+    int extentNum  = 0;
+    int b          = in.read();
     if( b >= 0 ) {
+      int extentsPerDirEntry = DiskUtil.getExtentsPerDirEntry(
+							blockSize,
+							blockNum16Bit );
       while( b >= 0 ) {
 	if( extentNum >= 0x800 ) {
 	  throwFileTooBig( entryName );
@@ -292,14 +291,14 @@ public class DiskImgCreator
 				sysFile,
 				archived,
 				fileTimesView,
-				extentNum++ );
+				extentNum );
 	int blkPos = dirPos + 0x10;
 
-	// Extent schreiben
-	int begExtentPos       = this.dstFilePos;
-	int endExtentPos       = begExtentPos;
-	int remainExtentBlocks = this.extentBlocks;
-	while( (remainExtentBlocks > 0) && (b >= 0) ) {
+	// Datenbloecke des Directory-Eintrags schreiben
+	int begEntryDataPos       = this.dstFilePos;
+	int endEntryDataPos       = begEntryDataPos;
+	int remainEntryDataBlocks = (this.blockNum16Bit ? 8 : 16);
+	while( (remainEntryDataBlocks > 0) && (b >= 0) ) {
 	  int remainBlockBytes = this.blockSize;
 	  while( (remainBlockBytes > 0) && (b >= 0) ) {
 	    if( this.dstFilePos >= this.diskBuf.length ) {
@@ -311,7 +310,7 @@ public class DiskImgCreator
 	    --remainBlockBytes;
 	    b = in.read();
 	  }
-	  endExtentPos       = this.dstFilePos;
+	  endEntryDataPos    = this.dstFilePos;
 	  int endOf128BlkPos = (this.dstFilePos + 127) & ~0x7F;
 	  if( endOf128BlkPos > this.diskBuf.length ) {
 	    endOf128BlkPos = this.diskBuf.length;
@@ -341,10 +340,23 @@ public class DiskImgCreator
 	      throwFileTooBig( entryName );
 	    }
 	  }
-	  --remainExtentBlocks;
+	  --remainEntryDataBlocks;
 	}
-	this.diskBuf[ dirPos + 15 ] =
-		(byte) ((endExtentPos - begExtentPos + 127) / 128);
+	int nEntrySegs  = (endEntryDataPos - begEntryDataPos + 127) / 128;
+	int nExtentSegs = nEntrySegs % 128;
+	if( (nEntrySegs > 0) && (nExtentSegs == 0) ) {
+	  nExtentSegs = 128;
+	}
+	int nEntryExtents = (nEntrySegs + 127) / 128;
+	int tmpExtentNum  = extentNum;
+	if( (nEntryExtents > 1) && (nEntryExtents <= extentsPerDirEntry) ) {
+	  tmpExtentNum = extentNum + nEntryExtents - 1;
+	}
+	this.diskBuf[ dirPos + 12 ] = (byte) (tmpExtentNum & 0x1F);
+	this.diskBuf[ dirPos + 14 ] = (byte) ((tmpExtentNum >> 5) & 0x3F);
+	this.diskBuf[ dirPos + 15 ] = (byte) nExtentSegs;
+
+	extentNum += extentsPerDirEntry;
       }
     } else {
       // leere Datei
@@ -355,9 +367,8 @@ public class DiskImgCreator
 		sysFile,
 		archived,
 		fileTimesView,
-		extentNum++ );
+		extentNum );
     }
-    return extentNum;
   }
 
 

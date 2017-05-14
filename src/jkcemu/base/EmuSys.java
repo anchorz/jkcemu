@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2015 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,25 +8,72 @@
 
 package jkcemu.base;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.image.ImageObserver;
-import java.io.*;
+import java.io.File;
 import java.lang.*;
-import java.text.*;
-import java.util.*;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
+import java.util.Arrays;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JOptionPane;
 import jkcemu.Main;
-import jkcemu.audio.AudioOut;
 import jkcemu.base.ScreenFrm;
-import jkcemu.disk.*;
-import jkcemu.etc.*;
+import jkcemu.disk.FloppyDiskDrive;
+import jkcemu.disk.FloppyDiskFormat;
+import jkcemu.disk.FloppyDiskInfo;
+import jkcemu.etc.Plotter;
+import jkcemu.etc.VDIP;
 import jkcemu.text.TextUtil;
-import z80emu.*;
+import z80emu.Z80CPU;
+import z80emu.Z80MaxSpeedListener;
+import z80emu.Z80Memory;
+import z80emu.Z80MemView;
+import z80emu.Z80TStatesListener;
 
 
-public abstract class EmuSys implements ImageObserver, Runnable
+public abstract class EmuSys
+			extends AbstractScreenDevice
+			implements
+				ImageObserver,
+				Runnable,
+				Z80MaxSpeedListener,
+				Z80TStatesListener
 {
+  public static final String PROP_COLOR        = "color";
+  public static final String PROP_COUNT        = "count";
+  public static final String PROP_FDC_ENABLED  = "fdc.enabled";
+  public static final String PROP_FILE         = "file";
+  public static final String PROP_FONT_PREFIX  = "font.";
+  public static final String PROP_FONT_FILE    = PROP_FONT_PREFIX + PROP_FILE;
+  public static final String PROP_BASIC_PREFIX = "basic.";
+  public static final String PROP_OS_PREFIX    = "os.";
+  public static final String PROP_OS_FILE      = PROP_OS_PREFIX + PROP_FILE;
+  public static final String PROP_OS_VERSION   = PROP_OS_PREFIX + "version";
+  public static final String PROP_ROM_PREFIX   = "rom.";
+  public static final String PROP_MODEL        = "model";
+  public static final String PROP_CATCH_PRINT_CALLS = "catch_print_calls";
+  public static final String PROP_FIXED_SCREEN_SIZE = "fixed_screen_size";
+  public static final String PROP_KCNET_ENABLED     = "kcnet.enabled";
+  public static final String PROP_ROMMEGA_ENABLED   = "rom_mega.enabled";
+  public static final String PROP_PASTE_FAST        = "paste.fast";
+  public static final String PROP_RF_PREFIX         = "ramfloppy.";
+  public static final String PROP_RF1_PREFIX        = "ramfloppy.1.";
+  public static final String PROP_RF2_PREFIX        = "ramfloppy.2.";
+  public static final String PROP_RTC_ENABLED       = "rtc.enabled";
+  public static final String PROP_VDIP_ENABLED      = "vdip.enabled";
+
+  public static final String VALUE_NONE        = "none";
+  public static final String VALUE_PREFIX_FILE = "file:";
+
+  public static final int     DEFAULT_PROMPT_AFTER_RESET_MILLIS_MAX = 500;
+  public static final boolean DEFAULT_SWAP_KEY_CHAR_CASE            = false;
+
   public enum Chessman {
 		WHITE_PAWN,
 		WHITE_KNIGHT,
@@ -41,32 +88,22 @@ public abstract class EmuSys implements ImageObserver, Runnable
 		BLACK_QUEEN,
 		BLACK_KING };
 
-  protected static final int BLACK = 0;
-  protected static final int WHITE = 1;
+  protected EmuThread                  emuThread;
+  protected ScreenFrm                  screenFrm;
+  protected String                     propPrefix;
+  protected Thread                     pasteThread;
+  protected volatile CharacterIterator pasteIter;
+  protected volatile boolean           soundOutPhase;
+  protected volatile boolean           tapeOutPhase;
 
-  protected EmuThread         emuThread;
-  protected ScreenFrm         screenFrm;
-  protected String            propPrefix;
-  protected Color             colorWhite;
-  protected Color             colorRedLight;
-  protected Color             colorRedDark;
-  protected Color             colorGreenLight;
-  protected Color             colorGreenDark;
-  protected Thread            pasteThread;
-  protected CharacterIterator pasteIter;
+  private int          curSoundOutTStates;
+  private int          curTapeOutTStates;
+  private int          soundOutTStates;
+  private int          tapeOutTStates;
+  private volatile int soundOutFrameRate;
+  private volatile int tapeOutFrameRate;
 
   private static final int CHESSBOARD_SQUARE_WIDTH = 48;
-
-  // Basiskoordinaten eines horizontalen Segments einer 7-Segment-Anzeige
-  private static final int[] base7SegHXPoints = { 0, 3, 31, 34, 31, 3, 0 };
-  private static final int[] base7SegHYPoints = { 3, 0, 0, 3, 6, 6, 3 };
-
-  // Basiskoordinaten eines vertikalen Segments einer 7-Segment-Anzeige
-  private static final int[] base7SegVXPoints = { 3, 0, 4, 7, 10, 6, 3 };
-  private static final int[] base7SegVYPoints = { 5, 2, -27, -30, -27, 2, 5 };
-
-  private static int[] tmp7SegXPoints = new int[ base7SegHXPoints.length ];
-  private static int[] tmp7SegYPoints = new int[ base7SegHYPoints.length ];
 
 
   public EmuSys(
@@ -74,12 +111,20 @@ public abstract class EmuSys implements ImageObserver, Runnable
 		Properties props,
 		String     propPrefix )
   {
-    this.emuThread   = emuThread;
-    this.screenFrm   = emuThread.getScreenFrm();
-    this.pasteThread = null;
-    this.pasteIter   = null;
-    this.propPrefix  = propPrefix;
-    createColors( props );
+    super( props );
+    this.emuThread          = emuThread;
+    this.screenFrm          = emuThread.getScreenFrm();
+    this.pasteThread        = null;
+    this.pasteIter          = null;
+    this.propPrefix         = propPrefix;
+    this.curSoundOutTStates = 0;
+    this.soundOutTStates    = 0;
+    this.soundOutFrameRate  = 0;
+    this.soundOutPhase      = false;
+    this.curTapeOutTStates  = 0;
+    this.tapeOutTStates     = 0;
+    this.tapeOutFrameRate   = 0;
+    this.tapeOutPhase       = false;
   }
 
 
@@ -102,36 +147,6 @@ public abstract class EmuSys implements ImageObserver, Runnable
   }
 
 
-  public void applySettings( Properties props )
-  {
-    createColors( props );
-  }
-
-
-  public void audioOutChanged( AudioOut audioOut )
-  {
-    // leer
-  }
-
-
-  public synchronized void cancelPastingText()
-  {
-    Thread thread = this.pasteThread;
-    if( thread != null ) {
-      try {
-	thread.interrupt();
-      }
-      catch( Exception ex ) {}
-      this.pasteThread = null;
-    }
-    if( this.pasteIter != null ) {
-      this.pasteIter = null;
-      this.screenFrm.firePastingTextFinished();
-    }
-    keyReleased();
-  }
-
-
   /*
    * Wenn sich die Einstellungen geaendert haben,
    * wird mit dieser Methode geprueft,
@@ -141,12 +156,6 @@ public abstract class EmuSys implements ImageObserver, Runnable
    * Wenn nein, wird ein neue neue EmuSys-Instanz angelegt.
    */
   public boolean canApplySettings( Properties props )
-  {
-    return false;
-  }
-
-
-  public boolean canExtractScreenText()
   {
     return false;
   }
@@ -172,6 +181,25 @@ public abstract class EmuSys implements ImageObserver, Runnable
 
 
   /*
+   * Die Methode zeigt einen Dialog mit Meldung an,
+   * dass ein Zeichen nicht eingefuegt werden konnte.
+   * Die Methode kann von jedem Thread heraus aufgerufen werden.
+   */
+  protected void fireShowCharNotPasted( final CharacterIterator iter )
+  {
+    EventQueue.invokeLater(
+		new Runnable()
+		{
+		  @Override
+		  public void run()
+		  {
+		    showCharNotPasted( iter );
+		  }
+		} );
+  }
+
+
+  /*
    * Die Methode liefert den Wert, auf den der Stackpointer vor einem
    * durch JKCEMU initiierten Programmstart gesetzt wird.
    * Bei einem negativen Wert wird der Stackpointer nicht gesetzt.
@@ -182,48 +210,15 @@ public abstract class EmuSys implements ImageObserver, Runnable
   }
 
 
+  public boolean getAutoLoadInputOnSoftReset()
+  {
+    return true;
+  }
+
+
   public int getBasicMemByte( int addr )
   {
     return getMemByte( addr, false );
-  }
-
-
-  public int getBorderColorIndex()
-  {
-    return BLACK;
-  }
-
-
-  public int getBorderColorIndexByLine( int line )
-  {
-    return getBorderColorIndex();
-  }
-
-
-  /*
-   * Die Helligkeit wird logarithmisch gewertet,
-   * damit man auch im unteren und mittleren Einstellbereich
-   * noch etwas sieht.
-   */
-  protected static float getBrightness( Properties props )
-  {
-    int value = EmuUtil.getIntProperty(
-				props,
-				"jkcemu.brightness",
-				SettingsFrm.DEFAULT_BRIGHTNESS );
-    float rv = 1F;
-    if( (value > 0) && (value < 100) ) {
-      rv = 1F - (float) Math.abs(
-			  Math.log10( (double) (value + 10) / 110.0 ) );
-    } else {
-      rv = (float) value / 100F;
-    }
-    if( rv < 0F ) {
-      rv = 0F;
-    } else if( rv > 1F ) {
-      rv = 1F;
-    }
-    return rv;
   }
 
 
@@ -233,39 +228,21 @@ public abstract class EmuSys implements ImageObserver, Runnable
   }
 
 
-  public Color getColor( int colorIdx )
-  {
-    return colorIdx == WHITE ? this.colorWhite : Color.black;
-  }
-
-
-  public int getColorCount()
-  {
-    return 2;		// schwarz/weiss
-  }
-
-
-  public int getColorIndex( int x, int y )
-  {
-    return BLACK;
-  }
-
-
   protected boolean getConvertKeyCharToISO646DE()
   {
     return true;
   }
 
 
-  public CharRaster getCurScreenCharRaster()
+  public FloppyDiskFormat getDefaultFloppyDiskFormat()
   {
     return null;
   }
 
 
-  public FloppyDiskFormat getDefaultFloppyDiskFormat()
+  public int getDefaultPromptAfterResetMillisMax()
   {
-    return null;
+    return DEFAULT_PROMPT_AFTER_RESET_MILLIS_MAX;
   }
 
 
@@ -299,21 +276,6 @@ public abstract class EmuSys implements ImageObserver, Runnable
   }
 
 
-  /*
-   * Die Methode liefert entsprechend der eingestellten Helligkeit
-   * den max. Wert fuer die jeweiligen Primaerfarben.
-   */
-  public static int getMaxRGBValue( Properties props )
-  {
-    int   value      = 255 * SettingsFrm.DEFAULT_BRIGHTNESS / 100;
-    float brightness = getBrightness( props );
-    if( (brightness >= 0F) && (brightness <= 1F) ) {
-      value = Math.round( 255 * brightness );
-    }
-    return value;
-  }
-
-
   public abstract int getMemByte( int addr, boolean m1 );
 
 
@@ -341,74 +303,9 @@ public abstract class EmuSys implements ImageObserver, Runnable
   }
 
 
-  protected int getScreenChar( CharRaster chRaster, int chX, int chY )
+  public AbstractScreenDevice getSecondScreenDevice()
   {
-    return -1;
-  }
-
-
-  public String getScreenText()
-  {
-    CharRaster chRaster = getCurScreenCharRaster();
-    return chRaster != null ?
-		getScreenText(
-			chRaster,
-			0,
-			0,
-			chRaster.getColCount() - 1,
-			chRaster.getRowCount() - 1 )
-		: null;
-  }
-
-
-  public String getScreenText(
-			CharRaster chRaster,
-			int        chX1,
-			int        chY1,
-			int        chX2,
-			int        chY2 )
-  {
-    String rv = null;
-    if( (chX1 >= 0) && (chY1 >= 0) ) {
-      int nCols = chRaster.getColCount();
-      int nRows = chRaster.getRowCount();
-      if( (nCols > 0) && (nRows > 0) ) {
-	if( chY2 >= nRows ) {
-	  chY2 = nRows - 1;
-	}
-	StringBuilder buf     = new StringBuilder( nRows * (nCols + 1) );
-	int           nSpaces = 0;
-	while( (chY1 < chY2)
-	       || ((chY1 == chY2) && (chX1 <= chX2)) )
-	{
-	  int b = getScreenChar( chRaster, chX1, chY1 );
-	  if( (b == 0) || b == 0x20 ) {
-	    if( chY1 < chY2 ) {
-	      nSpaces++;
-	    } else {
-	      buf.append( (char) '\u0020' );
-	    }
-	  } else {
-	    while( nSpaces > 0 ) {
-	      buf.append( (char) '\u0020' );
-	      --nSpaces;
-	    }
-	    buf.append( (char) (b > 0 ? b : '_') );
-	  }
-	  chX1++;
-	  if( chX1 >= nCols ) {
-	    buf.append( (char) '\n' );
-	    nSpaces = 0;
-	    chX1    = 0;
-	    chY1++;
-	  }
-	}
-	if( buf.length() > 0 ) {
-	 rv = buf.toString();
-	}
-      }
-    }
-    return rv;
+    return null;
   }
 
 
@@ -450,13 +347,8 @@ public abstract class EmuSys implements ImageObserver, Runnable
 
   public boolean getSwapKeyCharCase()
   {
-    return false;
+    return DEFAULT_SWAP_KEY_CHAR_CASE;
   }
-
-
-  public abstract int    getScreenHeight();
-  public abstract int    getScreenWidth();
-  public abstract String getTitle();
 
 
   public File getUSBMemStickDirectory()
@@ -514,7 +406,8 @@ public abstract class EmuSys implements ImageObserver, Runnable
     if( a != null ) {
       if( EmuUtil.getProperty(
 		props,
-		"jkcemu.sram.init" ).toLowerCase().startsWith( "r" ) )
+		EmuThread.PROP_SRAM_INIT ).equalsIgnoreCase(
+					EmuThread.VALUE_SRAM_INIT_RANDOM ) )
       {
 	fillRandom( a );
       } else {
@@ -540,8 +433,8 @@ public abstract class EmuSys implements ImageObserver, Runnable
   {
     return EmuUtil.getBooleanProperty(
 			props,
-			"jkcemu.external_rom.reload_on_power_on",
-			false );
+			EmuThread.PROP_EXT_ROM_RELOAD_ON_POWER_ON,
+			EmuThread.DEFAULT_EXT_ROM_RELOAD_ON_POWER_ON );
   }
 
 
@@ -614,61 +507,7 @@ public abstract class EmuSys implements ImageObserver, Runnable
   }
 
 
-  /*
-   * Malen einer Stelle einer 7-Segment-Anzeige
-   * in der Basisgroesse 50x85 (BxH)
-   *
-   * Kodierung der Segmente
-   *   A: Bit0
-   *   B: Bit1
-   *   C: Bit2
-   *   D: Bit3
-   *   E: Bit4
-   *   F: Bit6
-   *   G: Bit7
-   *   P: Bit8
-   */
-  protected static void paint7SegDigit(
-				Graphics g,
-				int      x,
-				int      y,
-				int      v,
-				Color    d,
-				Color    l,
-				int      f )
-  {
-    paint7SegH( g, x + (14 * f), y + (0 * f), f, (v & 0x01) != 0 ? l : d );
-    paint7SegV( g, x + (44 * f), y + (35 * f), f, (v & 0x02) != 0 ? l : d );
-    paint7SegV( g, x + (40 * f), y + (75 * f), f, (v & 0x04) != 0 ? l : d );
-    paint7SegH( g, x + (6 * f), y + (80 * f), f, (v & 0x08) != 0 ? l : d );
-    paint7SegV( g, x + (0 * f), y + (75 * f), f, (v & 0x10) != 0 ? l : d );
-    paint7SegV( g, x + (4 * f), y + (35 * f), f, (v & 0x20) != 0 ? l : d );
-    paint7SegH( g, x + (10 * f), y + (40 * f), f, (v & 0x40) != 0 ? l : d );
-    g.setColor( (v & 0x80) != 0 ? l : d );
-    g.fillArc(
-	x + (47 * f),
-	y + (80 * f),
-	5 * f,
-	5 * f,
-	0,
-	360 );
-  }
-
-
-  /*
-   * Durch Ueberschreiben dieser Methode hat das emulierte System
-   * die Moeglichkeit,
-   * selbst die Bildschirmausgabe grafisch darzustellen.
-   * Wenn nicht (Rueckgabewert false) werden die Methoden getColorCount()
-   * und getColorIndex( x, y ) aufgerufen.
-   */
-  public boolean paintScreen( Graphics g, int x, int y, int screenScale )
-  {
-    return false;
-  }
-
-
-  protected boolean pasteChar( char ch )
+  protected boolean pasteChar( char ch ) throws InterruptedException
   {
     boolean rv = false;
     switch( ch ) {
@@ -687,10 +526,7 @@ public abstract class EmuSys implements ImageObserver, Runnable
     if( rv ) {
       long millis = getHoldMillisPasteChar();
       if( millis > 0L ) {
-	try {
-	  Thread.sleep( millis );
-	}
-	catch( InterruptedException ex ) {}
+	Thread.sleep( millis );
       }
       keyReleased();
     }
@@ -958,7 +794,10 @@ public abstract class EmuSys implements ImageObserver, Runnable
 
   public void reset( EmuThread.ResetLevel resetLevel, Properties props )
   {
-    // leer
+    this.curSoundOutTStates = 0;
+    this.curTapeOutTStates  = 0;
+    this.soundOutPhase      = false;
+    this.tapeOutPhase       = false;
   }
 
 
@@ -991,7 +830,7 @@ public abstract class EmuSys implements ImageObserver, Runnable
 
   protected void showNoBasic()
   {
-    BasicDlg.showErrorDlg(
+    BaseDlg.showErrorDlg(
 	this.screenFrm,
 	"Es ist kein BASIC-Programm im entsprechenden\n"
 		+ "Adressbereich des Arbeitsspeichers vorhanden." );
@@ -1034,59 +873,23 @@ public abstract class EmuSys implements ImageObserver, Runnable
   }
 
 
-  /*
-   * Diese Methode besagt, ob die mit getScreenChar() und getScreenText()
-   * gelieferten Zeichen moeglicherweise noch konvertiert werden muessen.
-   * Das ist dann der Fall, wenn die Zeichensatzdatei
-   * bzw. bei einem Vollgrafiksystem das Betriebssystem
-   * von extern geladen wird und der Zeichensatz somit nicht bekannt ist.
-   */
-  public boolean shouldAskConvertScreenChar()
+  public void soundOutFrameRateChanged( int frameRate )
   {
-    return false;
-  }
-
-
-  public synchronized void startPastingText( String text )
-  {
-    boolean done = false;
-    if( text != null ) {
-      if( !text.isEmpty() ) {
-	cancelPastingText();
-	this.pasteIter   = new StringCharacterIterator( text );
-	this.pasteThread = new Thread(
-				Main.getThreadGroup(),
-				this,
-				"JKCEMU text paste" );
-	this.pasteThread.start();
-	done = true;
-      }
-    }
-    if( !done ) {
-      this.screenFrm.firePastingTextFinished();
-    }
+    this.soundOutFrameRate = frameRate;
+    updSoundOutTStates();
   }
 
 
   public boolean supportsAudio()
   {
-    return false;
-  }
-
-
-  public boolean supportsBorderColorByLine()
-  {
-    return false;
+    return (supportsTapeIn()
+		|| supportsTapeOut()
+		|| supportsSoundOutMono()
+		|| supportsSoundOutStereo());
   }
 
 
   public boolean supportsChessboard()
-  {
-    return false;
-  }
-
-
-  public boolean supportsCopyToClipboard()
   {
     return false;
   }
@@ -1099,12 +902,6 @@ public abstract class EmuSys implements ImageObserver, Runnable
 
 
   public boolean supportsOpenBasic()
-  {
-    return false;
-  }
-
-
-  public boolean supportsPasteFromClipboard()
   {
     return false;
   }
@@ -1140,7 +937,31 @@ public abstract class EmuSys implements ImageObserver, Runnable
   }
 
 
-  public boolean supportsStereoSound()
+  public boolean supportsSoundOut8Bit()
+  {
+    return false;
+  }
+
+
+  public boolean supportsSoundOutMono()
+  {
+    return false;
+  }
+
+
+  public boolean supportsSoundOutStereo()
+  {
+    return false;
+  }
+
+
+  public boolean supportsTapeIn()
+  {
+    return false;
+  }
+
+
+  public boolean supportsTapeOut()
   {
     return false;
   }
@@ -1149,6 +970,13 @@ public abstract class EmuSys implements ImageObserver, Runnable
   public boolean supportsUSB()
   {
     return (getVDIP() != null);
+  }
+
+
+  public void tapeOutFrameRateChanged( int frameRate )
+  {
+    this.tapeOutFrameRate = frameRate;
+    updTapeOutTStates();
   }
 
 
@@ -1206,138 +1034,225 @@ public abstract class EmuSys implements ImageObserver, Runnable
   @Override
   public void run()
   {
-    long    delay   = 0L;
-    boolean isFirst = true;
-    while( this.pasteThread != null ) {
+    try {
+      long    delay   = 0L;
+      boolean isFirst = true;
+      while( this.pasteThread != null ) {
 
-      // kurze Wartezeit vor dem naechsten Zeichen
-      if( delay > 0L ) {
-	try {
+	// kurze Wartezeit vor dem naechsten Zeichen
+	if( delay > 0L ) {
 	  Thread.sleep( delay );
 	}
-	catch( InterruptedException ex ) {}
-      }
 
-      // naechstes Zeichen holen und uebergeben
-      CharacterIterator iter = this.pasteIter;
-      if( iter != null ) {
-	char ch = '\u0000';
-	if( isFirst ) {
-	  ch      = iter.first();
-	  isFirst = false;
-	} else {
-	  ch = iter.next();
-	}
-	if( ch == CharacterIterator.DONE ) {
-	  cancelPastingText();
-	} else {
-	  if( getConvertKeyCharToISO646DE() ) {
-	    ch = TextUtil.toISO646DE( ch );
-	  }
-	  if( pasteChar( ch ) ) {
-	    if( (ch == '\n') || (ch == '\r') ) {
-	      delay = getDelayMillisAfterPasteEnter();
-	    } else {
-	      delay = getDelayMillisAfterPasteChar();
-	    }
+	// naechstes Zeichen holen und uebergeben
+	CharacterIterator iter = this.pasteIter;
+	if( iter != null ) {
+	  char ch = '\u0000';
+	  if( isFirst ) {
+	    keyReleased();
+	    Thread.sleep( 100 );
+	    ch      = iter.first();
+	    isFirst = false;
 	  } else {
-	    if( this.pasteThread != null ) {
-	      if( JOptionPane.showConfirmDialog(
-			this.screenFrm,
-			String.format(
-				"Das Zeichen mit dem hexadezimalen Code %02X\n"
-					+ "kann nicht eingef\u00FCgt werden.",
-				(int) ch ),
-			"Text einf\u00FCgen",
-			JOptionPane.OK_CANCEL_OPTION,
-			JOptionPane.WARNING_MESSAGE )
-					!= JOptionPane.OK_OPTION )
-	      {
+	    ch = iter.next();
+	  }
+	  if( ch == CharacterIterator.DONE ) {
+	    cancelPastingText();
+	  } else {
+	    if( getConvertKeyCharToISO646DE() ) {
+	      ch = TextUtil.toISO646DE( ch );
+	    }
+	    if( pasteChar( ch ) ) {
+	      if( (ch == '\n') || (ch == '\r') ) {
+		delay = getDelayMillisAfterPasteEnter();
+	      } else {
+		delay = getDelayMillisAfterPasteChar();
+	      }
+	    } else {
+	      if( this.pasteThread != null ) {
 		cancelPastingText();
+		fireShowCharNotPasted( iter );
 	      }
 	    }
 	  }
 	}
       }
     }
-    this.screenFrm.firePastingTextFinished();
+    catch( InterruptedException ex ) {}
+    finally {
+      this.screenFrm.firePastingTextFinished();
+    }
+  }
+
+
+	/* --- Z80MaxSpeedListener --- */
+
+  @Override
+  public void z80MaxSpeedChanged( Z80CPU cpu )
+  {
+    if( cpu == this.emuThread.getZ80CPU() ) {
+      updSoundOutTStates();
+      updTapeOutTStates();
+    }
+  }
+
+
+	/* --- Z80TStatesListener --- */
+
+  @Override
+  public void z80TStatesProcessed( Z80CPU cpu, int tStates )
+  {
+    if( this.soundOutTStates > 0 ) {
+      if( this.curSoundOutTStates > 0 ) {
+	this.curSoundOutTStates -= tStates;
+      } else {
+	this.curSoundOutTStates = this.soundOutTStates;
+	this.emuThread.writeSoundOutPhase( this.soundOutPhase );
+      }
+    }
+    if( this.tapeOutTStates > 0 ) {
+      if( this.curTapeOutTStates > 0 ) {
+	this.curTapeOutTStates -= tStates;
+      } else {
+	this.curTapeOutTStates = this.tapeOutTStates;
+	this.emuThread.writeTapeOutPhase( this.tapeOutPhase );
+      }
+    }
+  }
+
+
+	/* --- ueberschriebene Methoden --- */
+
+  @Override
+  public synchronized void cancelPastingText()
+  {
+    Thread thread = this.pasteThread;
+    if( thread != null ) {
+      try {
+	thread.interrupt();
+      }
+      catch( Exception ex ) {}
+      this.pasteThread = null;
+    }
+    if( this.pasteIter != null ) {
+      this.pasteIter = null;
+      this.screenFrm.firePastingTextFinished();
+    }
+    EventQueue.invokeLater(
+		new Runnable()
+		{
+		  @Override
+		  public void run()
+		  {
+		    keyReleased();
+		  }
+		} );
+  }
+
+
+  @Override
+  public EmuThread getEmuThread()
+  {
+    return this.emuThread;
+  }
+
+
+  @Override
+  public synchronized void startPastingText( String text )
+  {
+    boolean done = false;
+    if( text != null ) {
+      if( !text.isEmpty() ) {
+	cancelPastingText();
+	this.pasteIter   = new StringCharacterIterator( text );
+	this.pasteThread = new Thread(
+				Main.getThreadGroup(),
+				this,
+				"JKCEMU text paste" );
+	this.pasteThread.start();
+	done = true;
+      }
+    }
+    if( !done ) {
+      this.screenFrm.firePastingTextFinished();
+    }
   }
 
 
 	/* --- private Methoden --- */
 
-  private void createColors( Properties props )
+  private void showCharNotPasted( CharacterIterator iter )
   {
-    int value            = getMaxRGBValue( props );
-    this.colorWhite      = new Color( value, value, value );
-    this.colorRedLight   = new Color( value, 0, 0 );
-    this.colorRedDark    = new Color( value / 5, 0, 0 );
-    this.colorGreenLight = new Color( 0, value, 0 );
-    this.colorGreenDark  = new Color( 0, value / 8, 0 );
-  }
-
-
-  /*
-   * Zeichnen eines horizontalen Segments einer 7-Segment-Anzeige
-   * Laenge: 35, Hoehe: 7
-   *
-   * Parameter:
-   *   x, y: linke Spitze
-   */
-  private static void paint7SegH(
-			Graphics g,
-			int      x,
-			int      y,
-			int      f,
-			Color    color )
-  {
-    paint7Seg( g, x, y, f, base7SegHXPoints, base7SegHYPoints, color );
-  }
-
-
-  /*
-   * Zeichnen eines vertikalen Segments einer 7-Segment-Anzeige
-   * Hoehe:35 , Breite: 7 + 4 durch Neigung
-   *
-   * Parameter:
-   *   x, y: untere Spitze
-   */
-  private static void paint7SegV(
-			Graphics g,
-			int      x,
-			int      y,
-			int      f,
-			Color    color )
-  {
-    paint7Seg( g, x, y, f, base7SegVXPoints, base7SegVYPoints, color );
-  }
-
-
-  private static void paint7Seg(
-			Graphics g,
-			int      x,
-			int      y,
-			int      f,
-			int[]    baseXPoints,
-			int[]    baseYPoints,
-			Color    color )
-  {
-    if( color != null ) {
-      for( int i = 0; i < tmp7SegXPoints.length; i++ ) {
-	tmp7SegXPoints[ i ] = x + (baseXPoints[ i ] * f);
-	tmp7SegYPoints[ i ] = y + (baseYPoints[ i ] * f);
+    String title     = "Text einf\u00FCgen";
+    int    remainLen = iter.getEndIndex() - iter.getIndex() - 1;
+    if( remainLen > 0 ) {
+      if( BaseDlg.showYesNoWarningDlg(
+		this.screenFrm,
+		String.format(
+			"Das Zeichen mit dem hexadezimalen Code %02X\n"
+				+ "kann nicht eingef\u00FCgt werden.\n"
+				+ "M\u00F6chten Sie die restlichen"
+				+ " Zeichen einf\u00FCgen?",
+			(int) iter.current() ),
+		title ) )
+      {
+	StringBuilder buf = new StringBuilder( remainLen );
+	char          ch  = iter.next();
+	while( ch != CharacterIterator.DONE ) {
+	  buf.append( ch );
+	  ch = iter.next();
+	}
+	if( buf.length() > 0 ) {
+	  startPastingText( buf.toString() );
+	}
       }
-      g.setColor( color );
-      g.fillPolygon( tmp7SegXPoints, tmp7SegYPoints, tmp7SegXPoints.length );
+    } else {
+      BaseDlg.showWarningDlg(
+	this.screenFrm,
+	String.format(
+		"Das letzte Zeichen (hexadezimaler Code %02X)\n"
+			+ "kann nicht eingef\u00FCgt werden.",
+		(int) iter.current() ),
+	title );
     }
   }
 
 
   private void showFunctionNotSupported()
   {
-    BasicDlg.showErrorDlg(
+    BaseDlg.showErrorDlg(
 	this.screenFrm,
 	"Diese Funktion steht f\u00FCr das gerade emulierte System\n"
 		+ "nicht zur Verf\u00FCgung." );
+  }
+
+
+  private void updSoundOutTStates()
+  {
+    int frameRate = this.soundOutFrameRate;
+    if( (frameRate > 0)
+	&& supportsSoundOutMono()
+	&& !supportsSoundOutStereo()
+	&& !supportsSoundOut8Bit() )
+    {
+      this.soundOutTStates = Math.min(
+		this.emuThread.getZ80CPU().getMaxSpeedKHz() * 300 / frameRate,
+		1 );
+    } else {
+      this.soundOutTStates = 0;
+    }
+  }
+
+
+  private void updTapeOutTStates()
+  {
+    int frameRate = this.tapeOutFrameRate;
+    if( (frameRate > 0) && supportsTapeOut() ) {
+      this.tapeOutTStates = Math.min(
+		this.emuThread.getZ80CPU().getMaxSpeedKHz() * 100 / frameRate,
+		1 );
+    } else {
+      this.tapeOutTStates = 0;
+    }
   }
 }

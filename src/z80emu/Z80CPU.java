@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2016 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Z80-Emulator
  *
@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class Z80CPU
+public class Z80CPU implements Runnable
 {
   public static enum Action {
 			RUN,
@@ -1163,9 +1163,10 @@ public class Z80CPU
   }
 
 
-	/* --- Emulation ausfuehren --- */
+	/* --- Runnable --- */
 
-  public void run() throws Z80ExternalException
+  @Override
+  public void run()
   {
     int opCode = 0;
     resetSpeed();
@@ -2014,7 +2015,7 @@ public class Z80CPU
     if( opCode == 0x76 ) {			// HALT
 
       // NOP-Befehl mit Ruecksetzen des PCs
-      this.haltPC = new Integer( this.instBegPC );
+      this.haltPC = this.instBegPC;
       this.instTStates += 4;
       setHaltState( true );
 

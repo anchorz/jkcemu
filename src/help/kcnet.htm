@@ -3,10 +3,15 @@
  <h1>Netzwerkemulation</h1>
   <ul>
    <li><a href="kcnet.htm#intro">1. Allgemeines</a></li>
-   <li><a href="kcnet.htm#cfg">2. Konfiguration</a></li>
-   <li>&nbsp;&nbsp;<a href="kcnet.htm#dhcp">2.1. DHCP</a></li>
+   <li>
+    <a href="kcnet.htm#cfg">2. Konfiguration</a>
+    <ul>
+     <li><a href="kcnet.htm#dhcp">2.1. DHCP</a></li>
+    </ul>
+   </li>
    <li><a href="kcnet.htm#ipv6">3. Hinweise zu IPv6</a></li>
   </ul>
+ <br/>
 
  <h2><a name="intro">1. Allgemeines</a></h2>
   Ralf K&auml;stner hat eine TCP/IP-f&auml;hige L&ouml;sung
@@ -97,15 +102,15 @@
   Auf einem Windows-Betriebssystem geht das folgenderma&szlig;en:
   <ol>
    <li>
-    Starten Sie die DOS-Box, indem Sie in der Windows-Suche
+    Starten Sie die Eingabeaufforderung, indem Sie in der Windows-Suche
     <tt>cmd.exe</tt> eingeben.
    </li>
    <li>
-    Tippen Sie in der DOS-Box <tt>ipconfig /all</tt> ein
+    Tippen Sie in der Eingabeaufforderung <tt>ipconfig /all</tt> ein
     und dr&uuml;cken <em>Enter</em>.
    </li>
    <li>
-    Suchen Sie in der DOS-Box in den Programmausgaben die Zeile
+    Suchen Sie in der Eingabeaufforderung in den Programmausgaben die Zeile
     mit dem DNS-Server heraus und tragen die dort angegebene IP-Adresse
     im Emulator in das Feld <em>DNS-Server</em> ein.
    </li>
@@ -133,7 +138,7 @@
   und Rebind-Zeit der Client-IP-Adresse haben keinen realen Bezug!
   Diese Werte dienen nur dazu, den in der Emulation laufenden
   DHCP-Client zufieden zu stellen.
-  Desweiteren sollte beachtet werden, dass kein DHCP-Server simuliert wird,
+  Des Weiteren sollte beachtet werden, dass kein DHCP-Server simuliert wird,
   wenn JKCEMU keine IP-Adresse ermitteln kann und in den Einstellungen
   auch keine angegeben wurde.
  <br/><br/>

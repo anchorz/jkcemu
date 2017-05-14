@@ -1,5 +1,5 @@
 /*
- * (c) 2011-2013 Jens Mueller
+ * (c) 2011-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,10 +8,16 @@
 
 package jkcemu.emusys.a5105;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.lang.*;
 import java.util.Arrays;
-import jkcemu.base.*;
+import jkcemu.base.AbstractKeyboardFld;
+import jkcemu.base.EmuSys;
 import jkcemu.emusys.A5105;
 import jkcemu.image.ImgUtil;
 
@@ -69,9 +75,9 @@ public class A5105KeyboardFld extends AbstractKeyboardFld<A5105>
     this.imgHome      = getImage( "/images/keyboard/a5105/home.png" );
     this.imgShift     = getImage( "/images/keyboard/a5105/shift.png" );
 
-    this.colorLEDGreenOn   = Color.green;
+    this.colorLEDGreenOn   = Color.GREEN;
     this.colorLEDGreenOff  = new Color( 60, 120, 60 );
-    this.colorLEDYellowOn  = Color.yellow;
+    this.colorLEDYellowOn  = Color.YELLOW;
     this.colorLEDYellowOff = new Color( 120, 120, 0 );
 
     this.fontText   = new Font( "SansSerif", Font.PLAIN, TEXT_FONT_SIZE );

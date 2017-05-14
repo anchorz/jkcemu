@@ -1,5 +1,5 @@
 /*
- * (c) 2015 Jens Mueller
+ * (c) 2015-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,16 +8,29 @@
 
 package jkcemu.base;
 
-import java.awt.*;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.lang.*;
-import java.text.*;
-import java.util.*;
-import javax.swing.*;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.EventObject;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.text.BadLocationException;
 
 
-public class AutoInputEntryDlg extends BasicDlg
+public class AutoInputEntryDlg extends BaseDlg
 {
   private static final String LABEL_WAIT_TIME = "Wartezeit vor Eingabe:";
   private static final String CMD_CHAR_PREFIX = "char.";
@@ -33,7 +46,8 @@ public class AutoInputEntryDlg extends BasicDlg
 	{ "\t",     "Cursor rechts / Tabulator" },
 	{ "\n",     "Cursor runter" },
 	{ "\u000B", "Cursor hoch" },
-	{ "\r",     "Enter / Return" } };
+	{ "\r",     "Enter / Return" },
+	{ "\u001B", "Escape" } };
 
   private static NumberFormat waitFmt = null;
 
@@ -51,12 +65,14 @@ public class AutoInputEntryDlg extends BasicDlg
   public static AutoInputEntry openNewEntryDlg(
 					Window  owner,
 					boolean swapKeyCharCase,
+					int     functionKeyCount,
 					int     defaultMillisToWait )
   {
     AutoInputEntryDlg dlg = new AutoInputEntryDlg(
 					owner,
 					swapKeyCharCase,
-					"Neuer AutoInput-Eintrag" );
+					"Neuer AutoInput-Eintrag",
+					functionKeyCount );
     dlg.setMillisToWait( defaultMillisToWait );
     dlg.setVisible( true );
     return dlg.appliedAutoInputEntry;
@@ -66,12 +82,14 @@ public class AutoInputEntryDlg extends BasicDlg
   public static AutoInputEntry openEditEntryDlg(
 					Window         owner,
 					boolean        swapKeyCharCase,
+					int            functionKeyCount,
 					AutoInputEntry entry )
   {
     AutoInputEntryDlg dlg = new AutoInputEntryDlg(
 					owner,
 					swapKeyCharCase,
-					"AutoInput-Eintrag bearbeiten" );
+					"AutoInput-Eintrag bearbeiten",
+					functionKeyCount );
     dlg.setMillisToWait( entry.getMillisToWait() );
     dlg.setInputText( entry.getInputText() );
     dlg.fldRemark.setText( entry.getRemark() );
@@ -128,7 +146,8 @@ public class AutoInputEntryDlg extends BasicDlg
   private AutoInputEntryDlg(
 			Window  owner,
 			boolean swapKeyCharCase,
-			String  title )
+			String  title,
+			int     functionKeyCount )
   {
     super( owner, title );
     this.appliedAutoInputEntry = null;
@@ -232,6 +251,20 @@ public class AutoInputEntryDlg extends BasicDlg
 	  String s = AutoInputDocument.toVisibleText( code );
 	  if( s != null ) {
 	    JMenuItem item = new JMenuItem( specialChars[ i ][ 1 ] );
+	    item.setActionCommand( CMD_CHAR_PREFIX + s );
+	    item.addActionListener( this );
+	    this.mnuSpecialChars.add( item );
+	  }
+	}
+      }
+    }
+    if( functionKeyCount > 0 ) {
+      for( int i = 1; i <= functionKeyCount; i++ ) {
+	if( i != 10 ) {
+	  String s = AutoInputDocument.toVisibleText(
+				Character.toString( (char) (0xF0 + i) ) );
+	  if( s != null ) {
+	    JMenuItem item = new JMenuItem( String.format( "F%d", i ) );
 	    item.setActionCommand( CMD_CHAR_PREFIX + s );
 	    item.addActionListener( this );
 	    this.mnuSpecialChars.add( item );

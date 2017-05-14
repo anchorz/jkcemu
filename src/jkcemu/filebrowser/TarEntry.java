@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2014 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,10 +8,12 @@
 
 package jkcemu.filebrowser;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.*;
 import java.nio.file.attribute.PosixFilePermission;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class TarEntry
@@ -150,8 +152,9 @@ public class TarEntry
     } while( paxHeader );
 
     // Pruefsumme ermitteln und vergleichen
-    int chkSumOrg = parseOctalNumber( headerBuf, 148, 156 );
-    int pos       = 148;
+    String errMsg    = null;
+    int    chkSumOrg = parseOctalNumber( headerBuf, 148, 156 );
+    int    pos       = 148;
     while( pos < 156 ) {
       headerBuf[ pos++ ] = (byte) 0x20;
     }
@@ -164,12 +167,12 @@ public class TarEntry
       pos++;
     }
     if( (chkSumSigned != chkSumOrg) && (chkSumUnsigned != chkSumOrg) ) {
-      throw new IOException(
-		"Kein TAR-Kopfblock (Pr\u00FCfsumme differiert)" );
+      errMsg = addLine(
+		errMsg,
+		"Pr\u00FCfsumme im TAR-Kopfblock fehlerhaft" );
     }
 
     // Werte lesen
-    String errMsg = null;
     if( entryName == null ) {
       StringBuilder buf = new StringBuilder( 100 );
       pos = 0;
@@ -181,13 +184,15 @@ public class TarEntry
 	if( b >= '\u0020' ) {
 	  buf.append( (char) b );
 	} else {
-	  errMsg = "Ung\u00FCltiges Zeichen im Namen des Eintrags";
+	  errMsg = addLine(
+			errMsg,
+			"Ung\u00FCltiges Zeichen im Namen des Eintrags" );
 	}
       }
       entryName = buf.toString();
     }
-    if( entryName.isEmpty() && (errMsg == null) ) {
-      errMsg = "Name des Eintrags fehlt";
+    if( entryName.isEmpty() ) {
+      errMsg = addLine( errMsg, "Name des Eintrags fehlt" );
     }
     String    linkTarget = null;
     String    typeText   = null;
@@ -312,6 +317,14 @@ public class TarEntry
   }
 
 
+  private static String addLine( String baseText, String line )
+  {
+    return baseText != null ?
+			baseText + "\n" + line
+			: line;
+  }
+
+
   private static int parseOctalNumber( byte[] buf, int pos, int endPos )
   {
     while( (pos < endPos) && (buf[ pos ] == '\u0020') ) {
@@ -329,7 +342,7 @@ public class TarEntry
 
   /*
    * Die Methode liest einen Block (512 Bytes).
-   * Bloecke, die nur Null-Bytes enthalten, werden dabei ueberlesen.
+   * Bloecke, die nur Nullbytes enthalten, werden dabei ueberlesen.
    */
   private static boolean readFilledBlock(
 				InputStream in,
@@ -356,4 +369,3 @@ public class TarEntry
     return true;
   }
 }
-

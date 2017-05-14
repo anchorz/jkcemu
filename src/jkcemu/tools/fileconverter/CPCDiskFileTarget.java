@@ -1,5 +1,5 @@
 /*
- * (c) 2012-2013 Jens Mueller
+ * (c) 2012-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,10 +8,12 @@
 
 package jkcemu.tools.fileconverter;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.*;
 import jkcemu.base.EmuUtil;
-import jkcemu.disk.*;
+import jkcemu.disk.AbstractFloppyDisk;
+import jkcemu.disk.CPCDisk;
 
 
 public class CPCDiskFileTarget extends AbstractConvertTarget
@@ -48,8 +50,6 @@ public class CPCDiskFileTarget extends AbstractConvertTarget
   public String save( File file ) throws IOException
   {
     checkFileExtension( file, ".dsk" );
-    CPCDisk.export( this.disk, file );
-    return null;
+    return CPCDisk.export( this.disk, file );
   }
 }
-

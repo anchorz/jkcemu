@@ -1,5 +1,5 @@
 /*
- * (c) 2014-2016 Jens Mueller
+ * (c) 2014-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,22 +8,51 @@
 
 package jkcemu.filebrowser;
 
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.Desktop;
+import java.awt.Event;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 import java.lang.*;
-import java.net.*;
-import java.nio.file.*;
-import java.util.*;
-import javax.swing.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import javax.swing.AbstractButton;
+import javax.swing.JButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
 import jkcemu.Main;
 import jkcemu.audio.AudioPlayer;
-import jkcemu.base.*;
-import jkcemu.disk.*;
-import jkcemu.emusys.ac1_llc2.*;
-import jkcemu.emusys.kc85.KCAudioDataStream;
-import jkcemu.emusys.z1013.Z1013AudioDataStream;
+import jkcemu.base.AbstractFileWorker;
+import jkcemu.base.BaseDlg;
+import jkcemu.base.BaseFrm;
+import jkcemu.base.EmuThread;
+import jkcemu.base.EmuUtil;
+import jkcemu.base.FileFormat;
+import jkcemu.base.FileInfo;
+import jkcemu.base.FileRemover;
+import jkcemu.base.LoadDlg;
+import jkcemu.base.RAMFloppy;
+import jkcemu.base.ReplyFileHeadDlg;
+import jkcemu.base.ScreenFrm;
+import jkcemu.disk.AbstractFloppyDisk;
+import jkcemu.disk.DiskImgViewFrm;
+import jkcemu.disk.DiskUtil;
+import jkcemu.emusys.ac1_llc2.AC1AudioCreator;
+import jkcemu.emusys.ac1_llc2.SCCHAudioCreator;
+import jkcemu.emusys.kc85.KCAudioCreator;
+import jkcemu.emusys.z1013.Z1013AudioCreator;
 import jkcemu.image.ImageFrm;
 import jkcemu.text.TextEditFrm;
 import jkcemu.tools.fileconverter.FileConvertFrm;
@@ -81,7 +110,7 @@ public class FileActionMngr
   public static final String ACTION_TEXT_EDIT      = "text.edit";
   public static final String ACTION_UNPACK         = "unpack";
 
-  private BasicFrm                               owner;
+  private BaseFrm                                owner;
   private ScreenFrm                              screenFrm;
   private AbstractFileWorker.PathListener        pathListener;
   private Map<String,Collection<AbstractButton>> actionCmd2Btn;
@@ -89,7 +118,7 @@ public class FileActionMngr
 
 
   public FileActionMngr(
-		BasicFrm                        owner,
+		BaseFrm                         owner,
 		ScreenFrm                       screenFrm,
 		AbstractFileWorker.PathListener pathListener )
   {
@@ -123,18 +152,14 @@ public class FileActionMngr
 	} else if( actionCmd.equals( ACTION_EMU_START ) ) {
 	  doFileLoadIntoEmu( files, false, true );
 	} else if( actionCmd.equals( ACTION_RF1_LOAD ) ) {
-	  if( this.screenFrm != null ) {
-	    EmuThread emuThread = this.screenFrm.getEmuThread();
-	    if( emuThread != null ) {
-	      doFileRAMFloppyLoad( files, emuThread.getRAMFloppy1() );
-	    }
+	  EmuThread emuThread = getEmuThread();
+	  if( emuThread != null ) {
+	    doFileRAMFloppyLoad( files, emuThread.getRAMFloppy1() );
 	  }
 	} else if( actionCmd.equals( ACTION_RF2_LOAD ) ) {
-	  if( this.screenFrm != null ) {
-	    EmuThread emuThread = this.screenFrm.getEmuThread();
-	    if( emuThread != null ) {
-	      doFileRAMFloppyLoad( files, emuThread.getRAMFloppy2() );
-	    }
+	  EmuThread emuThread = getEmuThread();
+	  if( emuThread != null ) {
+	    doFileRAMFloppyLoad( files, emuThread.getRAMFloppy2() );
 	  }
 	} else if( actionCmd.equals( ACTION_TEXT_EDIT ) ) {
 	  doFileEditText( files );
@@ -526,11 +551,7 @@ public class FileActionMngr
 	      ImageFrm.open( file );
 	      done = true;
 	    } else if( checkResult.isTextFile() ) {
-	      EmuThread emuThread = null;
-	      if( this.screenFrm != null ) {
-		emuThread = this.screenFrm.getEmuThread();
-	      }
-	      TextEditFrm.open( emuThread ).openFile( file );
+	      TextEditFrm.open( getEmuThread() ).openFile( file );
 	      done = true;
 	    }
 	  }
@@ -544,11 +565,7 @@ public class FileActionMngr
 	    if( fName.endsWith( ".prj" ) ) {
 	      Properties props = TextEditFrm.loadProject( file );
 	      if( props != null ) {
-		EmuThread emuThread = null;
-		if( this.screenFrm != null ) {
-		  emuThread = this.screenFrm.getEmuThread();
-		}
-		TextEditFrm.open( emuThread ).openProject( file, props );
+		TextEditFrm.open( getEmuThread() ).openProject( file, props );
 		done = true;
 	      } else {
 		  throw new IOException(
@@ -597,7 +614,7 @@ public class FileActionMngr
 		}
 	      }
 	      catch( Exception ex ) {
-		BasicDlg.showErrorDlg( this.owner, ex );
+		BaseDlg.showErrorDlg( this.owner, ex );
 	      }
 	    }
 	  }
@@ -657,7 +674,7 @@ public class FileActionMngr
       }
     }
     if( checkResult != null ) {
-      isAudio       = checkResult.isAudioFile();
+      isAudio       = checkResult.isAudioFile() || checkResult.isTapeFile();
       isDisk        = (checkResult.isNonPlainDiskFile()
 				|| checkResult.isPlainDiskFile());
       isImage       = checkResult.isImageFile();
@@ -740,34 +757,43 @@ public class FileActionMngr
 
   private void doEditFileCopy( java.util.List<FileObject> files )
   {
-    try {
-      Toolkit tk = this.owner.getToolkit();
-      if( tk != null ) {
-	Clipboard clipboard = tk.getSystemClipboard();
-	if( clipboard != null ) {
-	  java.util.List<File> fileList = getFiles( files, false );
-	  if( !fileList.isEmpty() ) {
-	    FileListSelection fls = new FileListSelection( fileList );
-	    clipboard.setContents( fls, fls );
-	  }
-	}
-      }
-    }
-    catch( IllegalStateException ex ) {}
-  }
-
-
-  private void doEditPathCopy( java.util.List<FileObject> files )
-  {
-    int n = files.size();
-    if( n > 0 ) {
+    java.util.List<File> fileList = getFiles( files, false );
+    int                  nAll     = fileList.size();
+    if( nAll > 0 ) {
+      int nCopied  = 0;
       try {
 	Toolkit tk = this.owner.getToolkit();
 	if( tk != null ) {
 	  Clipboard clipboard = tk.getSystemClipboard();
 	  if( clipboard != null ) {
-	    boolean       multi = false;
-	    StringBuilder buf   = new StringBuilder( n * 256 );
+	    FileListSelection fls = new FileListSelection( fileList );
+	    clipboard.setContents( fls, fls );
+	    nCopied = nAll;
+	  }
+	}
+      }
+      catch( Exception ex ) {
+	BaseDlg.showErrorDlg( this.owner, ex );
+	nAll = 0;
+      }
+      finally {
+	checkShowCopyError( nAll, nCopied );
+      }
+    }
+  }
+
+
+  private void doEditPathCopy( java.util.List<FileObject> files )
+  {
+    int nAll = files.size();
+    if( nAll > 0 ) {
+      int nCopied = 0;
+      try {
+	Toolkit tk = this.owner.getToolkit();
+	if( tk != null ) {
+	  Clipboard clipboard = tk.getSystemClipboard();
+	  if( clipboard != null ) {
+	    StringBuilder buf = new StringBuilder( nAll * 256 );
 	    for( FileObject fObj : files ) {
 	      Path path = fObj.getPath();
 	      if( path != null ) {
@@ -776,7 +802,7 @@ public class FileActionMngr
 		  if( !fName.isEmpty() ) {
 		    if( buf.length() > 0 ) {
 		      buf.append( (char) '\n' );
-		      multi = true;
+		      nCopied++;
 		    }
 		    buf.append( fName );
 		  }
@@ -784,7 +810,7 @@ public class FileActionMngr
 	      }
 	    }
 	    if( buf.length() > 0 ) {
-	      if( multi ) {
+	      if( nCopied > 1 ) {
 		buf.append( (char) '\n' );
 	      }
 	      StringSelection ss = new StringSelection( buf.toString() );
@@ -793,22 +819,29 @@ public class FileActionMngr
 	  }
 	}
       }
-      catch( IllegalStateException ex ) {}
+      catch( Exception ex ) {
+	BaseDlg.showErrorDlg( this.owner, ex );
+	nAll = 0;
+      }
+      finally {
+	checkShowCopyError( nAll, nCopied );
+      }
     }
   }
 
 
   private void doEditURLCopy( java.util.List<FileObject> files )
   {
-    int n = files.size();
-    if( n > 0 ) {
+    int nAll = files.size();
+    if( nAll > 0 ) {
+      int nCopied = 0;
       try {
 	Toolkit tk = this.owner.getToolkit();
 	if( tk != null ) {
 	  Clipboard clipboard = tk.getSystemClipboard();
 	  if( clipboard != null ) {
 	    boolean       multi = false;
-	    StringBuilder buf   = new StringBuilder( n * 256 );
+	    StringBuilder buf   = new StringBuilder( nAll * 256 );
 	    for( FileObject fObj : files ) {
 	      File file = fObj.getFile();
 	      if( file != null ) {
@@ -821,7 +854,7 @@ public class FileActionMngr
 		      if( !urlText.isEmpty() ) {
 			if( buf.length() > 0 ) {
 			  buf.append( (char) '\n' );
-			  multi = true;
+			  nCopied++;
 			}
 			buf.append( urlText );
 		      }
@@ -831,7 +864,7 @@ public class FileActionMngr
 	      }
 	    }
 	    if( buf.length() > 0 ) {
-	      if( multi ) {
+	      if( nCopied > 1 ) {
 		buf.append( (char) '\n' );
 	      }
 	      StringSelection ss = new StringSelection( buf.toString() );
@@ -840,9 +873,12 @@ public class FileActionMngr
 	  }
 	}
       }
-      catch( IllegalStateException ex ) {}
-      catch( MalformedURLException ex ) {
-	BasicDlg.showErrorDlg( this.owner, ex );
+      catch( Exception ex ) {
+	BaseDlg.showErrorDlg( this.owner, ex );
+	nAll = 0;
+      }
+      finally {
+	checkShowCopyError( nAll, nCopied );
       }
     }
   }
@@ -928,7 +964,7 @@ public class FileActionMngr
     File file = getFile( files, true );
     if( file != null ) {
       if( file.isFile() ) {
-	TextEditFrm.open( null ).openFile( file );
+	TextEditFrm.open( getEmuThread() ).openFile( file );
       }
     }
   }
@@ -1063,7 +1099,7 @@ public class FileActionMngr
       File            file        = fObj.getFile();
       FileCheckResult checkResult = fObj.getCheckResult();
       if( (file != null) && (checkResult != null) ) {
-	if( checkResult.isAudioFile() ) {
+	if( checkResult.isAudioFile() || checkResult.isTapeFile() ) {
 	  AudioPlayer.play( this.owner, file );
 	}
       }
@@ -1098,12 +1134,12 @@ public class FileActionMngr
 	    }
 	    AudioPlayer.play(
 		this.owner,
-		new AC1AudioDataStream(
+		new AC1AudioCreator(
 			false,
 			EmuUtil.readFile( file, true, 0x10000 ),
 			dlg.getApprovedFileName(),
 			dlg.getApprovedBeginAddress(),
-			startAddr ),
+			startAddr ).newReader(),
 		title + "..." );
 	  }
 	}
@@ -1151,14 +1187,14 @@ public class FileActionMngr
 	    if( dlg.wasApproved() ) {
 	      AudioPlayer.play(
 			this.owner,
-			new AC1AudioDataStream(
+			new AC1AudioCreator(
 				true,
 				buf,
 				offs,
 				len,
 				dlg.getApprovedFileName(),
 				-1,
-				-1 ),
+				-1 ).newReader(),
 			title + "..." );
 	    }
 	  }
@@ -1182,10 +1218,13 @@ public class FileActionMngr
 	if( checkResult.isKCBasicHeadFile() ) {
 	  AudioPlayer.play(
 		this.owner,
-		new KCAudioDataStream(
+		new KCAudioCreator(
 			false,
 			1,
-			EmuUtil.readFile( file, true, 0x10000 ) ),
+			EmuUtil.readFile(
+					file,
+					true,
+					0x10000 ) ).newReader(),
 		title );
 	}
 	else if( checkResult.isKCBasicFile() ) {
@@ -1218,7 +1257,7 @@ public class FileActionMngr
 		}
 		AudioPlayer.play(
 			this.owner,
-			new KCAudioDataStream( false, 1, buf ),
+			new KCAudioCreator( false, 1, buf ).newReader(),
 			title );
 	      }
 	    }
@@ -1227,10 +1266,13 @@ public class FileActionMngr
 	else if( checkResult.isKCSysFile() ) {
 	  AudioPlayer.play(
 		this.owner,
-		new KCAudioDataStream(
+		new KCAudioCreator(
 			false,
 			firstBlkNum,
-			EmuUtil.readFile( file, true, 0x10000 ) ),
+			EmuUtil.readFile(
+					file,
+					true,
+					0x10000 ) ).newReader(),
 		title );
 	}
 	else if( (checkResult.isKC85TapFile() && (firstBlkNum == 1))
@@ -1238,10 +1280,13 @@ public class FileActionMngr
 	{
 	  AudioPlayer.play(
 		this.owner,
-		new KCAudioDataStream(
+		new KCAudioCreator(
 			true,
 			0,
-			EmuUtil.readFile( file, true, 0x10110 ) ),
+			EmuUtil.readFile(
+					file,
+					true,
+					0x10000 ) ).newReader(),
 		title );
 	}
       }
@@ -1323,14 +1368,14 @@ public class FileActionMngr
 	      }
 	      AudioPlayer.play(
 			this.owner,
-			new SCCHAudioDataStream(
+			new SCCHAudioCreator(
 				buf,
 				offs,
 				len,
 				dlg.getApprovedFileName(),
 				(char) fType,
 				begAddr,
-				endAddr ),
+				endAddr ).newReader(),
 			title + "..." );
 	    }
 	  }
@@ -1355,9 +1400,12 @@ public class FileActionMngr
 	{
 	  AudioPlayer.play(
 		this.owner,
-		new Z1013AudioDataStream(
+		new Z1013AudioCreator(
 			headersave,
-			EmuUtil.readFile( file, true, 0x10020 ) ),
+			EmuUtil.readFile(
+					file,
+					true,
+					0x10020 ) ).newReader(),
 		String.format(
 			"Z1013%s-Wiedergabe von %s...",
 			headersave ? "-Headersave" : "",
@@ -1387,10 +1435,10 @@ public class FileActionMngr
     if( file != null ) {
       try {
 	ramFloppy.load( file );
-	Main.setLastFile( file, "ramfloppy" );
+	Main.setLastFile( file, Main.FILE_GROUP_RF );
       }
       catch( IOException ex ) {
-	BasicDlg.showErrorDlg(
+	BaseDlg.showErrorDlg(
 		this.owner,
 		"Die RAM-Floppy kann nicht geladen werden.\n\n"
 						+ ex.getMessage() );
@@ -1553,14 +1601,14 @@ public class FileActionMngr
     if( file != null ) {
       if( file.exists() ) {
 	if( file.equals( srcFile ) ) {
-	  BasicDlg.showErrorDlg(
+	  BaseDlg.showErrorDlg(
 		this.owner,
 		"Die Ausgabedatei kann nicht\n"
 			+ "mit der Quelldatei identisch sein." );
 	  file = null;
 	}
 	else if( !file.isFile() ) {
-	  BasicDlg.showErrorDlg(
+	  BaseDlg.showErrorDlg(
 		this.owner,
 		file.getPath() + " existiert bereits\n"
 			+ "und kann nicht als Datei angelegt werden." );
@@ -1635,6 +1683,34 @@ public class FileActionMngr
   }
 
 
+  private void checkShowCopyError( int nAll, int nCopied )
+  {
+    if( (nAll > 0) && (nCopied < nAll) ) {
+      String msg = null;
+      if( nCopied == 1 ) {
+	msg = "Es konnte nur eine Datei bzw. ein Verzeichnis"
+		      + " kopiert werden.";
+      } else if( nCopied > 1 ) {
+	msg = String.format(
+		      "Es konnten nur %d Dateien bzw. Verzeichnisse"
+			      + " kopiert werden.",
+		      nCopied );
+      } else {
+	if( nAll == 1 ) {
+	  msg = "Die Datei bzw. das Verzeichnis\n"
+		      + "konnte nicht kopiert werden.";
+	} else {
+	  msg = "Die Dateien bzw. Verzeichnisse\n"
+		      + "konnten nicht kopiert werden.";
+	}
+      }
+      if( msg != null ) {
+	BaseDlg.showErrorDlg( this.owner, msg );
+      }
+    }
+  }
+
+
   private JButton createAndRegisterImageButton(
 				String resource,
 				String text,
@@ -1661,6 +1737,12 @@ public class FileActionMngr
     item.addActionListener( this.owner );
     registerButton( item, actionCmd );
     return item;
+  }
+
+
+  private EmuThread getEmuThread()
+  {
+    return this.screenFrm != null ? this.screenFrm.getEmuThread() : null;
   }
 
 

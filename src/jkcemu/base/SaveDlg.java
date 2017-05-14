@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2016 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,24 +8,47 @@
 
 package jkcemu.base;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 import java.lang.*;
 import java.util.EventObject;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.ComboBoxEditor;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 import jkcemu.Main;
-import jkcemu.emusys.*;
+import jkcemu.emusys.A5105;
+import jkcemu.emusys.KC85;
+import jkcemu.emusys.Z1013;
+import jkcemu.emusys.Z9001;
 
 
-public class SaveDlg extends BasicDlg implements DocumentListener
+public class SaveDlg extends BaseDlg implements DocumentListener
 {
+  private static final String HELP_PAGE = "/help/loadsave.htm";
+
   public static enum BasicType {
 				NO_BASIC,
 				TINYBASIC,
 				MS_DERIVED_BASIC,
+				MS_DERIVED_BASIC_HS,
 				KCBASIC,
 				RBASIC,
 				OTHER_BASIC };
@@ -383,6 +406,12 @@ public class SaveDlg extends BasicDlg implements DocumentListener
 	basEnabled = true;
 	basic      = true;
 	break;
+      case MS_DERIVED_BASIC_HS:
+	this.btnFileFmtHS.setSelected( true );
+	hsFileType = 'B';
+	basEnabled = true;
+	basic      = true;
+	break;
       case KCBASIC:
 	this.btnFileFmtSSS.setSelected( true );
 	this.btnBegBlkNum1.setSelected( true );
@@ -427,9 +456,7 @@ public class SaveDlg extends BasicDlg implements DocumentListener
       } else if( z1013 ) {
 	this.btnFileFmtHS.setSelected( true );
 	this.btnKeepHeader.setSelected(
-		EmuUtil.parseBoolean(
-			Main.getProperty( "jkcemu.loadsave.header.keep" ),
-			false ) );
+		Main.getBooleanProperty( LoadDlg.PROP_KEEP_HEADER, false ) );
       } else {
 	this.btnFileFmtBIN.setSelected( true );
       }
@@ -542,7 +569,7 @@ public class SaveDlg extends BasicDlg implements DocumentListener
       }
       else if( src == this.btnHelp ) {
 	rv = true;
-	HelpFrm.open( "/help/loadsave.htm" );
+	HelpFrm.open( HELP_PAGE );
       }
       else if( src == this.btnCancel ) {
 	rv = true;
@@ -653,6 +680,7 @@ public class SaveDlg extends BasicDlg implements DocumentListener
       String prefBasicFmt = null;
       switch( this.basicType ) {
 	case MS_DERIVED_BASIC:
+	case MS_DERIVED_BASIC_HS:
 	case RBASIC:
 	  if( !isBAS && !isHS ) {
 	    prefBasicFmt = this.btnFileFmtBAS.getText();
@@ -692,10 +720,10 @@ public class SaveDlg extends BasicDlg implements DocumentListener
 
 	// Dateiauswahldialog
 	File file = EmuUtil.showFileSaveDlg(
-				this.screenFrm,
-				title,
-				Main.getLastDirFile( "software" ),
-				fileFilter );
+			this.screenFrm,
+			title,
+			Main.getLastDirFile( Main.FILE_GROUP_SOFTWARE ),
+			fileFilter );
 	if( file != null ) {
 	  try {
 	    int     headBegAddr   = begAddr;
@@ -713,8 +741,7 @@ public class SaveDlg extends BasicDlg implements DocumentListener
 	      String s = this.fldHeadStartAddr.getText();
 	      if( s != null ) {
 		if( !s.trim().isEmpty() ) {
-		  headStartAddr = new Integer(
-			this.docHeadStartAddr.intValue() & 0xFFFF );
+		  headStartAddr = (this.docHeadStartAddr.intValue() & 0xFFFF);
 		}
 	      }
 	    }
@@ -736,7 +763,7 @@ public class SaveDlg extends BasicDlg implements DocumentListener
 			headFileType,
 			this.btnKeepHeader.isSelected() ? emuThread : null );
 	    saved = true;
-	    Main.setLastFile( file, "software" );
+	    Main.setLastFile( file, Main.FILE_GROUP_SOFTWARE );
 	    this.screenFrm.showStatusText( "Datei gespeichert" );
 	  }
 	  catch( IOException ex ) {
@@ -909,4 +936,3 @@ public class SaveDlg extends BasicDlg implements DocumentListener
     }
   }
 }
-

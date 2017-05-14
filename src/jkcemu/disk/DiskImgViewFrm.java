@@ -1,5 +1,5 @@
 /*
- * (c) 2016 Jens Mueller
+ * (c) 2016-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,35 +8,77 @@
 
 package jkcemu.disk;
 
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.dnd.*;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Event;
+import java.awt.EventQueue;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.*;
-import java.text.*;
-import java.util.*;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.EventObject;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.PatternSyntaxException;
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextField;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.text.JTextComponent;
 import jkcemu.Main;
-import jkcemu.base.*;
-import jkcemu.disk.*;
+import jkcemu.base.BaseDlg;
+import jkcemu.base.BaseFrm;
+import jkcemu.base.ByteDataSource;
+import jkcemu.base.EmuUtil;
+import jkcemu.base.HelpFrm;
+import jkcemu.base.HexCharFld;
+import jkcemu.base.ReplyBytesDlg;
 
 
-public class DiskImgViewFrm extends BasicFrm
+public class DiskImgViewFrm extends BaseFrm
 			implements
 				ByteDataSource,
 				CaretListener,
 				DropTargetListener,
 				HyperlinkListener
 {
-  private static final String MARK_BOGUS_ID = "*";
-  private static final String MARK_NO_DATA  = "no_data";
-  private static final String MARK_DELETED  = "del";
-  private static final String MARK_ERROR    = "err";
+  private static final String HELP_PAGE      = "/help/disk/diskimgviewer.htm";
+  private static final String MARK_BOGUS_ID  = "*";
+  private static final String MARK_NO_DATA   = "no_data";
+  private static final String MARK_DELETED   = "del";
+  private static final String MARK_ERROR     = "err";
+  private static final String PROP_SPLIT_POS = "split.position";
 
 
   private static class DataFoundException extends Exception
@@ -60,6 +102,7 @@ public class DiskImgViewFrm extends BasicFrm
   private static DiskImgViewFrm instance = null;
 
   private AbstractFloppyDisk        disk;
+  private File                      file;
   private SectorData                selectedSector;
   private boolean                   lastBigEndian;
   private ReplyBytesDlg.InputFormat lastInputFmt;
@@ -90,6 +133,8 @@ public class DiskImgViewFrm extends BasicFrm
   private JTextField                fldSectorID;
   private JTextField                fldSectorEtc;
   private HexCharFld                fldSectorData;
+  private JButton                   btnSectorCopy;
+  private JButton                   btnSectorExport;
   private JScrollPane               spSectorData;
   private JLabel                    sectorDataInfo;
 
@@ -243,10 +288,9 @@ public class DiskImgViewFrm extends BasicFrm
   public boolean applySettings( Properties props, boolean resizable )
   {
     boolean rv   = super.applySettings( props, resizable );
-    int splitPos = EmuUtil.parseIntProperty(
+    int splitPos = EmuUtil.getIntProperty(
 				props,
-				getSettingsPrefix() + "split.position",
-				-1,
+				getSettingsPrefix() + PROP_SPLIT_POS,
 				-1 );
     if( splitPos >= 0 ) {
       this.splitPane.setDividerLocation( splitPos );
@@ -264,8 +308,7 @@ public class DiskImgViewFrm extends BasicFrm
       if( src == this.mnuOpen ) {
 	rv = true;
 	doFileOpen();
-      }
-      else if( src == this.mnuClose ) {
+      } else if( src == this.mnuClose ) {
 	rv = true;
 	doClose();
       } else if( src == this.mnuBytesCopyAscii ) {
@@ -285,7 +328,13 @@ public class DiskImgViewFrm extends BasicFrm
         doFindNext();
       } else if( src == this.mnuHelpContent ) {
 	rv = true;
-	HelpFrm.open( "/help/disk/diskimgviewer.htm" );
+	HelpFrm.open( HELP_PAGE );
+      } else if( src == this.btnSectorCopy ) {
+	rv = true;
+	doSectorCopy();
+      } else if( src == this.btnSectorExport ) {
+	rv = true;
+	doSectorExport();
       }
     }
     return rv;
@@ -296,19 +345,27 @@ public class DiskImgViewFrm extends BasicFrm
   public boolean doClose()
   {
     boolean rv = super.doClose();
-    if( rv && (this.disk != null) ) {
-      this.disk.doClose();
-      this.fldFileName.setText( "" );
-      this.fldPhysFormat.setText( "" );
-      this.fldRemark.setText( "" );
-      this.fldTimestamp.setText( "" );
-      this.fldLogFormat.setText( "" );
-      this.fldBlockSize.setText( "" );
-      this.fldBlockNumFmt.setText( "" );
-      this.fldFileContent.setContentType( "text/plain" );
-      this.fldFileContent.setText( "" );
-      this.fldFileContent.setCaretPosition( 0 );
-      clearSectorDetails();
+    if( rv ) {
+      if( !Main.checkQuit( this ) ) {
+	// damit beim erneuten Oeffnen das Eingabefeld leer ist
+	if( this.disk != null ) {
+	  this.disk.closeSilent();
+	}
+	this.disk = null;
+	this.file = null;
+	this.mnuFind.setEnabled( false );
+	this.fldFileName.setText( "" );
+	this.fldPhysFormat.setText( "" );
+	this.fldRemark.setText( "" );
+	this.fldTimestamp.setText( "" );
+	this.fldLogFormat.setText( "" );
+	this.fldBlockSize.setText( "" );
+	this.fldBlockNumFmt.setText( "" );
+	this.fldFileContent.setContentType( "text/plain" );
+	this.fldFileContent.setText( "" );
+	this.fldFileContent.setCaretPosition( 0 );
+	clearSectorDetails();
+      }
     }
     return rv;
   }
@@ -320,7 +377,7 @@ public class DiskImgViewFrm extends BasicFrm
     if( props != null ) {
       super.putSettingsTo( props );
       props.setProperty(
-		getSettingsPrefix() + "split.position",
+		getSettingsPrefix() + PROP_SPLIT_POS,
 		String.valueOf( this.splitPane.getDividerLocation() ) );
     }
   }
@@ -333,6 +390,7 @@ public class DiskImgViewFrm extends BasicFrm
     setTitle( TITLE );
     Main.updIcon( this );
     this.disk              = null;
+    this.file              = null;
     this.selectedSector    = null;
 
 
@@ -574,7 +632,7 @@ public class DiskImgViewFrm extends BasicFrm
 		"Bitte in der linken Ansicht einen Sektor anklicken" );
     this.sectorDataInfo.setHorizontalAlignment( SwingConstants.CENTER );
     this.sectorDataInfo.setVerticalAlignment( SwingConstants.CENTER );
-    this.fldSectorData  = new HexCharFld( this );
+    this.fldSectorData = new HexCharFld( this );
 
     JPanel sectorDataPlaceholder = new JPanel();
     sectorDataPlaceholder.setPreferredSize(
@@ -587,6 +645,22 @@ public class DiskImgViewFrm extends BasicFrm
     gbcSector.gridy++;
     panelSector.add( this.spSectorData, gbcSector );
 
+    JPanel panelSectorBtns = new JPanel( new GridLayout( 1, 2, 5, 5 ) );
+    gbcSector.anchor       = GridBagConstraints.CENTER;
+    gbcSector.fill         = GridBagConstraints.NONE;
+    gbcSector.weightx      = 0.0;
+    gbcSector.weighty      = 0.0;
+    gbcSector.gridy++;
+    panelSector.add( panelSectorBtns, gbcSector );
+
+    this.btnSectorCopy = new JButton( "Sektordaten kopieren" );
+    this.btnSectorCopy.setEnabled( false );
+    panelSectorBtns.add( this.btnSectorCopy );
+
+    this.btnSectorExport = new JButton( "Sektordaten exportieren..." );
+    this.btnSectorExport.setEnabled( false );
+    panelSectorBtns.add( this.btnSectorExport );
+
 
     // Drag&Drop aktivieren
     (new DropTarget( this.fldFileContent, this )).setActive( true );
@@ -595,7 +669,8 @@ public class DiskImgViewFrm extends BasicFrm
     // Listener
     this.fldFileContent.addHyperlinkListener( this );
     this.fldSectorData.addCaretListener( this );
-
+    this.btnSectorCopy.addActionListener( this );
+    this.btnSectorExport.addActionListener( this );
 
     // sonstiges
     resetFind();
@@ -615,7 +690,7 @@ public class DiskImgViewFrm extends BasicFrm
     openFile( EmuUtil.showFileOpenDlg(
 			this,
 			"Diskettenabbilddatei \u00F6ffnen",
-			Main.getLastDirFile( "disk" ),
+			Main.getLastDirFile( Main.FILE_GROUP_DISK ),
 			EmuUtil.getPlainDiskFileFilter(),
 			EmuUtil.getAnaDiskFileFilter(),
 			EmuUtil.getCopyQMFileFilter(),
@@ -737,7 +812,84 @@ public class DiskImgViewFrm extends BasicFrm
 	    }
 	  }
 	}
-	BasicDlg.showInfoDlg( this, "Byte-Folge nicht gefunden" );
+	BaseDlg.showInfoDlg( this, "Byte-Folge nicht gefunden" );
+      }
+    }
+  }
+
+
+  private void doSectorCopy()
+  {
+    SectorData sector = this.selectedSector;
+    if( sector != null ) {
+      int len = sector.getDataLength();
+      if( len > 0 ) {
+	StringBuilder buf = new StringBuilder( len * 3 );
+	for( int i = 0; i < len; i++ ) {
+	  if( i > 0 ) {
+	    buf.append( (char) ((i % 16) == 0 ? '\n' : '\u0020') );
+	  }
+	  buf.append( String.format( "%02X", sector.getDataByte( i ) ) );
+	}
+	buf.append( (char) '\n' );
+	EmuUtil.copyToClipboard( this, buf.toString() );
+      }
+    }
+  }
+
+
+  private void doSectorExport()
+  {
+    SectorData sector = this.selectedSector;
+    if( sector != null ) {
+      int len = sector.getDataLength();
+      if( len > 0 ) {
+	File dirFile = Main.getLastDirFile( Main.FILE_GROUP_SECTOR );
+	if( (dirFile == null) && (this.file != null) ) {
+	  dirFile = this.file.getParentFile();
+	}
+	String preName = "";
+	if( this.file != null ) {
+	  String s = this.file.getName();
+	  if( s != null ) {
+	    int pos = s.indexOf( '.' );
+	    if( pos > 0 ) {
+	      preName = s.substring( 0, pos ) + "_";
+	    }
+	  }
+	}
+	String fName = String.format(
+				"%ssector_%d_%d_%d_%d.bin",
+				preName,
+				sector.getCylinder(),
+				sector.getHead(),
+				sector.getSectorNum(),
+				sector.getSizeCode() );
+	File file = EmuUtil.showFileSaveDlg(
+				this,
+				"Sektordaten exportieren",
+				dirFile != null ? 
+					new File( dirFile, fName )
+					: new File( fName ),
+				EmuUtil.getBinaryFileFilter() );
+	if( file != null ) {
+	  try {
+	    OutputStream out = null;
+	    try {
+	      out = new FileOutputStream( file );
+	      sector.writeTo( out, -1 );
+	      out.close();
+	      out = null;
+	      Main.setLastFile( file, Main.FILE_GROUP_SECTOR );
+	    }
+	    finally {
+	      EmuUtil.closeSilent( out );
+	    }
+	  }
+	  catch( IOException ex ) {
+	    BaseDlg.showErrorDlg( this, ex );
+	  }
+	}
       }
     }
   }
@@ -751,6 +903,8 @@ public class DiskImgViewFrm extends BasicFrm
     this.fldSectorPos.setText( "" );
     this.fldSectorID.setText( "" );
     this.fldSectorEtc.setText( "" );
+    this.btnSectorCopy.setEnabled( false );
+    this.btnSectorExport.setEnabled( false );
     if( this.disk != null ) {
       setSectorDataView( this.sectorDataInfo );
     } else {
@@ -768,10 +922,11 @@ public class DiskImgViewFrm extends BasicFrm
 
 	  // alte Abbilddatei schliessen und neue uebernehmen
 	  if( this.disk != null ) {
-	    this.disk.doClose();
+	    this.disk.closeSilent();
 	  }
 	  this.disk = disk;
-	  Main.setLastFile( file, "disk" );
+	  this.file = file;
+	  Main.setLastFile( file, Main.FILE_GROUP_DISK );
 	  setTitle( TITLE + ": " + file.getPath() );
 
 	  // Allgemeine Infos
@@ -1014,7 +1169,7 @@ public class DiskImgViewFrm extends BasicFrm
 	}
       }
       catch( IOException ex ) {
-	BasicDlg.showErrorDlg( this, ex );
+	BaseDlg.showErrorDlg( this, ex );
       }
     }
   }
@@ -1093,6 +1248,8 @@ public class DiskImgViewFrm extends BasicFrm
       this.selectedSector = sector;
       setSectorDataView( this.fldSectorData );
       this.fldSectorData.refresh();
+      this.btnSectorCopy.setEnabled( true );
+      this.btnSectorExport.setEnabled( true );
     } else {
       clearSectorDetails();
     }

@@ -1,5 +1,5 @@
 /*
- * (c) 2010-2011 Jens Mueller
+ * (c) 2010-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -10,7 +10,9 @@
 package jkcemu.etc;
 
 import java.lang.*;
-import z80emu.*;
+import z80emu.Z80CPU;
+import z80emu.Z80MaxSpeedListener;
+import z80emu.Z80TStatesListener;
 
 
 public class GDC82720 implements
@@ -237,7 +239,7 @@ public class GDC82720 implements
    * zeitlich hintereinander uebertragen,
    * werden diese Informationen hier auf hoehere Bits gelegt.
    * Die einzelnen Werte werden durch bitweise UND-Verknuepfung
-   * des Rueckgabewert mit den Konstanten DISPL_... extrahiert.
+   * des Rueckgabewerts mit den Konstanten DISPL_... extrahiert.
    * Die Konstante DISPL_IMAGE_MODE markiert das Image Flag,
    * d.h. die Ausgabe hat im Pixelmode zu erfolgen
    * und x muss anschliessend um die Anzahl der horizontalen Pixel
@@ -947,4 +949,3 @@ System.out.println( "GDC82720: Zoomfaktor groesser 1 nicht implementiert" );
     }
   }
 }
-

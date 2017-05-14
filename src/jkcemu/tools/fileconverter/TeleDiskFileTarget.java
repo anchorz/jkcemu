@@ -1,5 +1,5 @@
 /*
- * (c) 2015-2016 Jens Mueller
+ * (c) 2015-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,10 +8,12 @@
 
 package jkcemu.tools.fileconverter;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.*;
 import jkcemu.base.EmuUtil;
-import jkcemu.disk.*;
+import jkcemu.disk.AbstractFloppyDisk;
+import jkcemu.disk.TeleDisk;
 
 
 public class TeleDiskFileTarget extends AbstractConvertTarget
@@ -55,7 +57,9 @@ public class TeleDiskFileTarget extends AbstractConvertTarget
   public String save( File file ) throws IOException
   {
     checkFileExtension( file, ".td0" );
-    TeleDisk.export( this.disk, file, this.fileConvertFrm.getRemark() );
-    return null;
+    return TeleDisk.export(
+			this.disk,
+			file,
+			this.fileConvertFrm.getRemark() );
   }
 }

@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2016 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,25 +8,50 @@
 
 package jkcemu.tools.hexedit;
 
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.dnd.*;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.Dimension;
+import java.awt.Event;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.*;
-import java.util.*;
+import java.util.EventObject;
 import javax.naming.SizeLimitExceededException;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import jkcemu.Main;
-import jkcemu.base.*;
-import jkcemu.print.*;
+import jkcemu.base.BaseDlg;
+import jkcemu.base.EmuUtil;
+import jkcemu.base.HelpFrm;
+import jkcemu.base.ReplyBytesDlg;
+import jkcemu.print.PrintOptionsDlg;
+import jkcemu.print.PrintUtil;
 
 
 public class HexEditFrm
 		extends AbstractHexCharFrm
 		implements DropTargetListener
 {
-  private static final int BUF_EXTEND = 0x2000;
+  private static final String HELP_PAGE  = "/help/tools/hexeditor.htm";
+  private static final int    BUF_EXTEND = 0x2000;
 
   private static HexEditFrm instance = null;
 
@@ -46,6 +71,7 @@ public class HexEditFrm
   private JMenuItem mnuBytesCopyAscii;
   private JMenuItem mnuBytesCopyDump;
   private JMenuItem mnuBytesInvert;
+  private JMenuItem mnuBytesReverse;
   private JMenuItem mnuBytesSave;
   private JMenuItem mnuBytesAppend;
   private JMenuItem mnuBytesInsert;
@@ -56,6 +82,7 @@ public class HexEditFrm
   private JMenuItem mnuSavePos;
   private JMenuItem mnuGotoSavedPos;
   private JMenuItem mnuSelectToSavedPos;
+  private JMenuItem mnuSelectAll;
   private JMenuItem mnuChecksum;
   private JMenuItem mnuFind;
   private JMenuItem mnuFindNext;
@@ -192,6 +219,9 @@ public class HexEditFrm
       } else if( src == this.mnuBytesInvert ) {
 	rv = true;
 	doBytesInvert();
+      } else if( src == this.mnuBytesReverse ) {
+	rv = true;
+	doBytesReverse();
       } else if( src == this.mnuBytesSave ) {
 	rv = true;
 	doBytesSave();
@@ -219,6 +249,9 @@ public class HexEditFrm
       } else if( src == this.mnuSelectToSavedPos ) {
 	rv = true;
 	doGotoSavedPos( true );
+      } else if( src == this.mnuSelectAll ) {
+	rv = true;
+	doSelectAll();
       } else if( src == this.mnuChecksum ) {
 	rv = true;
 	doChecksum();
@@ -230,7 +263,7 @@ public class HexEditFrm
 	doFindNext();
       } else if( src == this.mnuHelpContent ) {
 	rv = true;
-	HelpFrm.open( "/help/tools/hexeditor.htm" );
+	HelpFrm.open( HELP_PAGE );
       } else {
 	rv = super.doAction( e );
       }
@@ -281,6 +314,7 @@ public class HexEditFrm
   {
     this.mnuSaveAs.setEnabled( state );
     this.mnuPrint.setEnabled( state );
+    this.mnuSelectAll.setEnabled( state );
     this.mnuFind.setEnabled( state );
     this.btnFind.setEnabled( state );
   }
@@ -300,6 +334,7 @@ public class HexEditFrm
     this.mnuBytesCopyAscii.setEnabled( state );
     this.mnuBytesCopyDump.setEnabled( state );
     this.mnuBytesInvert.setEnabled( state );
+    this.mnuBytesReverse.setEnabled( state );
     this.mnuBytesSave.setEnabled( state );
     this.mnuBytesInsert.setEnabled( state );
     this.mnuBytesOverwrite.setEnabled( state );
@@ -332,7 +367,7 @@ public class HexEditFrm
 	  insertBytes( this.fileLen, a, 0 );
 	}
 	catch( SizeLimitExceededException ex ) {
-	  BasicDlg.showErrorDlg( this, ex.getMessage() );
+	  BaseDlg.showErrorDlg( this, ex.getMessage() );
 	}
 	setDataChanged( true );
 	updView();
@@ -362,7 +397,7 @@ public class HexEditFrm
 	    insertBytes( caretPos, a, 0 );
 	  }
 	  catch( SizeLimitExceededException ex ) {
-	    BasicDlg.showErrorDlg( this, ex.getMessage() );
+	    BaseDlg.showErrorDlg( this, ex.getMessage() );
 	  }
 	  setDataChanged( true );
 	  updView();
@@ -400,12 +435,14 @@ public class HexEditFrm
       }
       else if( m2 == m1 ) {
 	msg = String.format(
-		"M\u00F6chten das ausgew\u00E4hlte Byte mit dem"
-			+ " hexadezimalen Wert %02X invertieren?",
-		this.fileBytes[ m1 ] );
+		"M\u00F6chten Sie das ausgew\u00E4hlte Byte"
+			+ " mit dem Wert %02Xh invertieren?\n"
+			+ "invertierte Wert: %02Xh",
+		(int) this.fileBytes[ m1 ] & 0xFF,
+		(int) ~this.fileBytes[ m1 ] & 0xFF );
       }
       if( msg != null ) {
-	if( BasicDlg.showYesNoDlg( this, msg ) ) {
+	if( BaseDlg.showYesNoDlg( this, msg ) ) {
 	  int p = m1;
 	  while( p <= m2 ) {
 	    this.fileBytes[ p ] = (byte) ~this.fileBytes[ p ];
@@ -447,7 +484,7 @@ public class HexEditFrm
 	    }
 	  }
 	  catch( SizeLimitExceededException ex ) {
-	    BasicDlg.showErrorDlg( this, ex.getMessage() );
+	    BaseDlg.showErrorDlg( this, ex.getMessage() );
 	  }
 	  setDataChanged( true );
 	  updView();
@@ -483,12 +520,12 @@ public class HexEditFrm
       }
       else if( m2 == m1 ) {
 	msg = String.format(
-		"M\u00F6chten das ausgew\u00E4hlte Byte mit dem"
-			+ " hexadezimalen Wert %02X entfernen?",
+		"M\u00F6chten das ausgew\u00E4hlte Byte"
+			+ " mit dem Wert %02Xh entfernen?",
 		this.fileBytes[ m1 ] );
       }
       if( msg != null ) {
-	if( BasicDlg.showYesNoDlg( this, msg ) ) {
+	if( BaseDlg.showYesNoDlg( this, msg ) ) {
 	  if( m2 + 1 < this.fileLen ) {
 	    m2++;
 	    while( m2 < this.fileLen ) {
@@ -499,6 +536,56 @@ public class HexEditFrm
 	  setDataChanged( true );
 	  updView();
 	  setCaretPosition( m1, false );
+	}
+      }
+    }
+  }
+
+
+  private void doBytesReverse()
+  {
+    int dataLen  = getDataLength();
+    int caretPos = this.hexCharFld.getCaretPosition();
+    int markPos  = this.hexCharFld.getMarkPosition();
+    int m1       = -1;
+    int m2       = -1;
+    if( (caretPos >= 0) && (markPos >= 0) ) {
+      m1 = Math.min( caretPos, markPos );
+      m2 = Math.max( caretPos, markPos );
+    } else {
+      m1 = caretPos;
+      m2 = caretPos;
+    }
+    if( m2 >= dataLen ) {
+      m2 = dataLen - 1;
+    }
+    if( m1 >= 0 ) {
+      String msg = null;
+      if( m2 > m1 ) {
+	msg = String.format(
+		"M\u00F6chten Sie die %d ausgew\u00E4hlten Bytes"
+			+ " spiegeln?\n"
+			+ "Bits tauschen: 0-7, 1-6, 2-5, 3-4",
+		m2 - m1 + 1);
+      }
+      else if( m2 == m1 ) {
+	msg = String.format(
+		"M\u00F6chten Sie das ausgew\u00E4hlte Byte"
+			+ " mit dem Wert %02Xh spiegeln?\n"
+			+ "gespiegelter Wert: %02Xh",
+		(int) this.fileBytes[ m1 ] & 0xFF,
+		toReverseByte( this.fileBytes[ m1 ] ) );
+      }
+      if( msg != null ) {
+	if( BaseDlg.showYesNoDlg( this, msg ) ) {
+	  int p = m1;
+	  while( p <= m2 ) {
+	    this.fileBytes[ p ] = (byte) toReverseByte( this.fileBytes[ p ] );
+	    p++;
+	  }
+	  setDataChanged( true );
+	  updView();
+	  setSelection( m1, m2 );
 	}
       }
     }
@@ -526,9 +613,9 @@ public class HexEditFrm
       int len = Math.min( m2, this.fileBytes.length ) - m1 + 1;
       if( len > 0 ) {
 	File file = EmuUtil.showFileSaveDlg(
-					this,
-					"Datei speichern",
-					Main.getLastDirFile( "hexedit" ) );
+			this,
+			"Datei speichern",
+			Main.getLastDirFile( Main.FILE_GROUP_HEXEDIT ) );
 	if( file != null ) {
 	  try {
 	    OutputStream out = null;
@@ -539,12 +626,12 @@ public class HexEditFrm
 	      out = null;
 	    }
 	    finally {
-	      EmuUtil.doClose( out );
+	      EmuUtil.closeSilent( out );
 	    }
-	    Main.setLastFile( file, "hexedit" );
+	    Main.setLastFile( file, Main.FILE_GROUP_HEXEDIT );
 	  }
 	  catch( Exception ex ) {
-	    BasicDlg.showErrorDlg( this, ex );
+	    BaseDlg.showErrorDlg( this, ex );
 	  }
 	}
       }
@@ -555,9 +642,9 @@ public class HexEditFrm
   private void doFileAppend()
   {
     File file = EmuUtil.showFileOpenDlg(
-				this,
-				"Datei anh\u00E4ngen",
-				Main.getLastDirFile( "hexedit" ) );
+			this,
+			"Datei anh\u00E4ngen",
+			Main.getLastDirFile( Main.FILE_GROUP_HEXEDIT ) );
     if( file != null ) {
       try {
 	int  oldLen  = this.fileLen;
@@ -574,17 +661,17 @@ public class HexEditFrm
 	      insertBytes( this.fileLen, a, 0 );
 	    }
 	    catch( SizeLimitExceededException ex ) {
-	      BasicDlg.showErrorDlg( this, ex.getMessage() );
+	      BaseDlg.showErrorDlg( this, ex.getMessage() );
 	    }
 	    setDataChanged( true );
 	    updView();
 	    setSelection( oldLen, this.fileLen - 1 );
-	    Main.setLastFile( file, "hexedit" );
+	    Main.setLastFile( file, Main.FILE_GROUP_HEXEDIT );
 	  }
 	}
       }
       catch( IOException ex ) {
-	BasicDlg.showErrorDlg( this, ex );
+	BaseDlg.showErrorDlg( this, ex );
       }
     }
   }
@@ -595,9 +682,9 @@ public class HexEditFrm
     int caretPos = this.hexCharFld.getCaretPosition();
     if( (caretPos >= 0) && (caretPos < this.fileLen) ) {
       File file = EmuUtil.showFileOpenDlg(
-				this,
-				"Datei einf\u00FCgen",
-				Main.getLastDirFile( "hexedit" ) );
+			this,
+			"Datei einf\u00FCgen",
+			Main.getLastDirFile( Main.FILE_GROUP_HEXEDIT ) );
       if( file != null ) {
 	try {
 	  long fileLen = file.length();
@@ -613,17 +700,17 @@ public class HexEditFrm
 		insertBytes( caretPos, a, 0 );
 	      }
 	      catch( SizeLimitExceededException ex ) {
-		BasicDlg.showErrorDlg( this, ex.getMessage() );
+		BaseDlg.showErrorDlg( this, ex.getMessage() );
 	      }
 	      setDataChanged( true );
 	      updView();
 	      setSelection( caretPos, caretPos + a.length - 1 );
-	      Main.setLastFile( file, "hexedit" );
+	      Main.setLastFile( file, Main.FILE_GROUP_HEXEDIT );
 	    }
 	  }
 	}
 	catch( IOException ex ) {
-	  BasicDlg.showErrorDlg( this, ex );
+	  BaseDlg.showErrorDlg( this, ex );
 	}
       }
     }
@@ -643,11 +730,12 @@ public class HexEditFrm
   {
     if( confirmDataSaved() ) {
       File file = EmuUtil.showFileOpenDlg(
-				this,
-				"Datei \u00F6ffnen",
-				Main.getLastDirFile( "hexedit" ) );
-      if( file != null )
+			this,
+			"Datei \u00F6ffnen",
+			Main.getLastDirFile( Main.FILE_GROUP_HEXEDIT ) );
+      if( file != null ) {
 	openFileInternal( file );
+      }
     }
   }
 
@@ -660,7 +748,9 @@ public class HexEditFrm
       file = EmuUtil.showFileSaveDlg(
 		this,
 		"Datei speichern",
-		file != null ? file : Main.getLastDirFile( "hexedit" ) );
+		file != null ?
+			file
+			: Main.getLastDirFile( Main.FILE_GROUP_HEXEDIT ) );
     }
     if( file != null ) {
       try {
@@ -682,12 +772,12 @@ public class HexEditFrm
 	  }
 	}
 	finally {
-	  EmuUtil.doClose( out );
+	  EmuUtil.closeSilent( out );
 	}
-	Main.setLastFile( file, "hexedit" );
+	Main.setLastFile( file, Main.FILE_GROUP_HEXEDIT );
       }
       catch( Exception ex ) {
-	BasicDlg.showErrorDlg( this, ex );
+	BaseDlg.showErrorDlg( this, ex );
       }
     }
     return rv;
@@ -810,6 +900,11 @@ public class HexEditFrm
     this.mnuBytesInvert.setEnabled( false );
     mnuEdit.add( this.mnuBytesInvert );
 
+    this.mnuBytesReverse = createJMenuItem(
+				"Ausgew\u00E4hlte Bytes spiegeln" );
+    this.mnuBytesReverse.setEnabled( false );
+    mnuEdit.add( this.mnuBytesReverse );
+
     this.mnuBytesRemove = createJMenuItem(
 		"Ausgew\u00E4hlte Bytes entfernen",
 		KeyStroke.getKeyStroke( KeyEvent.VK_DELETE, 0 ) );
@@ -838,6 +933,10 @@ public class HexEditFrm
 			"Bis zur gemerkten Position ausw\u00E4hlen" );
     this.mnuSelectToSavedPos.setEnabled( false );
     mnuEdit.add( this.mnuSelectToSavedPos );
+
+    this.mnuSelectAll = createJMenuItem( "Alles ausw\u00E4hlen" );
+    this.mnuSelectAll.setEnabled( false );
+    mnuEdit.add( this.mnuSelectAll );
     mnuEdit.addSeparator();
 
     this.mnuChecksum = createJMenuItem( "Pr\u00FCfsumme/Hash-Wert..." );
@@ -1084,14 +1183,14 @@ public class HexEditFrm
 	}
 	updView();
 	setCaretPosition( -1, false );
-	Main.setLastFile( file, "hexedit" );
+	Main.setLastFile( file, Main.FILE_GROUP_HEXEDIT );
       }
       finally {
-	EmuUtil.doClose( in );
+	EmuUtil.closeSilent( in );
       }
     }
     catch( IOException ex ) {
-      BasicDlg.showErrorDlg( this, ex );
+      BaseDlg.showErrorDlg( this, ex );
     }
   }
 
@@ -1113,6 +1212,19 @@ public class HexEditFrm
   private static void throwFileTooBig() throws IOException
   {
     throw new IOException( "Datei ist zu gro\u00DF!" );
+  }
+
+
+  private static int toReverseByte( int b )
+  {
+    return ((b >> 7) & 0x01)
+		| ((b >> 5) & 0x02)
+		| ((b >> 3) & 0x04)
+		| ((b >> 1) & 0x08)
+		| ((b << 1) & 0x10)
+		| ((b << 3) & 0x20)
+		| ((b << 5) & 0x40)
+		| ((b << 7) & 0x80);
   }
 
 

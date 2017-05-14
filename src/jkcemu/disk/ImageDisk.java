@@ -1,5 +1,5 @@
 /*
- * (c) 2012-2016 Jens Mueller
+ * (c) 2012-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -10,10 +10,22 @@
 package jkcemu.disk;
 
 import java.awt.Frame;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.*;
-import java.text.*;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 import jkcemu.base.EmuUtil;
 import jkcemu.text.CharConverter;
@@ -28,11 +40,13 @@ public class ImageDisk extends AbstractFloppyDisk
   private Map<Integer,java.util.List<SectorData>> side1;
 
 
-  public static void export(
+  public static String export(
 			AbstractFloppyDisk disk,
 			File               file,
 			String             remark ) throws IOException
   {
+    StringBuilder msgBuf = null;
+
     /*
      * Pruefen, ob geloschte Sektoren oder Sektoren mit CRC-Fehler
      * vorhanden sind
@@ -170,6 +184,18 @@ public class ImageDisk extends AbstractFloppyDisk
 	      sectorSize <<= sizeCode;
 	    }
 	    for( SectorData sector : sectors ) {
+	      if( sector.hasBogusID() ) {
+		if( msgBuf == null ) {
+		  msgBuf = new StringBuilder( 1024 );
+		}
+		msgBuf.append(
+			String.format(
+				"Seite %d, Spur %d, Sektor %d:"
+					+ " Sektor-ID generiert\n",
+				head + 1,
+				cyl,
+				sector.getSectorNum() ) );
+	      }
 	      int     fillByte = -1;
 	      boolean deleted  = sector.isDeleted();
 	      boolean err      = sector.checkError();
@@ -216,10 +242,18 @@ public class ImageDisk extends AbstractFloppyDisk
       }
       out.close();
       out = null;
+
+      if( msgBuf != null ) {
+	msgBuf.append( "\nDie angezeigten Informationen k\u00F6nnen"
+		+ " in einer ImageDisk-Datei nicht gespeichert werden\n"
+		+ "und sind deshalb in der erzeugten Datei"
+		+ " nicht mehr enthalten.\n" );
+      }
     }
     finally {
-      EmuUtil.doClose( out );
+      EmuUtil.closeSilent( out );
     }
+    return msgBuf != null ? msgBuf.toString() : null;
   }
 
 
@@ -415,11 +449,10 @@ public class ImageDisk extends AbstractFloppyDisk
 	    map = side1;
 	  }
 	  if( map != null ) {
-	    Integer keyObj                     = new Integer( cyl );
-	    java.util.List<SectorData> sectors = map.get( keyObj );
+	    java.util.List<SectorData> sectors = map.get( cyl );
 	    if( sectors == null ) {
 	      sectors = new ArrayList<>( nSec > 0 ? nSec : 1 );
-	      map.put( keyObj, sectors );
+	      map.put( cyl, sectors );
 	    }
 	    int secCyl = cyl;
 	    if( sectorCyls != null ) {
@@ -475,7 +508,7 @@ public class ImageDisk extends AbstractFloppyDisk
 		side1 );
     }
     finally {
-      EmuUtil.doClose( in );
+      EmuUtil.closeSilent( in );
     }
     return rv;
   }
@@ -533,8 +566,8 @@ public class ImageDisk extends AbstractFloppyDisk
   public void putSettingsTo( Properties props, String prefix )
   {
     if( (props != null) && (this.fileName != null) ) {
-      props.setProperty( prefix + "file", this.fileName );
-      props.setProperty( prefix + "readonly", "true" );
+      props.setProperty( prefix + PROP_FILE, this.fileName );
+      props.setProperty( prefix + PROP_READONLY, EmuUtil.VALUE_TRUE );
     }
   }
 
@@ -577,7 +610,7 @@ public class ImageDisk extends AbstractFloppyDisk
     Map<Integer,java.util.List<SectorData>> map = ((physHead & 0x01) != 0 ?
 							side1 : side0);
     if( map != null ) {
-      rv = map.get( new Integer( physCyl ) );
+      rv = map.get( physCyl );
     }
     return rv;
   }

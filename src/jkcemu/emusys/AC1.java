@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2016 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,28 +8,60 @@
 
 package jkcemu.emusys;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.*;
-import java.util.*;
-import javax.swing.JOptionPane;
-import jkcemu.base.*;
-import jkcemu.disk.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Properties;
+import jkcemu.base.CharRaster;
+import jkcemu.base.EmuMemView;
+import jkcemu.base.EmuSys;
+import jkcemu.base.EmuThread;
+import jkcemu.base.EmuUtil;
+import jkcemu.base.FileFormat;
+import jkcemu.base.LoadData;
+import jkcemu.base.OptionDlg;
+import jkcemu.base.RAMFloppy;
+import jkcemu.base.SaveDlg;
+import jkcemu.base.SourceUtil;
+import jkcemu.base.UserCancelException;
+import jkcemu.disk.FDC8272;
+import jkcemu.disk.FloppyDiskDrive;
+import jkcemu.disk.GIDE;
 import jkcemu.emusys.ac1_llc2.AbstractSCCHSys;
 import jkcemu.etc.VDIP;
 import jkcemu.joystick.JoystickThread;
 import jkcemu.net.KCNet;
 import jkcemu.text.TextUtil;
-import z80emu.*;
+import z80emu.Z80CPU;
+import z80emu.Z80CTC;
+import z80emu.Z80InterruptSource;
+import z80emu.Z80PIO;
 
 
 public class AC1
 		extends AbstractSCCHSys
-		implements
-			FDC8272.DriveSelector,
-			Z80TStatesListener
+		implements FDC8272.DriveSelector
 {
+  public static final String SYSNAME                  = "AC1";
+  public static final String PROP_PREFIX              = "jkcemu.ac1.";
+  public static final String PROP_2010_PIO2ROM_PREFIX = "2010.prop2rom.";
+  public static final String PROP_2010_ROMBANK_PREFIX = "2010.rombank.";
+  public static final String PROP_M1_TO_CTC_CLK2      = "m1_to_ctc_clk2";
+
+  public static final String VALUE_MON_31_64X16 = "3.1_64x16";
+  public static final String VALUE_MON_31_64X32 = "3.1_64x32";
+  public static final String VALUE_MON_SCCH80   = "SCCH8.0";
+  public static final String VALUE_MON_SCCH1088 = "SCCH10/88";
+  public static final String VALUE_MON_2010     = "2010";
+
+  public static final int     FUNCTION_KEY_COUNT         = 2;
+  public static final boolean DEFAULT_SWAP_KEY_CHAR_CASE = true;
+
   /*
    * Die im Emulator integrierten SCCH-Monitore enthalten eine Routine
    * zur seriellen Ausgabe von Zeichen ueber Bit 2 des IO-Ports 8 (PIO 2).
@@ -448,27 +480,27 @@ public class AC1
 
   public AC1( EmuThread emuThread, Properties props )
   {
-    super( emuThread, props, "jkcemu.ac1." );
+    super( emuThread, props, PROP_PREFIX );
     this.fontSwitchable = false;
     this.mode64x16      = false;
     this.mode2010       = false;
     this.modeSCCH       = false;
     this.pasteFast      = false;
-    this.ctcM1ToClk2    = emulatesCTCM1ToClk2( props );
+    this.ctcM1ToClk2    = emulatesM1ToCtcClk2( props );
     this.osVersion      = EmuUtil.getProperty(
-					props,
-					this.propPrefix + "os.version" );
-    if( this.osVersion.equals( "3.1_64x16" ) ) {
+				props,
+				this.propPrefix + PROP_OS_VERSION );
+    if( this.osVersion.equals( VALUE_MON_31_64X16 ) ) {
       this.mode64x16 = true;
     }
-    else if( this.osVersion.equals( "SCCH8.0" ) ) {
+    else if( this.osVersion.equals( VALUE_MON_SCCH80 ) ) {
       this.modeSCCH = true;
     }
-    else if( this.osVersion.equals( "SCCH10/88" ) ) {
+    else if( this.osVersion.equals( VALUE_MON_SCCH1088 ) ) {
       this.modeSCCH       = true;
       this.fontSwitchable = true;
     }
-    else if( this.osVersion.equals( "2010" ) ) {
+    else if( this.osVersion.equals( VALUE_MON_2010 ) ) {
       this.mode2010 = true;
     }
     this.osBytes             = null;
@@ -512,7 +544,7 @@ public class AC1
 				RAMFloppy.RFType.MP_3_1988,
 				"RAM-Floppy E/A-Adressen E0h-E7h",
 				props,
-				this.propPrefix + "ramfloppy." );
+				this.propPrefix + PROP_RF_PREFIX );
 
     this.fdDrives  = null;
     this.fdc       = null;
@@ -564,15 +596,8 @@ public class AC1
       this.ctc.setTimerConnection( 1, 2 );
     }
     this.ctc.setTimerConnection( 2, 3 );
+    cpu.addMaxSpeedListener( this );
     cpu.addTStatesListener( this );
-    if( this.fdc != null ) {
-      this.fdc.setTStatesPerMilli( cpu.getMaxSpeedKHz() );
-      cpu.addMaxSpeedListener( this.fdc );
-    }
-    if( this.kcNet != null ) {
-      this.kcNet.z80MaxSpeedChanged( cpu );
-      cpu.addMaxSpeedListener( this.kcNet );
-    }
     if( this.vdip != null ) {
       this.vdip.applySettings( props );
     }
@@ -580,6 +605,7 @@ public class AC1
       loadROMs( props );
     }
     checkAddPCListener( props );
+    z80MaxSpeedChanged( cpu );
   }
 
 
@@ -719,12 +745,6 @@ public class AC1
   }
 
 
-  public static boolean getDefaultSwapKeyCharCase()
-  {
-    return true;
-  }
-
-
   public static String getTinyBasicProgram( EmuMemView memory )
   {
     return SourceUtil.getTinyBasicProgram(
@@ -748,11 +768,13 @@ public class AC1
     }
 
     // OS-ROM
-    this.osFile  = EmuUtil.getProperty( props, this.propPrefix + "os.file" );
+    this.osFile  = EmuUtil.getProperty(
+				props,
+				this.propPrefix + PROP_OS_FILE );
     this.osBytes = readROMFile( this.osFile, 0x1000, "Monitorprogramm" );
     if( this.osBytes == null ) {
       if( this.modeSCCH ) {
-	if( this.osVersion.startsWith( "SCCH8.0" ) ) {
+	if( this.osVersion.startsWith( VALUE_MON_SCCH80 ) ) {
 	  if( monSCCH80 == null ) {
 	    monSCCH80 = readResource( "/rom/ac1/scchmon_80g.bin" );
 	  }
@@ -793,8 +815,8 @@ public class AC1
     // AC1-2010 ROM-Baenke
     if( this.mode2010 ) {
       this.pio2Rom2010File  = EmuUtil.getProperty(
-				props,
-				this.propPrefix + "2010.pio2rom.file" );
+		props,
+		this.propPrefix + PROP_2010_PIO2ROM_PREFIX + PROP_FILE );
       this.pio2Rom2010Bytes = readROMFile(
 				this.pio2Rom2010File,
 				0x2000,
@@ -806,8 +828,8 @@ public class AC1
 	this.pio2Rom2010Bytes = pio2Rom2010;
       }
       this.romBank2010File  = EmuUtil.getProperty(
-				props,
-				this.propPrefix + "2010.rombank.file" );
+		props,
+		this.propPrefix + PROP_2010_ROMBANK_PREFIX + PROP_FILE );
       this.romBank2010Bytes = readROMFile(
 				this.romBank2010File,
 				0x20000,
@@ -839,76 +861,6 @@ public class AC1
   }
 
 
-	/* --- Z80TStatesListener --- */
-
-  @Override
-  public void z80TStatesProcessed( Z80CPU cpu, int tStates )
-  {
-    boolean phase = this.emuThread.readAudioPhase();
-    if( phase != this.audioInPhase ) {
-      this.audioInPhase = phase;
-      this.pio1.putInValuePortB( this.audioInPhase ? 0x80 : 0, 0x80 );
-    }
-    if( this.fdc != null ) {
-      this.fdc.z80TStatesProcessed( cpu, tStates );
-    }
-    if( this.kcNet != null ) {
-      this.kcNet.z80TStatesProcessed( cpu, tStates );
-    }
-    if( this.v24BitNum > 0 ) {
-      synchronized( this ) {
-	this.v24TStateCounter -= tStates;
-	if( this.v24TStateCounter < 0 ) {
-	  if( this.v24BitNum > 8 ) {
-	    this.emuThread.getPrintMngr().putByte( this.v24ShiftBuf );
-	    this.v24BitNum = 0;
-	  } else {
-	    this.v24ShiftBuf >>= 1;
-	    if( this.v24BitOut ) {
-	      this.v24ShiftBuf |= 0x80;
-	    }
-	    this.v24TStateCounter = this.v24TStatesPerBit;
-	    this.v24BitNum++;
-	  }
-	}
-      }
-    }
-    if( this.ctcM1ToClk2 && !this.ctcWritten ) {
-      /*
-       * Die CTC muss taktzyklengenau mit dem /M1-Signal getriggert werden,
-       * da sie erst einen Taktzyklus nach dem programmierenden
-       * Ausgabebefehl gestartet wird und somit die fallende Flanke
-       * des ersten /M1-Signals noch nicht wirksam ist.
-       * Um die CTC-Emulation nicht zu stoeren,
-       * duerfen die Taktzyklen eines Ausgabebefehls auf die CTC
-       * nicht zerlegt werden.
-       * Deshalb wird dieser Zweig nicht bei "ctcWritten" durchlaufen.
-       */
-      while( (tStates > 0) && (this.m1Cnt > 0) ) {
-	this.ctc.externalUpdate( 2, false );	// fallende Flanke
-	int t = Math.min( tStates, 3 );
-	if( t > 0 ) {
-	  this.ctc.z80TStatesProcessed( cpu, t );
-	  tStates -= t;
-	}
-	this.ctc.externalUpdate( 2, true );	// steigende Flanke
-	if( tStates > 0 ) {
-	  this.ctc.z80TStatesProcessed( cpu, 1 );
-	  --tStates;
-	}
-	--this.m1Cnt;
-      }
-      if( tStates > 0 ) {
-	this.ctc.z80TStatesProcessed( cpu, tStates );
-      }
-      this.m1Cnt = 0;
-    } else {
-      this.ctc.z80TStatesProcessed( cpu, tStates );
-      this.ctcWritten = false;
-    }
-  }
-
-
 	/* --- ueberschriebene Methoden --- */
 
   @Override
@@ -918,15 +870,16 @@ public class AC1
       buf.append( "<h1>AC1 Status</h1>\n"
 		+ "<table border=\"1\">\n"
 		+ "<tr><td>Monitor ROM:</td><td>" );
-      buf.append( !this.lowerDRAMEnabled && this.osRomEnabled ?
-						"ein" : "aus" );
+      EmuUtil.appendOnOffText(
+		buf,
+		!this.lowerDRAMEnabled && this.osRomEnabled );
       buf.append( "</td></tr>\n"
 		+ "<tr><td>SRAM / BWS</td><td>" );
-      buf.append( this.lowerDRAMEnabled ? "aus" : "ein" );
+      EmuUtil.appendOnOffText( buf, !this.lowerDRAMEnabled );
       buf.append( "</td></tr>\n" );
       if( this.modeSCCH ) {
 	buf.append( "<tr><td>ROM-Disk:</td><td>" );
-	buf.append( this.scchRomdiskEnabled ? "ein" : "aus" );
+	EmuUtil.appendOnOffText( buf, this.scchRomdiskEnabled );
 	buf.append( "</td></tr>\n"
 		+ "<tr><td>ROM-Disk Bank:</td><td>" );
 	if( this.scchRomdiskBegAddr == 0x8000 ) {
@@ -936,10 +889,10 @@ public class AC1
 	}
 	buf.append( "</td></tr>\n"
 		+ "<tr><td>Programmpaket X ROM:</td><td>" );
-	buf.append( this.scchPrgXRomEnabled ? "ein" : "aus" );
+	EmuUtil.appendOnOffText( buf, this.scchPrgXRomEnabled );
 	buf.append( "</td></tr>\n"
 		+ "<tr><td>SCCH-BASIC ROM:</td><td>" );
-	buf.append( this.scchBasicRomEnabled ? "ein" : "aus" );
+	EmuUtil.appendOnOffText( buf, this.scchBasicRomEnabled );
 	buf.append( "</td></tr>\n" );
       }
       if( this.mode2010 ) {
@@ -949,7 +902,7 @@ public class AC1
 		+ "<tr><td>PIO2 ROM Segment-Offset:</td><td>" );
 	  buf.append( String.format( "%Xh", this.pio2Rom2010Offs ) );
 	} else {
-	  buf.append( "aus" );
+	  buf.append( EmuUtil.TEXT_OFF );
 	}
 	buf.append( "</td></tr>\n"
 		+ "<tr><td>ROM-Bank:</td><td>" );
@@ -961,7 +914,7 @@ public class AC1
 		+ "<tr><td>ROM-Bank Segment-Offset:</td><td>" );
 	  buf.append( String.format( "%Xh", this.romBank2010Offs ) );
 	} else {
-	  buf.append( "aus" );
+	  buf.append( EmuUtil.TEXT_OFF );
 	}
 	buf.append( "</td></tr>\n" );
       }
@@ -987,18 +940,20 @@ public class AC1
   {
     boolean rv = EmuUtil.getProperty(
 			props,
-			"jkcemu.system" ).equals( "AC1" );
+			EmuThread.PROP_SYSNAME ).equals( SYSNAME );
     if( rv ) {
       rv = TextUtil.equals(
 		this.osVersion,
 		EmuUtil.getProperty(
-				props,
-				this.propPrefix + "os.version" ) );
+			props,
+			this.propPrefix + PROP_OS_VERSION ) );
     }
     if( rv ) {
       rv = TextUtil.equals(
 		this.osFile,
-		EmuUtil.getProperty( props, this.propPrefix + "os.file" ) );
+		EmuUtil.getProperty(
+			props,
+			this.propPrefix + PROP_OS_VERSION ) );
     }
     if( rv ) {
       if( this.modeSCCH ) {
@@ -1014,15 +969,19 @@ public class AC1
 	rv = TextUtil.equals(
 		this.pio2Rom2010File,
 		EmuUtil.getProperty(
-				props,
-				this.propPrefix + "2010.pio2rom.file" ) );
+			props,
+			this.propPrefix
+				+ PROP_2010_PIO2ROM_PREFIX
+				+ PROP_FILE ) );
       }
       if( rv ) {
 	rv = TextUtil.equals(
 		this.romBank2010File,
 		EmuUtil.getProperty(
-				props,
-				this.propPrefix + "2010.rombank.file" ) );
+			props,
+			this.propPrefix
+				+ PROP_2010_ROMBANK_PREFIX
+				+ PROP_FILE ) );
       }
     }
     if( rv ) {
@@ -1031,7 +990,7 @@ public class AC1
 			"AC1",
 			RAMFloppy.RFType.MP_3_1988,
 			props,
-			this.propPrefix + "ramfloppy." );
+			this.propPrefix + PROP_RF_PREFIX );
     }
     if( rv ) {
       rv = GIDE.complies( this.gide, props, this.propPrefix );
@@ -1042,7 +1001,7 @@ public class AC1
     if( rv && (emulatesColors( props ) != (this.ramColor != null)) ) {
       rv = false;
     }
-    if( rv && (emulatesCTCM1ToClk2( props ) != this.ctcM1ToClk2) ) {
+    if( rv && (emulatesM1ToCtcClk2( props ) != this.ctcM1ToClk2) ) {
       rv = false;
     }
     if( rv && (emulatesKCNet( props ) != (this.kcNet != null)) ) {
@@ -1098,6 +1057,7 @@ public class AC1
 
     Z80CPU cpu = this.emuThread.getZ80CPU();
     cpu.removeTStatesListener( this );
+    cpu.removeMaxSpeedListener( this );
     cpu.setInterruptSources( (Z80InterruptSource[]) null );
     if( this.pasteFast ) {
       cpu.removePCListener( this );
@@ -1105,11 +1065,9 @@ public class AC1
     }
 
     if( this.fdc != null ) {
-      cpu.removeMaxSpeedListener( this.fdc );
       this.fdc.die();
     }
     if( this.kcNet != null ) {
-      cpu.removeMaxSpeedListener( this.kcNet );
       this.kcNet.die();
     }
     if( this.vdip != null ) {
@@ -1321,14 +1279,14 @@ public class AC1
   @Override
   public boolean getSwapKeyCharCase()
   {
-    return getDefaultSwapKeyCharCase();
+    return DEFAULT_SWAP_KEY_CHAR_CASE;
   }
 
 
   @Override
   public String getTitle()
   {
-    return "AC1";
+    return SYSNAME;
   }
 
 
@@ -1381,12 +1339,37 @@ public class AC1
 
 
   @Override
+  public boolean keyTyped( char ch )
+  {
+    boolean rv = false;
+    switch( ch ) {
+      case '\u00F1':
+	this.inverseByKey = !this.inverseByKey;
+	this.screenFrm.setScreenDirty( true );
+	rv = true;
+	break;
+
+      case '\u00F2':
+	if( this.modeSCCH || this.mode2010 ) {
+	  this.graphicKeyState = !this.graphicKeyState;
+	}
+	rv = true;
+	break;
+
+      default:
+	rv = super.keyTyped( ch );
+    }
+    return rv;
+  }
+
+
+  @Override
   public void openBasicProgram()
   {
-    boolean   canceled = false;
-    BasicType bType    = null;
-    String    text     = null;
-    int       preIdx   = -1;
+    boolean   cancelled = false;
+    BasicType bType     = null;
+    String    text      = null;
+    int       preIdx    = -1;
     if( this.lastBasicType != null ) {
       switch( this.lastBasicType ) {
 	case AC1_MINI:
@@ -1493,9 +1476,9 @@ public class AC1
 	break;
 
       default:
-	canceled = true;
+	cancelled = true;
     }
-    if( !canceled ) {
+    if( !cancelled ) {
       if( text != null ) {
 	this.lastBasicType = bType;
 	this.screenFrm.openText( text );
@@ -1802,7 +1785,7 @@ public class AC1
 	}
       }
     }
-    this.audioInPhase     = this.emuThread.readAudioPhase();
+    this.audioInPhase     = this.emuThread.readTapeInPhase();
     this.inverseBySW      = false;
     this.pio1B3State      = false;
     this.fdcWaitEnabled   = false;
@@ -1833,7 +1816,7 @@ public class AC1
   @Override
   public void saveBasicProgram()
   {
-    boolean           canceled     = false;
+    boolean           cancelled    = false;
     int               begAddr      = -1;
     int               endAddr      = -1;
     BasicType         ac1BasicType = null;
@@ -1933,9 +1916,9 @@ public class AC1
 	break;
 
       default:
-	canceled = true;
+	cancelled = true;
     }
-    if( !canceled ) {
+    if( !cancelled ) {
       if( (begAddr > 0) && (endAddr > begAddr) ) {
 	this.lastBasicType = ac1BasicType;
 	(new SaveDlg(
@@ -2059,13 +2042,6 @@ public class AC1
 
 
   @Override
-  public boolean supportsAudio()
-  {
-    return true;
-  }
-
-
-  @Override
   public boolean supportsCopyToClipboard()
   {
     return true;
@@ -2094,6 +2070,27 @@ public class AC1
 
 
   @Override
+  public boolean supportsSoundOutMono()
+  {
+    return true;
+  }
+
+
+  @Override
+  public boolean supportsTapeIn()
+  {
+    return true;
+  }
+
+
+  @Override
+  public boolean supportsTapeOut()
+  {
+    return true;
+  }
+
+
+  @Override
   public void updSysCells(
 			int        begAddr,
 			int        len,
@@ -2109,11 +2106,11 @@ public class AC1
 			&& (begAddr <= 0x60F7)
 			&& ((begAddr + len) > 0x60FE)) )
       {
-	int topAddr = SourceUtil.getBasicEndAddr( this.emuThread, 0x60F7 );
-	if( topAddr > 0x60F7 ) {
-	  this.emuThread.setMemWord( 0x60D2, topAddr );
-	  this.emuThread.setMemWord( 0x60D4, topAddr );
-	  this.emuThread.setMemWord( 0x60D6, topAddr );
+	int tAddr = SourceUtil.getBasicEndAddr( this.emuThread, 0x60F7 ) + 1;
+	if( tAddr > 0x60F7 ) {
+	  this.emuThread.setMemWord( 0x60D2, tAddr );
+	  this.emuThread.setMemWord( 0x60D4, tAddr );
+	  this.emuThread.setMemWord( 0x60D6, tAddr );
 	}
       }
       if( (fileFmt.equals( FileFormat.BASIC_PRG )
@@ -2124,11 +2121,11 @@ public class AC1
 			&& (begAddr <= 0x6300)
 			&& ((begAddr + len) > 0x6307)) )
       {
-	int topAddr = SourceUtil.getBasicEndAddr( this.emuThread, 0x6300 );
-	if( topAddr > 0x6300 ) {
-	  this.emuThread.setMemWord( 0x60A8, topAddr );
-	  this.emuThread.setMemWord( 0x60AA, topAddr );
-	  this.emuThread.setMemWord( 0x60AC, topAddr );
+	int tAddr = SourceUtil.getBasicEndAddr( this.emuThread, 0x6300 ) + 1;
+	if( tAddr > 0x6300 ) {
+	  this.emuThread.setMemWord( 0x60A8, tAddr );
+	  this.emuThread.setMemWord( 0x60AA, tAddr );
+	  this.emuThread.setMemWord( 0x60AC, tAddr );
 	}
       }
       else if( (fileFmt.equals( FileFormat.BASIC_PRG )
@@ -2139,11 +2136,11 @@ public class AC1
 			&& (begAddr > 0x60F7) && (begAddr <= 0x6FB7)
 			&& ((begAddr + len) > 0x6FBE)) )
       {
-	int topAddr = SourceUtil.getBasicEndAddr( this.emuThread, 0x6FB7 );
-	if( topAddr > 0x6FB7 ) {
-	  this.emuThread.setMemWord( 0x415E, topAddr );
-	  this.emuThread.setMemWord( 0x4160, topAddr );
-	  this.emuThread.setMemWord( 0x4162, topAddr );
+	int tAddr = SourceUtil.getBasicEndAddr( this.emuThread, 0x6FB7 ) + 1;
+	if( tAddr > 0x6FB7 ) {
+	  this.emuThread.setMemWord( 0x415E, tAddr );
+	  this.emuThread.setMemWord( 0x4160, tAddr );
+	  this.emuThread.setMemWord( 0x4162, tAddr );
 	}
       }
     }
@@ -2178,9 +2175,8 @@ public class AC1
 	  this.pio1.writeDataB( value );
 	  synchronized( this.pio1 ) {
 	    int v = this.pio1.fetchOutValuePortB( false );
-	    this.emuThread.writeAudioPhase(
-			(v & (this.emuThread.isSoundOutEnabled() ?
-						0x01 : 0x40 )) != 0 );
+	    this.soundOutPhase = ((v & 0x01) != 0);
+	    this.tapeOutPhase  = ((v & 0x40) != 0);
 	    if( this.joystickEnabled ) {
 	      boolean joySelected = ((v & 0x02) == 0);
 	      if( joySelected != this.joystickSelected ) {
@@ -2453,6 +2449,88 @@ public class AC1
   }
 
 
+  @Override
+  public void z80MaxSpeedChanged( Z80CPU cpu )
+  {
+    super.z80MaxSpeedChanged( cpu );
+    if( this.fdc != null ) {
+      this.fdc.z80MaxSpeedChanged( cpu );
+    }
+    if( this.kcNet != null ) {
+      this.kcNet.z80MaxSpeedChanged( cpu );
+    }
+  }
+
+
+  @Override
+  public void z80TStatesProcessed( Z80CPU cpu, int tStates )
+  {
+    super.z80TStatesProcessed( cpu, tStates );
+    boolean phase = this.emuThread.readTapeInPhase();
+    if( phase != this.audioInPhase ) {
+      this.audioInPhase = phase;
+      this.pio1.putInValuePortB( this.audioInPhase ? 0x80 : 0, 0x80 );
+    }
+    if( this.fdc != null ) {
+      this.fdc.z80TStatesProcessed( cpu, tStates );
+    }
+    if( this.kcNet != null ) {
+      this.kcNet.z80TStatesProcessed( cpu, tStates );
+    }
+    if( this.v24BitNum > 0 ) {
+      synchronized( this ) {
+	this.v24TStateCounter -= tStates;
+	if( this.v24TStateCounter < 0 ) {
+	  if( this.v24BitNum > 8 ) {
+	    this.emuThread.getPrintMngr().putByte( this.v24ShiftBuf );
+	    this.v24BitNum = 0;
+	  } else {
+	    this.v24ShiftBuf >>= 1;
+	    if( this.v24BitOut ) {
+	      this.v24ShiftBuf |= 0x80;
+	    }
+	    this.v24TStateCounter = this.v24TStatesPerBit;
+	    this.v24BitNum++;
+	  }
+	}
+      }
+    }
+    if( this.ctcM1ToClk2 && !this.ctcWritten ) {
+      /*
+       * Die CTC muss taktzyklengenau mit dem /M1-Signal getriggert werden,
+       * da sie erst einen Taktzyklus nach dem programmierenden
+       * Ausgabebefehl gestartet wird und somit die fallende Flanke
+       * des ersten /M1-Signals noch nicht wirksam ist.
+       * Um die CTC-Emulation nicht zu stoeren,
+       * duerfen die Taktzyklen eines Ausgabebefehls auf die CTC
+       * nicht zerlegt werden.
+       * Deshalb wird dieser Zweig nicht bei "ctcWritten" durchlaufen.
+       */
+      while( (tStates > 0) && (this.m1Cnt > 0) ) {
+	this.ctc.externalUpdate( 2, false );	// fallende Flanke
+	int t = Math.min( tStates, 3 );
+	if( t > 0 ) {
+	  this.ctc.z80TStatesProcessed( cpu, t );
+	  tStates -= t;
+	}
+	this.ctc.externalUpdate( 2, true );	// steigende Flanke
+	if( tStates > 0 ) {
+	  this.ctc.z80TStatesProcessed( cpu, 1 );
+	  --tStates;
+	}
+	--this.m1Cnt;
+      }
+      if( tStates > 0 ) {
+	this.ctc.z80TStatesProcessed( cpu, tStates );
+      }
+      this.m1Cnt = 0;
+    } else {
+      this.ctc.z80TStatesProcessed( cpu, tStates );
+      this.ctcWritten = false;
+    }
+  }
+
+
 	/* --- private Methoden --- */
 
   private void createColors( Properties props )
@@ -2474,16 +2552,16 @@ public class AC1
   {
     return EmuUtil.getBooleanProperty(
 			props,
-			this.propPrefix + "color",
+			this.propPrefix + PROP_COLOR,
 			false );
   }
 
 
-  private boolean emulatesCTCM1ToClk2( Properties props )
+  private boolean emulatesM1ToCtcClk2( Properties props )
   {
     return EmuUtil.getBooleanProperty(
 			props,
-			this.propPrefix + "ctc.m1_to_clk2",
+			this.propPrefix + PROP_M1_TO_CTC_CLK2,
 			false );
   }
 
@@ -2493,7 +2571,7 @@ public class AC1
     this.extFont   = true;
     this.fontBytes = readFontByProperty(
 			props,
-			this.propPrefix + "font.file",
+			this.propPrefix + PROP_FONT_FILE,
 			this.fontSwitchable ? 0x1000 : 0x0800 );
 
     if( this.fontBytes == null ) {

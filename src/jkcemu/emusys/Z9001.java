@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2016 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,29 +8,87 @@
 
 package jkcemu.emusys;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.lang.*;
-import java.util.*;
-import jkcemu.base.*;
-import jkcemu.disk.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Properties;
+import jkcemu.base.AbstractKeyboardFld;
+import jkcemu.base.CharRaster;
+import jkcemu.base.EmuSys;
+import jkcemu.base.EmuThread;
+import jkcemu.base.EmuUtil;
+import jkcemu.base.FileFormat;
+import jkcemu.base.RAMFloppy;
+import jkcemu.base.SourceUtil;
+import jkcemu.disk.FDC8272;
+import jkcemu.disk.FloppyDiskDrive;
+import jkcemu.disk.FloppyDiskFormat;
+import jkcemu.disk.FloppyDiskInfo;
+import jkcemu.disk.GIDE;
 import jkcemu.emusys.z9001.Z9001KeyboardFld;
-import jkcemu.etc.*;
+import jkcemu.etc.Plotter;
+import jkcemu.etc.RTC7242X;
+import jkcemu.etc.VDIP;
 import jkcemu.joystick.JoystickThread;
 import jkcemu.net.KCNet;
 import jkcemu.text.TextUtil;
-import z80emu.*;
+import z80emu.Z80CPU;
+import z80emu.Z80CTC;
+import z80emu.Z80CTCListener;
+import z80emu.Z80InterruptSource;
+import z80emu.Z80MemView;
+import z80emu.Z80PCListener;
+import z80emu.Z80PIO;
+import z80emu.Z80SIO;
+import z80emu.Z80SIOChannelListener;
 
 
 public class Z9001 extends EmuSys implements
 					ActionListener,
 					FDC8272.DriveSelector,
 					Z80CTCListener,
-					Z80MaxSpeedListener,
 					Z80PCListener,
-					Z80SIOChannelListener,
-					Z80TStatesListener
+					Z80SIOChannelListener
 {
+  public static final String SYSNAME_KC85_1 = "KC85_1";
+  public static final String SYSNAME_KC87   = "KC87";
+  public static final String SYSNAME_Z9001  = "Z9001";
+
+  public static final String SYSTEXT_KC85_1 = "KC85/1";
+
+  public static final String PROP_PREFIX_KC85_1 = "jkcemu.kc85_1.";
+  public static final String PROP_PREFIX_KC87   = "jkcemu.kc87.";
+  public static final String PROP_PREFIX_Z9001  = "jkcemu.z9001.";
+
+  public static final String PROP_80CHARS_ENABLED   = "80_chars.enabled";
+  public static final String PROP_FONT_PROGRAMMABLE = "font.programmable";
+  public static final String PROP_GRAPHIC_TYPE      = "graphic.type";
+  public static final String PROP_PLOTTER_ENABLED   = "plotter.enabled";
+  public static final String PROP_PRINTER_MOD_ENABLED
+						= "printer_module.enabled";
+
+  public static final String PROP_RAM16K4000_ENABLED = "ram_16k_4000.enabled";
+  public static final String PROP_RAM64K_ENABLED     = "ram_64k.enabled";
+  public static final String PROP_RAM16K8000_ENABLED = "ram_16k_8000.enabled";
+
+  public static final String PROP_ROM_MOD_PREFIX     = "rom_module.";
+  public static final String PROP_ROM10KC000_ENABLED = "rom_10k_c000.enabled";
+  public static final String PROP_ROM16K4000_ENABLED = "rom_16k_4000.enabled";
+  public static final String PROP_ROM16K8000_ENABLED = "rom_16k_8000.enabled";
+  public static final String PROP_ROM32K4000_ENABLED = "rom_32k_4000.enabled";
+  public static final String PROP_ROM64K_ENABLED     = "rom_64k.enabled";
+  public static final String PROP_ROMBOOT_ENABLED    = "rom_boot.enabled";
+
+  public static final String VALUE_GRAPHIC_KRT      = "krt";
+  public static final String VALUE_GRAPHIC_ROBOTRON = "robotron";
+
+  public static final int     DEFAULT_PROMPT_AFTER_RESET_MILLIS_MAX = 2500;
+  public static final boolean DEFAULT_SWAP_KEY_CHAR_CASE            = true;
+
   public static final String[] basicTokens = {
     "END",       "FOR",      "NEXT",    "DATA",		// 0x80
     "INPUT",     "DIM",      "READ",    "LET",
@@ -203,8 +261,7 @@ public class Z9001 extends EmuSys implements
   private boolean           ramC000Enabled;
   private boolean           ramFontActive;
   private boolean           ramFontEnabled;
-  private boolean           audioOutPhase;
-  private boolean           audioInPhase;
+  private boolean           tapeInPhase;
   private int               lineNum;
   private int               lineTStates;
   private int               tStatesPerLine;
@@ -256,16 +313,19 @@ public class Z9001 extends EmuSys implements
     this.graphicLED    = false;
     this.keyboardFld   = null;
 
-    this.sysName = EmuUtil.getProperty( props, "jkcemu.system" );
-    if( this.sysName.equals( "KC87" ) ) {
-      this.kc87       = true;
-      this.propPrefix = "jkcemu.kc87.";
-    } else if( this.sysName.equals( "KC85/1" ) ) {
-      this.kc87       = false;
-      this.propPrefix = "jkcemu.kc85_1.";
-    } else {
-      this.kc87       = false;
-      this.propPrefix = "jkcemu.z9001.";
+    this.sysName = EmuUtil.getProperty( props, EmuThread.PROP_SYSNAME );
+    switch( this.sysName ) {
+      case SYSNAME_KC87:
+	this.kc87       = true;
+	this.propPrefix = PROP_PREFIX_KC87;
+	break;
+      case SYSNAME_KC85_1:
+	this.kc87       = false;
+	this.propPrefix = PROP_PREFIX_KC85_1;
+	break;
+      default:
+	this.kc87       = false;
+	this.propPrefix = PROP_PREFIX_Z9001;
     }
 
     if( emulatesFloppyDisk( props ) ) {
@@ -324,7 +384,7 @@ public class Z9001 extends EmuSys implements
 				RAMFloppy.RFType.ADW,
 				"RAM-Floppy an E/A-Adressen 20h/21h",
 				props,
-				this.propPrefix + "ramfloppy.1." );
+				this.propPrefix + PROP_RF1_PREFIX );
 
     this.ramFloppy2 = RAMFloppy.prepare(
 				this.emuThread.getRAMFloppy2(),
@@ -332,12 +392,11 @@ public class Z9001 extends EmuSys implements
 				RAMFloppy.RFType.ADW,
 				"RAM-Floppy an E/A-Adressen 24h/25h",
 				props,
-				this.propPrefix + "ramfloppy.2." );
+				this.propPrefix + PROP_RF2_PREFIX );
 
     this.lineNum         = 0;
     this.lineTStates     = 0;
-    this.audioInPhase    = this.emuThread.readAudioPhase();
-    this.audioOutPhase   = false;
+    this.tapeInPhase     = this.emuThread.readTapeInPhase();
     this.pcListenerAdded = false;
     this.mode20Rows      = false;
     this.colorSwap       = false;
@@ -377,11 +436,14 @@ public class Z9001 extends EmuSys implements
 	iSources.toArray( new Z80InterruptSource[ iSources.size() ] ) );
     }
     catch( ArrayStoreException ex ) {}
+    this.ctc80.setTimerConnection( 2, 3 );
+    this.ctc80.addCTCListener( this );
     if( this.sioB0 != null ) {
       this.sioB0.addChannelListener( this, 0 );
     }
-    this.ctc80.setTimerConnection( 2, 3 );
-    this.ctc80.addCTCListener( this );
+    if( this.ctcA8 != null ) {
+      this.ctcA8.addCTCListener( this );
+    }
     cpu.addMaxSpeedListener( this );
     cpu.addTStatesListener( this );
     checkAddPCListener( props );
@@ -433,12 +495,6 @@ public class Z9001 extends EmuSys implements
   public static int getDefaultSpeedKHz()
   {
     return 2458;	// eigentlich 2,4576 MHz
-  }
-
-
-  public static boolean getDefaultSwapKeyCharCase()
-  {
-    return true;
   }
 
 
@@ -520,29 +576,14 @@ public class Z9001 extends EmuSys implements
   public void z80CTCUpdate( Z80CTC ctc, int timerNum )
   {
     if( (ctc == this.ctc80) && (timerNum == 0) ) {
-      this.audioOutPhase = !this.audioOutPhase;
-      if( this.emuThread.isSoundOutEnabled() ) {
-	updLoudspeaker( this.pio88.fetchOutValuePortA( false ) );
-      } else {
-	this.emuThread.writeAudioPhase( this.audioOutPhase );
-      }
+      this.tapeOutPhase = !this.tapeOutPhase;
+      updLoudspeaker( this.pio88.fetchOutValuePortA( false ) );
     }
-  }
-
-
-	/* --- Z80MaxSpeedListener --- */
-
-  @Override
-  public void z80MaxSpeedChanged( Z80CPU cpu )
-  {
-    int maxSpeedKHz = cpu.getMaxSpeedKHz();
-    this.tStatesPerLine = maxSpeedKHz * 20 / 312;
-    this.tStatesVisible = (int) Math.round( this.tStatesPerLine / 2 );
-    if( this.fdc != null ) {
-      this.fdc.setTStatesPerMilli( maxSpeedKHz );
-    }
-    if( this.kcNet != null ) {
-      this.kcNet.z80MaxSpeedChanged( cpu );
+    else if( (ctc == this.ctcA8) && (timerNum == 0)
+	     && (this.sioB0 != null) )
+    {
+      this.sioB0.clockPulseSenderA();
+      this.sioB0.clockPulseReceiverA();
     }
   }
 
@@ -563,51 +604,12 @@ public class Z9001 extends EmuSys implements
 	/* --- Z80SIOChannelListener --- */
 
   @Override
-  public void z80SIOChannelByteAvailable( Z80SIO sio, int channel, int value )
+  public void z80SIOByteSent( Z80SIO sio, int channel, int value )
   {
-    if( this.printerModule && (sio == this.sioB0) && (channel == 0) )
+    if( this.printerModule && (sio == this.sioB0) && (channel == 0) ) {
       this.emuThread.getPrintMngr().putByte( value );
-  }
-
-
-	/* --- Z80TStatesListener --- */
-
-  @Override
-  public void z80TStatesProcessed( Z80CPU cpu, int tStates )
-  {
-    this.ctc80.z80TStatesProcessed( cpu, tStates );
-    if( this.ctcA8 != null ) {
-      this.ctcA8.z80TStatesProcessed( cpu, tStates );
-    }
-    if( this.fdc != null ) {
-      this.fdc.z80TStatesProcessed( cpu, tStates );
-    }
-    if( this.kcNet != null ) {
-      this.kcNet.z80TStatesProcessed( cpu, tStates );
-    }
-
-    /*
-     * Der Kassettenrecorderanschluss eingangsseitig wird emuliert,
-     * indem zyklisch geschaut wird, ob sich die Eingangsphase geaendert hat.
-     * Wenn ja, wird ein Impuls an der Strobe-Leitung der zugehoerigen PIO
-     * emuliert.
-     */
-    if( this.emuThread.readAudioPhase() != this.audioInPhase ) {
-      this.audioInPhase = !this.audioInPhase;
-      this.pio88.strobePortA();
-    }
-
-    // Zugriffe auf den Bildwiederhol- und Farbspeicher verlangsamen
-    if( (this.tStatesPerLine > 0) && (this.tStatesVisible > 0) ) {
-      this.lineTStates += tStates;
-      if( this.lineTStates >= this.tStatesPerLine ) {
-	this.lineTStates %= this.tStatesPerLine;
-	if( this.lineNum < 311 ) {
-	  this.lineNum++;
-	} else {
-	  this.lineNum = 0;
-	}
-      }
+      this.sioB0.setClearToSendA( false );
+      this.sioB0.setClearToSendA( true );
     }
   }
 
@@ -618,7 +620,7 @@ public class Z9001 extends EmuSys implements
   public void appendStatusHTMLTo( StringBuilder buf, Z80CPU cpu )
   {
     buf.append( "<h1>" );
-    buf.append( this.sysName );
+    EmuUtil.appendHTML( buf, getTitle() );
     buf.append( " Speicherkonfiguration</h1>\n"
         + "<table border=\"1\">\n"
 	+ "<tr><td>F000h-FFFFh:</td><td>Betriebssystem-ROM</td></tr>\n"
@@ -686,7 +688,7 @@ public class Z9001 extends EmuSys implements
 	+ "</table>\n"
 	+ "<br/><br/>\n"
 	+ "<h1>" );
-    buf.append( this.sysName );
+    EmuUtil.appendHTML( buf, getTitle() );
     buf.append( " Status</h1>\n"
 	+ "<table border=\"1\">\n"
 	+ "<tr><td>Bildausgabe:</td><td>" );
@@ -736,8 +738,9 @@ public class Z9001 extends EmuSys implements
   @Override
   public boolean canApplySettings( Properties props )
   {
-    boolean rv = this.sysName.equals(
-			EmuUtil.getProperty( props, "jkcemu.system" ) );
+    boolean rv = EmuUtil.getProperty(
+			props,
+			EmuThread.PROP_SYSNAME ).equals( this.sysName );
     if( rv && (emulatesRAM16K4000( props ) != this.ram16k4000) ) {
       rv = false;
     }
@@ -750,60 +753,62 @@ public class Z9001 extends EmuSys implements
     if( rv ) {
       rv = TextUtil.equals(
 		this.romOSFile,
-		EmuUtil.getProperty( props,  propPrefix + "os.file" ) );
+		EmuUtil.getProperty( props,  propPrefix + PROP_OS_FILE ) );
     }
     if( rv && this.kc87 ) {
       rv = TextUtil.equals(
 		this.romBasicFile,
-		EmuUtil.getProperty( props,  propPrefix + "basic.file" ) );
+		EmuUtil.getProperty(
+			props,
+			propPrefix + PROP_BASIC_PREFIX + PROP_FILE ) );
     }
     if( rv ) {
       rv = equalsROMModule(
 		this.rom16k4000,
 		this.romModuleFile,
 		props,
-		this.propPrefix + "rom_16k_4000.enabled",
-		this.propPrefix + "rom_module.file" );
+		this.propPrefix + PROP_ROM16K4000_ENABLED,
+		this.propPrefix + PROP_ROM_MOD_PREFIX + PROP_FILE );
     }
     if( rv ) {
       rv = equalsROMModule(
 		this.rom32k4000,
 		this.romModuleFile,
 		props,
-		this.propPrefix + "rom_32k_4000.enabled",
-		this.propPrefix + "rom_module.file" );
+		this.propPrefix + PROP_ROM32K4000_ENABLED,
+		this.propPrefix + PROP_ROM_MOD_PREFIX + PROP_FILE );
     }
     if( rv ) {
       rv = equalsROMModule(
 		this.rom16k8000,
 		this.romModuleFile,
 		props,
-		this.propPrefix + "rom_16k_8000.enabled",
-		this.propPrefix + "rom_module.file" );
+		this.propPrefix + PROP_ROM16K8000_ENABLED,
+		this.propPrefix + PROP_ROM_MOD_PREFIX + PROP_FILE );
     }
     if( rv ) {
       rv = equalsROMModule(
 		this.rom10kC000,
 		this.romModuleFile,
 		props,
-		this.propPrefix + "rom_10k_c000.enabled",
-		this.propPrefix + "rom_module.file" );
+		this.propPrefix + PROP_ROM10KC000_ENABLED,
+		this.propPrefix + PROP_ROM_MOD_PREFIX + PROP_FILE );
     }
     if( rv ) {
       rv = equalsROMModule(
 		this.romBoot,
 		this.romModuleFile,
 		props,
-		this.propPrefix + "rom_boot.enabled",
-		this.propPrefix + "rom_module.file" );
+		this.propPrefix + PROP_ROMBOOT_ENABLED,
+		this.propPrefix + PROP_ROM_MOD_PREFIX + PROP_FILE );
     }
     if( rv ) {
       rv = equalsROMModule(
 		this.romMega,
 		this.romModuleFile,
 		props,
-		this.propPrefix + "rom_mega.enabled",
-		this.propPrefix + "rom_module.file" );
+		this.propPrefix + Z9001.PROP_ROMMEGA_ENABLED,
+		this.propPrefix + PROP_ROM_MOD_PREFIX + PROP_FILE );
     }
     if( rv && (emulatesFloppyDisk( props ) != (this.fdc != null)) ) {
       rv = false;
@@ -832,7 +837,7 @@ public class Z9001 extends EmuSys implements
 			this.sysName,
 			RAMFloppy.RFType.ADW,
 			props,
-			this.propPrefix + "ramfloppy.1." );
+			this.propPrefix + PROP_RF1_PREFIX );
     }
     if( rv ) {
       rv = RAMFloppy.complies(
@@ -840,7 +845,7 @@ public class Z9001 extends EmuSys implements
 			this.sysName,
 			RAMFloppy.RFType.ADW,
 			props,
-			this.propPrefix + "ramfloppy.2." );
+			this.propPrefix + PROP_RF2_PREFIX );
     }
     if( rv ) {
       if( getColorMode( props ) != (this.ramColor != null) ) {
@@ -887,6 +892,9 @@ public class Z9001 extends EmuSys implements
       this.sioB0.removeChannelListener( this, 0 );
     }
     this.ctc80.removeCTCListener( this );
+    if( this.ctcA8 != null ) {
+      this.ctcA8.removeCTCListener( this );
+    }
 
     Z80CPU cpu = this.emuThread.getZ80CPU();
     cpu.removeMaxSpeedListener( this );
@@ -1263,14 +1271,15 @@ public class Z9001 extends EmuSys implements
   @Override
   public boolean getSwapKeyCharCase()
   {
-    return getDefaultSwapKeyCharCase();
+    return DEFAULT_SWAP_KEY_CHAR_CASE;
   }
 
 
   @Override
   public String getTitle()
   {
-    return this.sysName;
+    return this.sysName.equals( SYSNAME_KC85_1 ) ?
+					SYSTEXT_KC85_1 : this.sysName;
   }
 
 
@@ -1480,7 +1489,7 @@ public class Z9001 extends EmuSys implements
 
 
   @Override
-  protected boolean pasteChar( char ch )
+  protected boolean pasteChar( char ch ) throws InterruptedException
   {
     boolean rv = false;
     if( this.pasteFast ) {
@@ -1488,15 +1497,12 @@ public class Z9001 extends EmuSys implements
 	if( ch == '\n' ) {
 	  ch = '\r';
 	}
-	try {
-	  while( getMemByte( 0x0025, false ) != 0 ) {
-	    Thread.sleep( 10 );
-	  }
-	  setMemByte( 0x0024, ch );
-	  setMemByte( 0x0025, ch );
-	  rv = true;
+	while( getMemByte( 0x0025, false ) != 0 ) {
+	  Thread.sleep( 10 );
 	}
-	catch( InterruptedException ex ) {}
+	setMemByte( 0x0024, ch );
+	setMemByte( 0x0025, ch );
+	rv = true;
       }
     } else {
       rv = super.pasteChar( ch );
@@ -1757,6 +1763,8 @@ public class Z9001 extends EmuSys implements
   @Override
   public void reset( EmuThread.ResetLevel resetLevel, Properties props )
   {
+    super.reset( resetLevel, props );
+
     boolean coldReset = false;
     if( resetLevel == EmuThread.ResetLevel.POWER_ON ) {
       coldReset = true;
@@ -1766,8 +1774,8 @@ public class Z9001 extends EmuSys implements
       if( (this.romBoot != null) || (this.romMega != null) ) {
 	/*
 	 * Der originale DRAM enthaelt nach dem Einschalten
-	 * abwechselnd die Bytes FF und 00.
-	 * Wenn nur 00-Bytes vorhanden sind,
+	 * abwechselnd die Bytes FFh und 00h.
+	 * Wenn nur Nullbytes vorhanden sind,
 	 * wird der ROM-Modul nicht aktiviert.
 	 * Aus diesem diesem Grund wird hier das originale Byte-Muster
 	 * nachgebildet.
@@ -1801,6 +1809,8 @@ public class Z9001 extends EmuSys implements
     }
     if( this.sioB0 != null ) {
       this.sioB0.reset( coldReset );
+      this.sioB0.setClearToSendA( true );
+      this.sioB0.setClearToSendB( true );
     }
     if( this.fdc != null ) {
       this.fdc.reset( coldReset );
@@ -1827,7 +1837,6 @@ public class Z9001 extends EmuSys implements
     this.graphBorder       = false;
     this.graphMode         = false;
     this.c80MemSwap        = false;
-    this.audioOutPhase     = false;
     this.plotterPenState   = false;
     this.plotterMoveState  = false;
     this.fdcReset          = false;
@@ -1902,13 +1911,6 @@ public class Z9001 extends EmuSys implements
 
 
   @Override
-  public boolean supportsAudio()
-  {
-    return true;
-  }
-
-
-  @Override
   public boolean supportsCopyToClipboard()
   {
     return true;
@@ -1959,6 +1961,27 @@ public class Z9001 extends EmuSys implements
 
   @Override
   public boolean supportsSaveBasic()
+  {
+    return true;
+  }
+
+
+  @Override
+  public boolean supportsSoundOutMono()
+  {
+    return true;
+  }
+
+
+  @Override
+  public boolean supportsTapeIn()
+  {
+    return true;
+  }
+
+
+  @Override
+  public boolean supportsTapeOut()
   {
     return true;
   }
@@ -2052,9 +2075,7 @@ public class Z9001 extends EmuSys implements
 	{
 	  int v = this.pio88.fetchOutValuePortA( false );
 	  updScreenConfig( v );
-	  if( this.emuThread.isSoundOutEnabled() ) {
-	    updLoudspeaker( v );
-	  }
+	  updLoudspeaker( v );
 	  setGraphicLED( (v & 0x40) != 0 );
 	}
 	break;
@@ -2342,6 +2363,64 @@ public class Z9001 extends EmuSys implements
   }
 
 
+  @Override
+  public void z80MaxSpeedChanged( Z80CPU cpu )
+  {
+    super.z80MaxSpeedChanged( cpu );
+
+    int maxSpeedKHz = cpu.getMaxSpeedKHz();
+    this.tStatesPerLine = maxSpeedKHz * 20 / 312;
+    this.tStatesVisible = (int) Math.round( this.tStatesPerLine / 2 );
+    if( this.fdc != null ) {
+      this.fdc.setTStatesPerMilli( maxSpeedKHz );
+    }
+    if( this.kcNet != null ) {
+      this.kcNet.z80MaxSpeedChanged( cpu );
+    }
+  }
+
+
+  @Override
+  public void z80TStatesProcessed( Z80CPU cpu, int tStates )
+  {
+    super.z80TStatesProcessed( cpu, tStates );
+    this.ctc80.z80TStatesProcessed( cpu, tStates );
+    if( this.ctcA8 != null ) {
+      this.ctcA8.z80TStatesProcessed( cpu, tStates );
+    }
+    if( this.fdc != null ) {
+      this.fdc.z80TStatesProcessed( cpu, tStates );
+    }
+    if( this.kcNet != null ) {
+      this.kcNet.z80TStatesProcessed( cpu, tStates );
+    }
+
+    /*
+     * Der Kassettenrecorderanschluss eingangsseitig wird emuliert,
+     * indem zyklisch geschaut wird, ob sich die Eingangsphase geaendert hat.
+     * Wenn ja, wird ein Impuls an der Strobe-Leitung der zugehoerigen PIO
+     * emuliert.
+     */
+    if( this.emuThread.readTapeInPhase() != this.tapeInPhase ) {
+      this.tapeInPhase = !this.tapeInPhase;
+      this.pio88.strobePortA();
+    }
+
+    // Zugriffe auf den Bildwiederhol- und Farbspeicher verlangsamen
+    if( (this.tStatesPerLine > 0) && (this.tStatesVisible > 0) ) {
+      this.lineTStates += tStates;
+      if( this.lineTStates >= this.tStatesPerLine ) {
+	this.lineTStates %= this.tStatesPerLine;
+	if( this.lineNum < 311 ) {
+	  this.lineNum++;
+	} else {
+	  this.lineNum = 0;
+	}
+      }
+    }
+  }
+
+
 	/* --- private Methoden --- */
 
   private void adjustVideoRAMAccessTStates()
@@ -2360,17 +2439,18 @@ public class Z9001 extends EmuSys implements
   private void applyPasteFast( Properties props )
   {
     this.pasteFast = EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "paste.fast",
-				true );
+			props,
+			this.propPrefix + PROP_PASTE_FAST,
+			true );
   }
 
 
   private synchronized void checkAddPCListener( Properties props )
   {
     boolean state = EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "catch_print_calls", true );
+			props,
+			this.propPrefix + PROP_CATCH_PRINT_CALLS,
+			true );
     if( state != this.pcListenerAdded ) {
       Z80CPU cpu = this.emuThread.getZ80CPU();
       if( state ) {
@@ -2400,153 +2480,153 @@ public class Z9001 extends EmuSys implements
   private boolean emulates80CharsMode( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "80_chars.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_80CHARS_ENABLED,
+			false );
   }
 
 
   private boolean emulatesPlotter( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "plotter.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_PLOTTER_ENABLED,
+			false );
   }
 
 
   private boolean emulatesRAM16K4000( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "ram_16k_4000.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_RAM16K4000_ENABLED,
+			false );
   }
 
 
   private boolean emulatesRAM16K8000( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "ram_16k_8000.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_RAM16K8000_ENABLED,
+			false );
   }
 
 
   private boolean emulatesRAM64K( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "ram_64k.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_RAM64K_ENABLED,
+			false );
   }
 
 
   private boolean emulatesROM16K4000( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "rom_16k_4000.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_ROM16K4000_ENABLED,
+			false );
   }
 
 
   private boolean emulatesROM32K4000( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "rom_32k_4000.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_ROM32K4000_ENABLED,
+			false );
   }
 
 
   private boolean emulatesROM16K8000( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "rom_16k_8000.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_ROM16K8000_ENABLED,
+			false );
   }
 
 
   private boolean emulatesROM10KC000( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "rom_10k_c000.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_ROM10KC000_ENABLED,
+			false );
   }
 
 
   private boolean emulatesBootROM( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "rom_boot.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_ROMBOOT_ENABLED,
+			false );
   }
 
 
   private boolean emulatesFloppyDisk( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "floppydisk.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_FDC_ENABLED,
+			false );
   }
 
 
   private boolean emulatesKCNet( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "kcnet.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_KCNET_ENABLED,
+			false );
   }
 
 
   private boolean emulatesMegaROM( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "rom_mega.enabled",
-				false );
+			props,
+			this.propPrefix + Z9001.PROP_ROMMEGA_ENABLED,
+			false );
   }
 
 
   private boolean emulatesPrinterModule( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "printer_module.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_PRINTER_MOD_ENABLED,
+			false );
   }
 
 
   private boolean emulatesProgrammableFont( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "font.programmable",
-				false );
+			props,
+			this.propPrefix + PROP_FONT_PROGRAMMABLE,
+			false );
   }
 
 
   private boolean emulatesRTC( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "rtc.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_RTC_ENABLED,
+			false );
   }
 
 
   private boolean emulatesUSB( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "vdip.enabled",
-				false );
+			props,
+			this.propPrefix + PROP_VDIP_ENABLED,
+			false );
   }
 
 
@@ -2578,9 +2658,9 @@ public class Z9001 extends EmuSys implements
   private boolean getColorMode( Properties props )
   {
     return EmuUtil.getBooleanProperty(
-				props,
-				this.propPrefix + "color",
-				true );
+			props,
+			this.propPrefix + PROP_COLOR,
+			true );
   }
 
 
@@ -2589,7 +2669,7 @@ public class Z9001 extends EmuSys implements
     int    rv        = GRAPHIC_NONE;
     String graphType = EmuUtil.getProperty(
 			props,
-			this.propPrefix + "graphic.type" ).toLowerCase();
+			this.propPrefix + PROP_GRAPHIC_TYPE ).toLowerCase();
     if( graphType.equals( "robotron" ) ) {
       rv = GRAPHIC_ROBOTRON;
     }
@@ -2852,9 +2932,9 @@ public class Z9001 extends EmuSys implements
   private boolean isFixedScreenSize( Properties props )
   {
     return this.c80Enabled
-	   && EmuUtil.parseBooleanProperty(
+	   && EmuUtil.getBooleanProperty(
 			props,
-			this.propPrefix + "fixed_screen_size",
+			this.propPrefix + PROP_FIXED_SCREEN_SIZE,
 			false );
   }
 
@@ -2863,10 +2943,10 @@ public class Z9001 extends EmuSys implements
   {
     this.fontBytes = readFontByProperty(
 				props,
-				this.propPrefix + "font.file",
+				this.propPrefix + PROP_FONT_FILE,
 				0x1000 );
     if( this.fontBytes == null ) {
-      if( this.sysName.equals( "KC87" ) ) {
+      if( this.sysName.equals( SYSNAME_KC87 ) ) {
 	if( kc87FontBytes == null ) {
 	  kc87FontBytes = readResource( "/rom/z9001/kc87font.bin" );
 	}
@@ -2885,32 +2965,35 @@ public class Z9001 extends EmuSys implements
   {
     this.romOSFile = EmuUtil.getProperty(
 				props,
-				this.propPrefix + "os.file" );
+				this.propPrefix + PROP_OS_FILE );
     this.romOS = readROMFile( this.romOSFile, 0x1000, "Betriebssystem" );
     if( this.romOS == null ) {
-      if( this.sysName.equals( "KC87" ) ) {
-	if( os13 == null ) {
-	  os13 = readResource( "/rom/z9001/os13.bin" );
-	}
-	this.romOS = os13;
-      } else if( this.sysName.equals( "KC85/1" ) ) {
-	if( os12 == null ) {
-	  os12 = readResource( "/rom/z9001/os12.bin" );
-	}
-	this.romOS = os12;
-      } else {
-	if( os11 == null ) {
-	  os11 = readResource( "/rom/z9001/os11.bin" );
-	}
-	this.romOS = os11;
+      switch( this.sysName ) {
+	case SYSNAME_KC87:
+	  if( os13 == null ) {
+	    os13 = readResource( "/rom/z9001/os13.bin" );
+	  }
+	  this.romOS = os13;
+	  break;
+	case SYSNAME_KC85_1:
+	  if( os12 == null ) {
+	    os12 = readResource( "/rom/z9001/os12.bin" );
+	  }
+	  this.romOS = os12;
+	  break;
+	default:
+	  if( os11 == null ) {
+	    os11 = readResource( "/rom/z9001/os11.bin" );
+	  }
+	  this.romOS = os11;
       }
     }
 
     // BASIC-ROM
     if( this.kc87 ) {
       this.romBasicFile = EmuUtil.getProperty(
-				props,
-				this.propPrefix + "basic.file" );
+			props,
+			this.propPrefix + PROP_BASIC_PREFIX + PROP_FILE );
       this.romBasic = readROMFile( this.romBasicFile, 0x2800, "BASIC" );
       if( this.romBasic == null ) {
 	if( basic86 == null ) {
@@ -2925,7 +3008,7 @@ public class Z9001 extends EmuSys implements
 
     // Modul-ROM
     this.romModuleFile = props.getProperty(
-			      this.propPrefix + "rom_module.file" );
+		      this.propPrefix + PROP_ROM_MOD_PREFIX + PROP_FILE );
     if( emulatesROM16K4000( props ) ) {
       this.rom16k4000 = readROMFile(
 			this.romModuleFile,
@@ -3127,15 +3210,16 @@ public class Z9001 extends EmuSys implements
 
   private void updKeyboardFld()
   {
-    if( this.keyboardFld != null )
+    if( this.keyboardFld != null ) {
       this.keyboardFld.updKeySelection( this.kbMatrix );
+    }
   }
 
 
   private void updLoudspeaker( int pio88PortAValue )
   {
-    this.emuThread.writeAudioPhase(
-		!(!this.audioOutPhase && ((pio88PortAValue & 0x80) != 0)) );
+    this.soundOutPhase =
+		!(!this.tapeOutPhase && ((pio88PortAValue & 0x80) != 0));
   }
 
 

@@ -6,22 +6,20 @@
    <li><a href="filebrowser.htm#dragdrop">2. Drag&amp;Drop</a></li>
    <li>
     <a href="filebrowser.htm#load_start">3. Dateien laden und starten</a>
-   </li>
-   <li>
-    &nbsp;&nbsp;
-    <a href="filebrowser.htm#load_with">3.1. In Emulator laden mit...</a>
-   </li>
-   <li>
-    &nbsp;&nbsp;
-    <a href="filebrowser.htm#load">3.2. In Emulator laden</a>
-   </li>
-   <li>
-    &nbsp;&nbsp;
-    <a href="filebrowser.htm#start">3.3. Im Emulator starten</a>
-   </li>
-   <li>
-    &nbsp;&nbsp;
-    <a href="filebrowser.htm#doubleclick">3.4. Doppelklick</a>
+    <ul>
+     <li>
+      <a href="filebrowser.htm#load_with">3.1. In Emulator laden mit...</a>
+     </li>
+     <li>
+      <a href="filebrowser.htm#load">3.2. In Emulator laden</a>
+     </li>
+     <li>
+      <a href="filebrowser.htm#start">3.3. Im Emulator starten</a>
+     </li>
+     <li>
+      <a href="filebrowser.htm#doubleclick">3.4. Doppelklick</a>
+     </li>
+    </ul>
    </li>
    <li>
     <a href="filebrowser.htm#copy_paste">4. Ausschneiden, Kopieren und Einf&uuml;gen</a>
@@ -31,7 +29,14 @@
    </li>
    <li><a href="filebrowser.htm#etc">6. Weitere Funktionen</a></li>
    <li><a href="filebrowser.htm#keyboard">7. Tastaturbedienung</a></li>
-   <li><a href="filebrowser.htm#settings">8. Einstellungen</a></li>
+   <li>
+    <a href="filebrowser.htm#settings">8. Einstellungen</a>
+    <ul>
+     <li>
+      <a href="filebrowser.htm#phys_filesys">8.1. Phyische Dateisystemstruktur anzeigen</a>
+     </li>
+    </ul>
+   </li>
   </ul>
  <br/>
   Der Datei-Browser dient dazu,
@@ -52,10 +57,16 @@
  <h2><a name="layout">1. Ansicht</a></h2>
   Der Datei-Browser zeigt auf der linken Seite das Dateisystem
   in einer Baumdarstellung an.
+  Mit den <a href="filebrowser.htm#settings">Einstellungen</a>
+  k&ouml;nnen Sie Einfluss auf die angezeigten Dateien und Verzeichnisse
+  nehmen.
+  Sofern vorhanden, sollten Sie insbesondere den Men&uuml;punkt
+  <a href="filebrowser.htm#phys_filesys">Phyische Dateisystemstruktur anzeigen</a>
+  beachten.
+ <br/><br/>
   Die rechte Seite dient zur Anzeige von Details.
   Zwischen beiden Seiten befindet sich ein Balken,
   den Sie nach links und rechts verschieben k&ouml;nnen.
- <br/><br/>
   Wenn Sie eine Datei anklicken,
   werden Detailinformationen auf der rechten Seite angezeigt.
   Bei einer Bilddatei sehen Sie das ganze Bild, vorausgesetzt,
@@ -290,6 +301,26 @@
   k&ouml;nnen Sie auch dauerhaft in einem Profil speichern.
   Das tun Sie in dem separaten Fenster f&uuml;r
   <a href="../settings.htm">Einstellungen</a>.
+ <br/><br/>
+
+ <h3>
+  <a name="phys_filesys">8.1. Phyische Dateisystemstruktur anzeigen</a>
+ </h3>
+  Es gibt Betriebssysteme,
+  die dem Anwender eine Dateisystemansicht zeigen,
+  welche nicht der physischen Dateisystemstruktur entspricht.
+  So eine Anwendersicht kann z.B. Verzeichnisse wie <em>Bibliotheken</em>
+  oder <em>Computer</em> oder auch in die lokale Sprache
+  &uuml;bersetzte Verzeichnisnamen enthalten.
+  Wenn sowohl das Betriebssystem und als auch die Java-Laufzeitumgebung
+  eine solche Anwendersicht auf das Dateisystem unterst&uuml;tzen,
+  kann der Datei-Browser auch beide Sichten anzeigen.
+  In dem Fall gibt es im Men&uuml; <em>Einstellungen</em>
+  den Punkt <em>Phyische Dateisystemstruktur anzeigen</em>,
+  mit dem Sie zwischen den beiden Sichten umschalten k&ouml;nnen.
+  Ist diese Men&uuml;eintrag nicht vorhanden,
+  ist auch keine Anwendersicht verf&uuml;gbar,
+  und es wird immer die physische Dateisystemstruktur angezeigt.
 </body>
 </html>
 

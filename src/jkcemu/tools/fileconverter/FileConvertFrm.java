@@ -1,5 +1,5 @@
 /*
- * (c) 2011-2016 Jens Mueller
+ * (c) 2011-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,30 +8,79 @@
 
 package jkcemu.tools.fileconverter;
 
-import java.awt.*;
-import java.awt.dnd.*;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.WindowEvent;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.*;
-import java.util.*;
-import javax.sound.sampled.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import java.util.Collections;
+import java.util.EventObject;
+import java.util.Vector;
+import javax.swing.BorderFactory;
+import javax.swing.ComboBoxEditor;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.text.JTextComponent;
 import jkcemu.Main;
-import jkcemu.audio.*;
-import jkcemu.base.*;
-import jkcemu.disk.*;
+import jkcemu.audio.AudioFile;
+import jkcemu.audio.AudioPlayer;
+import jkcemu.audio.AudioUtil;
+import jkcemu.audio.BitSampleBuffer;
+import jkcemu.audio.PCMDataInfo;
+import jkcemu.audio.CSWFile;
+import jkcemu.base.BaseDlg;
+import jkcemu.base.BaseFrm;
+import jkcemu.base.EmuUtil;
+import jkcemu.base.FileFormat;
+import jkcemu.base.FileInfo;
+import jkcemu.base.FileNameFld;
+import jkcemu.base.HelpFrm;
+import jkcemu.base.HexDocument;
+import jkcemu.base.LimitedDocument;
+import jkcemu.base.LoadData;
+import jkcemu.base.UserInputException;
+import jkcemu.disk.AbstractFloppyDisk;
+import jkcemu.disk.AnaDisk;
+import jkcemu.disk.CPCDisk;
+import jkcemu.disk.CopyQMDisk;
+import jkcemu.disk.DiskUtil;
+import jkcemu.disk.FloppyDiskFormat;
+import jkcemu.disk.FloppyDiskFormatDlg;
+import jkcemu.disk.ImageDisk;
+import jkcemu.disk.PlainDisk;
+import jkcemu.disk.TeleDisk;
+import jkcemu.emusys.zxspectrum.ZXSpectrumAudioCreator;
 import jkcemu.text.TextUtil;
 
 
-public class FileConvertFrm extends BasicFrm implements
+public class FileConvertFrm extends BaseFrm implements
 						DropTargetListener,
 						ListSelectionListener
 {
   private static final int MAX_MEM_FILE_SIZE  = 0x40000;	// 256 KByte
   private static final int MAX_DISK_FILE_SIZE = 0x200000;	// 2 MByte
   private static final int MAX_TAPE_FILE_SIZE = 0x100000;	// 1 MByte
+
+  private static final String HELP_PAGE = "/help/tools/fileconverter.htm";
 
   private static final String LABEL_BEG_ADDR   = "Anfangsadresse:";
   private static final String LABEL_START_ADDR = "Startadresse:";
@@ -41,8 +90,10 @@ public class FileConvertFrm extends BasicFrm implements
   private String                        orgFileDesc;
   private int                           orgFileTypeChar;
   private int                           orgStartAddr;
-  private boolean                       orgIsBasicPrg;
   private String                        orgRemark;
+  private boolean                       orgIsBasicPrg;
+  private boolean                       lastOutDirAsInDir;
+  private String                        lastSavedTargetText;
   private FileNameFld                   fldSrcFile;
   private JButton                       btnSrcSelect;
   private JButton                       btnSrcRemove;
@@ -211,13 +262,31 @@ public class FileConvertFrm extends BasicFrm implements
 	String fName = file.getName();
 	if( fName != null ) {
 	  if( !fName.isEmpty() ) {
+	    /*
+	     * Dateibasisname als Bezeichnung uebernehmen,
+	     * Wenn ein Grossbuchstabe enthalten ist,
+	     * dann die Gross-/Kleinschreibung des Basisnamen beibehalten,
+	     * anderenfalls alles gross wandeln,
+	     */
 	    String tmpName = fName;
 	    int pos = tmpName.lastIndexOf( '.' );
 	    if( pos >= 0 ) {
 	      tmpName = tmpName.substring( 0, pos );
 	    }
-	    if( !tmpName.isEmpty() ) {
-	      this.orgFileDesc = tmpName;
+	    int len = tmpName.length();
+	    if( len > 0 ) {
+	      boolean hasUpper = false;
+	      for( int i = 0; i < len; i++ ) {
+		if( Character.isUpperCase( tmpName.charAt( i ) ) ) {
+		  hasUpper = true;
+		  break;
+		}
+	      }
+	      if( hasUpper ) {
+		this.orgFileDesc = tmpName;
+	      } else {
+		this.orgFileDesc = tmpName.toUpperCase();
+	      }
 	    }
 	  }
 	  fName = fName.toLowerCase();
@@ -234,45 +303,20 @@ public class FileConvertFrm extends BasicFrm implements
 	boolean       done    = false;
 
 	// Sound-Datei pruefen
-	AudioInputStream    aIn = null;
-	BufferedInputStream bIn = null;
 	try {
-	  bIn = EmuUtil.openBufferedOptionalGZipFile( file );
-	  aIn = AudioSystem.getAudioInputStream( bIn );
-	  if( aIn != null ) {
-	    infoBuf.append( "Sound-Datei" );
-	    AudioFormat aFmt = aIn.getFormat();
-	    if( aFmt != null ) {
-	      infoBuf.append( ", " );
-	      AudioUtil.appendAudioFormatText( infoBuf, aFmt );
-	    }
+	  PCMDataInfo info = AudioFile.getInfo( file );
+	  infoBuf.append( "Sound-Datei" );
+	  infoBuf.append( ", " );
+	  AudioUtil.appendAudioFormatText( infoBuf, info );
 
-	    /*
-	     * Ausgabeformate ermitteln, in die konverttiert werden kann,
-	     * das eigene Format dabei ausblenden
-	     */
-	    String[] extensions = AudioUtil.getAudioOutFileExtensions(
-							      aIn,
-							      fExt );
-	    if( extensions != null ) {
-	      StringBuilder buf = new StringBuilder( 256 );
-	      AudioUtil.appendAudioFileExtensionText( buf, 3, extensions );
-	      this.targets.add(
-			new AudioFileTarget(
-					this,
-					file,
-					extensions,
-					buf.toString() ) );
-	    }
-	    done = true;
-	  }
+	  /*
+	   * Ausgabeformate ermitteln, in die konverttiert werden kann,
+	   * das eigene Format dabei ausblenden
+	   */
+	  this.targets.add( new AudioFileTarget( this, file ) );
+	  done = true;
 	}
-	catch( UnsupportedAudioFileException ex1 ) {}
 	catch( IOException ex2 ) {}
-	finally {
-	  EmuUtil.doClose( aIn );
-	  EmuUtil.doClose( bIn );
-	}
 
 	// Dateiextension pruefen
 	if( !done && (fName != null) ) {
@@ -352,8 +396,12 @@ public class FileConvertFrm extends BasicFrm implements
 					&& (this.orgFileTypeChar == 'B')
 					&& (begAddr == 0x0401))
 		  || fileFmt.equals( FileFormat.KCB )
+		  || fileFmt.equals( FileFormat.KCB_BLKN )
+		  || fileFmt.equals( FileFormat.KCB_BLKN_CKS )
 		  || fileFmt.equals( FileFormat.KCTAP_BASIC_PRG )
 		  || fileFmt.equals( FileFormat.KCBASIC_HEAD_PRG )
+		  || fileFmt.equals( FileFormat.KCBASIC_HEAD_PRG_BLKN )
+		  || fileFmt.equals( FileFormat.KCBASIC_HEAD_PRG_BLKN_CKS )
 		  || fileFmt.equals( FileFormat.KCBASIC_PRG ) )
 	      {
 		byte[] fileBytes = EmuUtil.readFile(
@@ -379,9 +427,17 @@ public class FileConvertFrm extends BasicFrm implements
 	      if( fileFmt.equals( FileFormat.KCB ) ) {
 		fileFmt = FileFormat.KCC;
 	      }
+	      else if( fileFmt.equals( FileFormat.KCB_BLKN ) ) {
+		fileFmt = FileFormat.KCC_BLKN;
+	      }
+	      else if( fileFmt.equals( FileFormat.KCB_BLKN_CKS ) ) {
+		fileFmt = FileFormat.KCC_BLKN_CKS;
+	      }
 	      if( fileFmt.equals( FileFormat.HEADERSAVE )
 		  || fileFmt.equals( FileFormat.INTELHEX )
 		  || fileFmt.equals( FileFormat.KCC )
+		  || fileFmt.equals( FileFormat.KCC_BLKN )
+		  || fileFmt.equals( FileFormat.KCC_BLKN_CKS )
 		  || fileFmt.equals( FileFormat.KCTAP_SYS )
 		  || fileFmt.equals( FileFormat.KCTAP_Z9001 )
 		  || fileFmt.equals( FileFormat.KCTAP_KC85 ) )
@@ -536,13 +592,22 @@ public class FileConvertFrm extends BasicFrm implements
 					dataLen,
 					false ) );
 	    }
+	    boolean basic = false;
+	    if( fileFmt.equals( FileFormat.BASIC_PRG ) ) {
+	      basic = true;
+	    }
+	    else if( fileFmt.equals( FileFormat.HEADERSAVE )
+		     && (this.orgFileTypeChar == 'B') )
+	    {
+	      basic = true;
+	    }
 	    this.targets.add(
 			new AC1AudioFileTarget(
 					this,
 					dataBytes,
 					dataOffs,
 					dataLen,
-					false ) );
+					basic ) );
 	    this.targets.add(
 			new SCCHAudioFileTarget(
 					this,
@@ -578,8 +643,20 @@ public class FileConvertFrm extends BasicFrm implements
 					dataLen,
 					true ) );
 	  }
+	  if( fileFmt.equals( FileFormat.CSW ) ) {
+	    byte[] fileBytes = EmuUtil.readFile(
+					file,
+					false,
+					MAX_TAPE_FILE_SIZE );
+	    if( fileBytes != null ) {
+	      BitSampleBuffer samples = CSWFile.getBitSampleBuffer(
+								fileBytes,
+								0 );
+	      this.targets.add( new AudioFileTarget( this, samples ) );
+	      this.targets.add(	new TZXFileTarget( this, samples ) );
+	    }
+	  }
 	  if( fileFmt.equals( FileFormat.CDT )
-	      || fileFmt.equals( FileFormat.CSW )
 	      || fileFmt.equals( FileFormat.TZX )
 	      || fileFmt.equals( FileFormat.ZXTAP ) )
 	  {
@@ -588,24 +665,12 @@ public class FileConvertFrm extends BasicFrm implements
 					false,
 					MAX_TAPE_FILE_SIZE );
 	    if( fileBytes != null ) {
-	      String text = "Sound-Datei";
-	      if( fName != null ) {
-		if( fName.endsWith( ".cdt" )
-				|| fName.endsWith( ".cdt.gz" ) )
-		{
-		  text += " im CPC-Format";
-		}
-		else if( fName.endsWith( ".tzx" )
-				|| fName.endsWith( ".tzx.gz" ) )
-		{
-		  text += " im TZX-Format";
-		}
-	      }
-	      this.targets.add(
-			new ZXSpectrumAudioFileTarget(
-					this,
-					fileBytes,
-					text ) );
+	      BitSampleBuffer samples = new ZXSpectrumAudioCreator(
+							fileBytes,
+							0,
+							fileBytes.length );
+	      this.targets.add( new AudioFileTarget( this, samples ) );
+	      this.targets.add(	new CSWFileTarget( this, samples ) );
 	    }
 	  }
 	}
@@ -615,7 +680,20 @@ public class FileConvertFrm extends BasicFrm implements
 	  }
 	  catch( ClassCastException ex ) {}
 	  this.listTarget.setListData( this.targets );
-	  EmuUtil.fireSelectRow( this.listTarget, 0 );
+	  int rowToSelect = 0;
+	  if( this.lastSavedTargetText != null ) {
+	    int n = this.targets.size();
+	    for( int i = 0; i < n; i++ ) {
+	      String s = this.targets.get( i ).toString();
+	      if( s != null ) {
+		if( s.equals( this.lastSavedTargetText ) ) {
+		  rowToSelect = i;
+		  break;
+		}
+	      }
+	    }
+	  }
+	  EmuUtil.fireSelectRow( this.listTarget, rowToSelect );
 	} else {
 	  if( infoBuf.length() == 0 ) {
 	    infoBuf.append( "unbekannt" );
@@ -625,13 +703,13 @@ public class FileConvertFrm extends BasicFrm implements
 	this.fldSrcFile.setFile( file );
 	this.fldSrcInfo.setText( infoBuf.toString() );
 	this.btnSrcRemove.setEnabled( true );
-	Main.setLastFile( file, "fileconverter.in" );
+	Main.setLastFile( file, Main.FILE_GROUP_FC_IN );
 	if( infoMsg != null ) {
-	  BasicDlg.showInfoDlg( this, infoMsg );
+	  BaseDlg.showInfoDlg( this, infoMsg );
 	}
       }
       catch( IOException ex ) {
-	BasicDlg.showErrorDlg( this, ex );
+	BaseDlg.showErrorDlg( this, ex );
       }
     }
   }
@@ -719,7 +797,7 @@ public class FileConvertFrm extends BasicFrm implements
       }
       else if( src == this.btnHelp ) {
 	rv = true;
-	HelpFrm.open( "/help/tools/fileconverter.htm" );
+	HelpFrm.open( HELP_PAGE );
       }
     }
     return rv;
@@ -731,10 +809,10 @@ public class FileConvertFrm extends BasicFrm implements
   {
     boolean rv = super.doClose();
     if( rv ) {
-      Main.checkQuit( this );
-    } else {
-      // damit beim erneuten Oeffnen das Fenster leer ist
-      doRemoveSrcFile();
+      if( !Main.checkQuit( this ) ) {
+	// damit beim erneuten Oeffnen das Fenster leer ist
+	doRemoveSrcFile();
+      }
     }
     return rv;
   }
@@ -766,14 +844,14 @@ public class FileConvertFrm extends BasicFrm implements
 	try {
 	  AudioPlayer.play(
 			this,
-			target.getAudioInputStream(),
+			target.createPCMDataSource(),
 			"Wiedergabe..." );
 	}
 	catch( IOException ex ) {
-	  BasicDlg.showErrorDlg( this, ex );
+	  BaseDlg.showErrorDlg( this, ex );
 	}
 	catch( UserInputException ex ) {
-	  BasicDlg.showErrorDlg( this, ex );
+	  BaseDlg.showErrorDlg( this, ex );
 	}
       }
     }
@@ -796,13 +874,13 @@ public class FileConvertFrm extends BasicFrm implements
       file = file.getParentFile();
     }
     if( file == null ) {
-      file = Main.getLastDirFile( "fileconverter.in" );
+      file = Main.getLastDirFile( Main.FILE_GROUP_FC_IN );
     }
     file = EmuUtil.showFileOpenDlg(
 			this,
 			"Quelldatei ausw\u00E4hlen",
 			file,
-			AudioUtil.getAudioInFileFilter(),
+			AudioFile.getFileFilter(),
 			EmuUtil.getBinaryFileFilter(),
 			EmuUtil.getHeadersaveFileFilter(),
 			EmuUtil.getHexFileFilter(),
@@ -825,38 +903,52 @@ public class FileConvertFrm extends BasicFrm implements
   {
     AbstractConvertTarget target = this.listTarget.getSelectedValue();
     if( target != null ) {
-      File file = target.getSuggestedOutFile( this.fldSrcFile.getFile() );
-      if( file != null ) {
-	File dirFile = Main.getLastDirFile( "fileconverter.out" );
-	if( (dirFile != null) && (file != null) ) {
-	  String fName = file.getName();
+      File inFile  = this.fldSrcFile.getFile();
+      File outFile = target.getSuggestedOutFile( inFile );
+      if( (outFile != null) && !this.lastOutDirAsInDir ) {
+	File dirFile = Main.getLastDirFile( Main.FILE_GROUP_FC_OUT );
+	if( (dirFile != null) && (outFile != null) ) {
+	  String fName = outFile.getName();
 	  if( fName != null ) {
 	    if( !fName.isEmpty() ) {
-	      file = new File( dirFile, fName );
+	      outFile = new File( dirFile, fName );
 	    }
 	  }
 	}
       }
-      file = EmuUtil.showFileSaveDlg(
+      outFile = EmuUtil.showFileSaveDlg(
 				this,
 				"Konvertierte Datei speichern",
-				file,
+				outFile,
 				target.getFileFilters() );
-      if( file != null ) {
+      if( outFile != null ) {
 	try {
-	  String logText = target.save( file );
-	  Main.setLastFile( file, "fileconverter.out" );
+	  String logText = target.save( outFile );
+	  Main.setLastFile( outFile, Main.FILE_GROUP_FC_OUT );
+	  this.lastOutDirAsInDir = false;
+	  if( inFile != null ) {
+	    File inDir  = inFile.getParentFile();
+	    File outDir = outFile.getParentFile();
+	    if( (inDir != null) && (outDir != null) ) {
+	      this.lastOutDirAsInDir = outDir.equals( inDir );
+	    } else {
+	      if( (inDir == null) && (outDir == null) ) {
+		this.lastOutDirAsInDir = true;
+	      }
+	    }
+	  }
 	  if( logText != null ) {
 	    if( !logText.isEmpty() ) {
 	      LogDlg.showDlg( this, logText, "Hinweise" );
 	    }
 	  }
+	  this.lastSavedTargetText = target.toString();
 	}
 	catch( IOException ex ) {
-	  BasicDlg.showErrorDlg( this, ex );
+	  BaseDlg.showErrorDlg( this, ex );
 	}
 	catch( UserInputException ex ) {
-	  BasicDlg.showErrorDlg( this, ex );
+	  BaseDlg.showErrorDlg( this, ex );
 	}
       }
     }
@@ -867,11 +959,13 @@ public class FileConvertFrm extends BasicFrm implements
 
   private FileConvertFrm()
   {
-    this.orgFileDesc     = null;
-    this.orgFileTypeChar = -1;
-    this.orgStartAddr    = -1;
-    this.orgIsBasicPrg   = false;
-    this.orgRemark       = null;
+    this.orgFileDesc         = null;
+    this.orgFileTypeChar     = -1;
+    this.orgStartAddr        = -1;
+    this.orgRemark           = null;
+    this.orgIsBasicPrg       = false;
+    this.lastOutDirAsInDir   = false;
+    this.lastSavedTargetText = null;
     setTitle( "JKCEMU Dateikonverter" );
     Main.updIcon( this );
 
@@ -1353,4 +1447,3 @@ public class FileConvertFrm extends BasicFrm implements
     this.fldStartAddr.setEditable( state );
   }
 }
-

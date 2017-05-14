@@ -1,5 +1,5 @@
 /*
- * (c) 2009-2016 Jens Mueller
+ * (c) 2009-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,12 +8,22 @@
 
 package jkcemu.disk;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Dialog;
+import java.awt.EventQueue;
+import java.awt.Window;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.*;
-import java.util.*;
-import jkcemu.Main;
-import jkcemu.base.*;
+import java.util.ArrayList;
+import jkcemu.base.AbstractThreadDlg;
+import jkcemu.base.BaseDlg;
+import jkcemu.base.EmuUtil;
+import jkcemu.base.FileTimesView;
+import jkcemu.base.FileTimesViewFactory;
+import jkcemu.base.NIOFileTimesViewFactory;
 import jkcemu.filebrowser.FileBrowserFrm;
 
 
@@ -25,6 +35,7 @@ public class DiskUnpacker extends AbstractThreadDlg
   private int                sysTracks;
   private int                sides;
   private int                sectPerCyl;
+  private int                sectorOffset;
   private int                sectorSize;
   private int                blockSize;
   private int                maxBlocksPerEntry;
@@ -45,7 +56,7 @@ public class DiskUnpacker extends AbstractThreadDlg
 		int                blockSize,
 		boolean            blockNum16Bit,
 		boolean            applyReadOnly,
-		boolean            forceLowerCase )
+		boolean            forceLowerCase ) throws IOException
   {
     Dialog dlg = new DiskUnpacker(
 				owner,
@@ -107,14 +118,14 @@ public class DiskUnpacker extends AbstractThreadDlg
 	  int sectPerCyl = this.disk.getSectorsPerCylinder();
 	  for( int cyl = 0; cyl < this.sysTracks; cyl++ ) {
 	    for( int head = 0; head < this.disk.getSides(); head++ ) {
-	      for( int sectorIdx = 0; sectorIdx < sectPerCyl; sectorIdx++ ) {
+	      for( int sectIdx = 0; sectIdx < sectPerCyl; sectIdx++ ) {
 		SectorData sector = this.disk.getSectorByID(
-						cyl,
-						head,
-						cyl,
-						head,
-						sectorIdx + 1,
-						-1 );
+					cyl,
+					head,
+					cyl,
+					head,
+					sectIdx + 1 + this.sectorOffset,
+					-1 );
 		if( sector != null ) {
 		  if( sector.checkError() ) {
 		    err = true;
@@ -133,7 +144,7 @@ public class DiskUnpacker extends AbstractThreadDlg
 	  err = true;
 	}
 	finally {
-	  EmuUtil.doClose( out );
+	  EmuUtil.closeSilent( out );
 	  if( err ) {
 	    fName = "@boot.sys.error";
 	    if( file.renameTo( new File( outDir, "@boot.sys.error" ) ) ) {
@@ -164,8 +175,11 @@ public class DiskUnpacker extends AbstractThreadDlg
 	appendToLog( this.diskDesc + " ist leer.\n" );
 	disableAutoClose();
       } else {
-	boolean              firstEntry = true;
+	int extentsPerDirEntry = DiskUtil.getExtentsPerDirEntry(
+							this.blockSize,
+							this.blockNum16Bit );
 	int                  dirBlkOffs = 0;
+	boolean              firstEntry = true;
 	FileTimesViewFactory ftvFactory = new NIOFileTimesViewFactory();
 	this.outDir.mkdirs();
 	for( byte[] dirBlockBuf : dirBlocks ) {
@@ -173,14 +187,16 @@ public class DiskUnpacker extends AbstractThreadDlg
 	    int entryPos = 0;
 	    while( (entryPos + 31) < dirBlockBuf.length ) {
 	      /*
-	       * Gueltige Extent-0-Eintraege suchen,
+	       * Gueltige erste Directory-Eintraege suchen,
 	       * Das 1. Bye wird dabei mit ausgeblendetem Bit 4
 	       * (Passwort-Bit) auswertet.
 	       */
-	      int b0 = (int) dirBlockBuf[ entryPos ] & 0xEF;
+	      int b0        = (int) dirBlockBuf[ entryPos ] & 0xEF;
+	      int extentNum = DiskUtil.getExtentNumByEntryPos(
+							dirBlockBuf,
+							entryPos );
 	      if( (b0 >= 0) && (b0 <= 0x1F)
-		  && (((int) dirBlockBuf[ entryPos + 12 ] & 0xFF) == 0)
-		  && (((int) dirBlockBuf[ entryPos + 14 ] & 0xFF) == 0) )
+		  && (extentNum >= 0) && (extentNum < extentsPerDirEntry) )
 	      {
 		String fileName = getFileName( dirBlockBuf, entryPos + 1 );
 		if( fileName != null ) {
@@ -215,24 +231,18 @@ public class DiskUnpacker extends AbstractThreadDlg
 		    } else {
 		      out = new FileOutputStream( file );
 		    }
-
-		    int extentNum = 0;
-		    writeEntryContentTo(
-				out,
-				dirBlockBuf,
-				entryPos,
-				extentNum );
-		    do {
-		      if( extentNum > 0x3FF ) {
-			break;
-		      }
-		      extentNum++;
-		    } while( writeExtentContentTo(
+		    writeEntryContentTo( out, dirBlockBuf, entryPos, 0 );
+		    int baseExtentNum = extentsPerDirEntry;
+		    while( writeExtentContentTo(
 					out,
 					dirBlocks,
 					dirBlockBuf,
 					entryPos,
-					extentNum ) );
+					baseExtentNum,
+					extentsPerDirEntry ) )
+		    {
+		      baseExtentNum += extentsPerDirEntry;
+		    }
 		    out.close();
 		    if( out instanceof ByteArrayOutputStream ) {
 		      timeBytes = ((ByteArrayOutputStream) out).toByteArray();
@@ -250,7 +260,7 @@ public class DiskUnpacker extends AbstractThreadDlg
 		    this.fileErr = true;
 		  }
 		  finally {
-		    EmuUtil.doClose( out );
+		    EmuUtil.closeSilent( out );
 		  }
 
 		  // Zeitstempel setzen
@@ -323,15 +333,15 @@ public class DiskUnpacker extends AbstractThreadDlg
 		  public void run()
 		  {
 		    if( error ) {
-		      BasicDlg.showWarningDlg( owner, msg );
+		      BaseDlg.showWarningDlg( owner, msg );
 		    } else {
-		      BasicDlg.showInfoDlg( owner, msg, "Entpacken" );
+		      BaseDlg.showInfoDlg( owner, msg, "Entpacken" );
 		    }
 		  }
 		} );
       }
     }
-    this.disk.doClose();
+    this.disk.closeSilent();
   }
 
 
@@ -346,7 +356,7 @@ public class DiskUnpacker extends AbstractThreadDlg
 		int                blockSize,
 		boolean            blockNum16Bit,
 		boolean            applyReadOnly,
-		boolean            forceLowerCase )
+		boolean            forceLowerCase ) throws IOException
   {
     super( owner, "JKCEMU disk unpacker", false );
     this.disk              = disk;
@@ -355,6 +365,7 @@ public class DiskUnpacker extends AbstractThreadDlg
     this.sysTracks         = sysTracks;
     this.sides             = disk.getSides();
     this.sectPerCyl        = disk.getSectorsPerCylinder();
+    this.sectorOffset      = disk.getSectorOffset();
     this.sectorSize        = disk.getSectorSize();
     this.blockSize         = blockSize;
     this.sectPerBlock      = (sectorSize > 0 ? (blockSize / sectorSize) : 0);
@@ -439,7 +450,7 @@ public class DiskUnpacker extends AbstractThreadDlg
 					head,
 					cyl,
 					head,
-					sectIdx + 1,
+					sectIdx + 1 + this.sectorOffset,
 					-1 );
       if( sector != null ) {
 	nRead = sector.read( buf, i * sectorSize, sectorSize );
@@ -454,12 +465,16 @@ public class DiskUnpacker extends AbstractThreadDlg
 
 
   private void writeEntryContentTo(
-				OutputStream out,
-				byte[]       dirBlockBuf,
-				int          entryPos,
-				int          extentNum ) throws IOException
+			OutputStream out,
+			byte[]       dirBlockBuf,
+			int          entryPos,
+			int          baseExtentNum ) throws IOException
   {
-    int nBytes  = ((int) dirBlockBuf[ entryPos + 15 ] & 0xFF) * 128;
+    int extentNum = DiskUtil.getExtentNumByEntryPos( dirBlockBuf, entryPos );
+    int nBytes    = ((int) dirBlockBuf[ entryPos + 15 ] & 0xFF) * 128;
+    if( extentNum > baseExtentNum ) {
+      nBytes += (0x4000 * (extentNum - baseExtentNum));
+    }
     int nBlocks = (nBytes + this.blockSize - 1) / this.blockSize;
     if( nBlocks > this.maxBlocksPerEntry ) {
       this.blockNumErr = true;
@@ -503,7 +518,7 @@ public class DiskUnpacker extends AbstractThreadDlg
 					head,
 					cyl,
 					head,
-					sectIdx + 1,
+					sectIdx + 1 + this.sectorOffset,
 					-1 );
 	if( sector != null ) {
 	  if( sector.checkError() ) {
@@ -539,30 +554,38 @@ public class DiskUnpacker extends AbstractThreadDlg
 			java.util.List<byte[]> dirBlocks,
 			byte[]                 baseBlockBuf,
 			int                    baseEntryPos,
-			int                    extentNum ) throws IOException
+			int                    baseExtentNum,
+			int                    extentsPerDirEntry )
+							throws IOException
   {
-    boolean rv  = false;
-    int     b12 = extentNum & 0x1F;
-    int     b14 = (extentNum >> 5) & 0x1F;
+    boolean rv = false;
     for( byte[] dirBlockBuf : dirBlocks ) {
       if( dirBlockBuf != null ) {
 	int entryPos = 0;
 	while( (entryPos + 31) < dirBlockBuf.length ) {
-	  if( ((dirBlockBuf != baseBlockBuf) || (entryPos != baseEntryPos))
-	      && (((int) dirBlockBuf[ entryPos + 12 ] & 0xFF) == b12)
-	      && (((int) dirBlockBuf[ entryPos + 14 ] & 0xFF) == b14) )
-	  {
-	    rv = true;
-	    for( int i = 0; i < 12; i++ ) {
-	      if( dirBlockBuf[ entryPos + i ]
-				!= baseBlockBuf[ baseEntryPos + i ] )
-	      {
-		rv = false;
-		break;
+	  if( (dirBlockBuf != baseBlockBuf) || (entryPos != baseEntryPos) ) {
+	    int extentNum = DiskUtil.getExtentNumByEntryPos(
+							dirBlockBuf,
+							entryPos );
+	    if( (extentNum >= baseExtentNum)
+		&& (extentNum < (baseExtentNum + extentsPerDirEntry)) )
+	    {
+	      rv = true;
+	      for( int i = 0; i < 12; i++ ) {
+		if( dirBlockBuf[ entryPos + i ]
+			!= baseBlockBuf[ baseEntryPos + i ] )
+		{
+		  rv = false;
+		  break;
+		}
 	      }
 	    }
 	    if( rv ) {
-	      writeEntryContentTo( out, dirBlockBuf, entryPos, extentNum );
+	      writeEntryContentTo(
+				out,
+				dirBlockBuf,
+				entryPos,
+				baseExtentNum );
 	      break;
 	    }
 	  }

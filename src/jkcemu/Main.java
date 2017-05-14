@@ -1,5 +1,5 @@
 /*
- * (c) 2008-2016 Jens Mueller
+ * (c) 2008-2017 Jens Mueller
  *
  * Kleincomputer-Emulator
  *
@@ -8,22 +8,47 @@
 
 package jkcemu;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.Frame;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Window;
+import java.io.Console;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.lang.*;
 import java.net.URL;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import javax.print.attribute.PrintRequestAttributeSet;
-import javax.swing.*;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import jkcemu.audio.AudioRecorderFrm;
-import jkcemu.base.*;
-import jkcemu.disk.*;
-import jkcemu.filebrowser.*;
+import jkcemu.base.BaseDlg;
+import jkcemu.base.BaseFrm;
+import jkcemu.base.EmuThread;
+import jkcemu.base.EmuUtil;
+import jkcemu.base.ScreenFrm;
+import jkcemu.disk.DiskImgCreateFrm;
+import jkcemu.disk.DiskImgViewFrm;
+import jkcemu.disk.FloppyDiskStationFrm;
+import jkcemu.filebrowser.FileBrowserFrm;
+import jkcemu.filebrowser.FindFilesFrm;
 import jkcemu.image.ImageFrm;
 import jkcemu.programming.assembler.CmdLineAssembler;
 import jkcemu.programming.basic.CmdLineBasicCompiler;
-import jkcemu.text.*;
+import jkcemu.text.TextEditFrm;
+import jkcemu.text.TextUtil;
 import jkcemu.tools.calculator.CalculatorFrm;
 import jkcemu.tools.fileconverter.FileConvertFrm;
 import jkcemu.tools.hexdiff.HexDiffFrm;
@@ -33,8 +58,31 @@ import jkcemu.tools.hexedit.HexEditFrm;
 public class Main
 {
   public static final String APPNAME = "JKCEMU";
-  public static final String VERSION = "0.9.5";
+  public static final String VERSION = "0.9.7+AZ";
   public static final String APPINFO = APPNAME + " Version " + VERSION;
+
+  public static final String FILE_GROUP_AUDIO    = "audio";
+  public static final String FILE_GROUP_DEBUG    = "debug";
+  public static final String FILE_GROUP_DISK     = "disk";
+  public static final String FILE_GROUP_FC_IN    = "fileconnverter.in";
+  public static final String FILE_GROUP_FC_OUT   = "fileconnverter.out";
+  public static final String FILE_GROUP_FIND     = "find";
+  public static final String FILE_GROUP_HEXDIFF  = "hexdiff";
+  public static final String FILE_GROUP_HEXEDIT  = "hexedit";
+  public static final String FILE_GROUP_IMAGE    = "image";
+  public static final String FILE_GROUP_LABEL    = "label";
+  public static final String FILE_GROUP_PRINT    = "print";
+  public static final String FILE_GROUP_PROJECT  = "project";
+  public static final String FILE_GROUP_RF       = "ramfloppy";
+  public static final String FILE_GROUP_ROM      = "rom";
+  public static final String FILE_GROUP_SCREEN   = "screen";
+  public static final String FILE_GROUP_SECTOR   = "sector";
+  public static final String FILE_GROUP_SOFTWARE = "software";
+  public static final String FILE_GROUP_TEXT     = "text";
+  public static final String FILE_GROUP_USB      = "usb";
+
+  public static final String LASTDIRS_FILE      = "lastdirs.xml";
+  public static final String PROP_LAF_CLASSNAME = "jkcemu.laf.classname";
 
   public static final int WINDOW_MASK_SCREEN   = 0x01;
   public static final int WINDOW_MASK_JOYSTICK = 0x02;
@@ -95,7 +143,7 @@ public class Main
   private static boolean                  printFileName     = true;
   private static int                      printFontSize     = 12;
   private static PrintRequestAttributeSet printRequestAttrs = null;
-  private static BasicFrm                 topFrm            = null;
+  private static BaseFrm                  topFrm            = null;
   private static ScreenFrm                screenFrm         = null;
   private static java.util.List<Image>    iconImages        = null;
 
@@ -105,7 +153,8 @@ public class Main
   public static void main( String[] args )
   {
     /*
-     * In der DOS-Box von Windows ist der DOS-Zeichensatz installiert.
+     * In der Eingabeaufforderung von Windows
+     * ist der DOS-Zeichensatz installiert.
      * Deshalb werden ueber System.out und System.err ausgegebene Umlaute
      * dort falsch angezeigt.
      * Ueber System.console() erfolgt die Ausgabe dagegen richtig.
@@ -139,7 +188,7 @@ public class Main
     } else {
       configDir = new File( subDirName );
     }
-    lastDirsFile = new File( configDir, "lastdirs.xml" );
+    lastDirsFile = new File( configDir, LASTDIRS_FILE );
     if( lastDirsFile.exists() ) {
       InputStream in = null;
       try {
@@ -148,7 +197,7 @@ public class Main
       }
       catch( Exception ex ) {}
       finally {
-	EmuUtil.doClose( in );
+	EmuUtil.closeSilent( in );
       }
     }
 
@@ -390,7 +439,7 @@ public class Main
 	firstExec = false;
       } else {
 	if( !configDir.mkdirs() ) {
-	  BasicDlg.showErrorDlg(
+	  BaseDlg.showErrorDlg(
 		screenFrm,
 		"Das Verzeichnis " + configDir.getPath()
 			+ "\nkonnte nicht angelegt werden."
@@ -422,8 +471,7 @@ public class Main
        */
       boolean lafState = false;
       if( props != null ) {
-	String className = props.getProperty(
-				  "jkcemu.lookandfeel.classname" );
+	String className = props.getProperty( PROP_LAF_CLASSNAME );
 	if( className != null ) {
 	  if( !className.isEmpty() ) {
 	    lafState = true;
@@ -469,8 +517,7 @@ public class Main
     boolean lafChanged = false;
     if( props != null ) {
       if( checkLAF ) {
-	String className = props.getProperty(
-				"jkcemu.lookandfeel.classname" );
+	String className = props.getProperty( PROP_LAF_CLASSNAME );
 	if( className != null ) {
 	  if( !className.isEmpty() ) {
 	    lafChanged = !EmuUtil.equalsLookAndFeel( className );
@@ -479,7 +526,7 @@ public class Main
 		UIManager.setLookAndFeel( className );
 	      }
 	      catch( Exception ex ) {
-		props.remove( "jkcemu.lookandfeel.classname" );
+		props.remove( PROP_LAF_CLASSNAME );
 	      }
 	    }
 	  }
@@ -495,17 +542,17 @@ public class Main
 	if( f != null ) {
 	  if( lafChanged ) {
 	    SwingUtilities.updateComponentTreeUI( f );
-	    if( f instanceof BasicFrm ) {
-	      ((BasicFrm) f).lookAndFeelChanged();
+	    if( f instanceof BaseFrm ) {
+	      ((BaseFrm) f).lookAndFeelChanged();
 	    }
 	    if( !f.isResizable() ) {
 	      f.pack();
 	    }
 	  }
-	  if( (f instanceof BasicFrm)
+	  if( (f instanceof BaseFrm)
 	      && ((frameToIgnore == null) || (frameToIgnore != f)) )
 	  {
-	    ((BasicFrm) f).applySettings( props, f.isResizable() );
+	    ((BaseFrm) f).applySettings( props, f.isResizable() );
 	  }
 	}
       }
@@ -520,8 +567,8 @@ public class Main
       Frame[] frms = Frame.getFrames();
       if( frms != null ) {
 	for( Frame f : frms ) {
-	  if( (f != frm) && (f instanceof BasicFrm) ) {
-	    ((BasicFrm) f).doClose();
+	  if( (f != frm) && (f instanceof BaseFrm) ) {
+	    ((BaseFrm) f).doClose();
 	  } else {
 	    f.setVisible( false );
 	    f.dispose();
@@ -547,7 +594,7 @@ public class Main
   }
 
 
-  public static void frameCreated( BasicFrm frm )
+  public static void frameCreated( BaseFrm frm )
   {
     if( topFrm == null )
       topFrm = frm;
@@ -655,24 +702,7 @@ public class Main
 				String  keyword,
 				boolean defaultValue )
   {
-    boolean rv = defaultValue;
-    if( properties != null ) {
-      String s = properties.getProperty( keyword );
-      if( s != null ) {
-	s = s.trim().toUpperCase();
-	if( s.equals( "1" )
-	    || s.equals( "Y" )
-	    || s.equals( "TRUE" )
-	    || Boolean.parseBoolean( s ) )
-	{
-	  rv = true;
-	}
-	if( s.equals( "0" ) || s.equals( "N" ) || s.equals( "FALSE" ) ) {
-	  rv = false;
-	}
-      }
-    }
-    return rv;
+    return EmuUtil.getBooleanProperty( properties, keyword, defaultValue );
   }
 
 
@@ -747,14 +777,14 @@ public class Main
       catch( Exception ex ) {
 	props = null;
 	if( screenFrm != null ) {
-	  BasicDlg.showErrorDlg(
+	  BaseDlg.showErrorDlg(
 		screenFrm,
 		"Profildatei \'" + file.getPath()
 			+ "\'\nkann nicht geladen werden." );
 	}
       }
       finally {
-	EmuUtil.doClose( in );
+	EmuUtil.closeSilent( in );
       }
     }
     return props;
@@ -803,7 +833,7 @@ public class Main
 	      }
 	      catch( Exception ex ) {}
 	      finally {
-		EmuUtil.doClose( out );
+		EmuUtil.closeSilent( out );
 	      }
 	    }
 	  }
@@ -952,7 +982,7 @@ public class Main
       if( file.exists() ) {
 	props = loadProperties( file );
 	if( props != null ) {
-	  String cn = props.getProperty( "jkcemu.lookandfeel.classname" );
+	  String cn = props.getProperty( PROP_LAF_CLASSNAME );
 	  if( cn != null ) {
 	    if( !cn.isEmpty() ) {
 	      try {
@@ -1015,4 +1045,3 @@ public class Main
     }
   }
 }
-
