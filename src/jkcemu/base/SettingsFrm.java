@@ -2044,6 +2044,7 @@ public class SettingsFrm extends BaseFrm
       case Z1013.SYSNAME_Z1013_12:
       case Z1013.SYSNAME_Z1013_16:
       case Z1013.SYSNAME_Z1013_64:
+      case Z1013.SYSNAME_Z1013_128:
 	this.btnSysZ1013.setSelected( true );
 	break;
       case Z9001.SYSNAME_Z9001:

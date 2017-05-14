@@ -60,6 +60,7 @@ public class Z1013 extends EmuSys implements
   public static final String SYSNAME_Z1013_12      = "Z1013.12";
   public static final String SYSNAME_Z1013_16      = "Z1013.16";
   public static final String SYSNAME_Z1013_64      = "Z1013.64";
+  public static final String SYSNAME_Z1013_128     = "Z1013-128";
   public static final String PROP_PREFIX           = "jkcemu.z1013.";
   public static final String PROP_CATCH_JOY_CALLS  = "catch_joystick_calls";
   public static final String PROP_GCCJ_FONT_FILE   = "graphic_ccj.font.file";
@@ -166,6 +167,10 @@ public class Z1013 extends EmuSys implements
 			CENTR7_PRACTIC_2_1989,
 			CENTR8_FA_10_1990 };
 
+  private static int ramBank=0;
+  private static boolean rom8000=true;
+  private static byte[] rom8000Image   = null;
+  private static byte[][] ram128         = {new byte[0x10000],new byte[0x10000]};
   private static byte[] mon202         = null;
   private static byte[] monA2          = null;
   private static byte[] monRB_K7659    = null;
@@ -521,7 +526,16 @@ public class Z1013 extends EmuSys implements
       buf.append( this.romMegaSeg );
       buf.append( "</td></tr>\n" );
     }
-    if( this.ramPixel != null ) {
+    //if (sysName == SYSNAME_Z1013_128)
+    {
+      buf.append( "<tr><td>Ram Bank:</td><td>" );
+      buf.append( ramBank );
+      buf.append( "</td></tr>\n" );
+      buf.append( "<tr><td>Rom 8000:</td><td>" );
+      buf.append( rom8000? "ein":" aus" );
+      buf.append( "</td></tr>\n" );
+    }
+        if( this.ramPixel != null ) {
       buf.append( "<tr><td>KRT-Grafik:</td><td>" );
       if( this.modeGraph ) {
 	int bank = this.ramPixelBank;
@@ -946,7 +960,19 @@ public class Z1013 extends EmuSys implements
       }
     }
     if( !done && (addr <= this.ramEndAddr) ) {
-      rv = this.emuThread.getRAMByte( addr );
+        if (addr<0xec00)
+        {
+          if (rom8000 && addr>=0x8000)
+          {
+            rv= this.rom8000Image[ (addr-0x8000) & 0xFFFF ] & 0xFF;
+          } else
+          {
+            rv = this.ram128[ramBank][ addr & 0xFFFF ] & 0xFF;
+          }
+        } else
+        {
+            rv=this.emuThread.getRAMByte(addr);
+        }
     }
     return rv;
   }
@@ -1430,6 +1456,8 @@ public class Z1013 extends EmuSys implements
     this.romDisabled       = false;
     this.altFontEnabled    = false;
     this.modeGraph         = false;
+    this.ramBank           = 0;
+    this.rom8000           = true;
     if( this.mode64x16 || this.graphCCJActive ) {
       this.graphCCJActive = false;
       this.mode64x16      = false;
@@ -1650,8 +1678,21 @@ public class Z1013 extends EmuSys implements
       }
     }
     if( !done && (addr <= this.ramEndAddr) ) {
-      this.emuThread.setRAMByte( addr, value );
-      rv = true;
+        addr &= 0xFFFF;
+        if (addr<0xec00)
+        {
+            if (rom8000 && addr>=0x8000)
+            {
+               rv=false;
+            } else
+            {
+              this.ram128[ramBank][ addr ] = (byte) value;
+              rv = true;
+            }
+        } else
+        {
+            this.emuThread.setRAMByte(addr,value);
+        }
     }
     return rv;
   }
@@ -1779,35 +1820,57 @@ public class Z1013 extends EmuSys implements
   public void writeIOByte( int port, int value, int tStates )
   {
     port &= 0xFF;
-    if( port == 4 ) {
-      boolean oldAltFontEnabled = this.altFontEnabled;
-      boolean oldMode64x16      = this.mode64x16;
-
-      this.romDisabled    = ((value & 0x10) != 0);
-      this.altFontEnabled = ((value & 0x20) != 0);
-      this.mode64x16      = ((value & 0x80) != 0);
-
-      Z80CPU cpu = this.emuThread.getZ80CPU();
-      if( (value & 0x40) != 0 ) {
-	if( !this.mode4MHz && (cpu.getMaxSpeedKHz() == 2000) ) {
-	  cpu.setMaxSpeedKHz( 4000 );
-	  this.mode4MHz = true;
-	}
-      } else {
-	if( this.mode4MHz && (cpu.getMaxSpeedKHz() == 4000) ) {
-	  cpu.setMaxSpeedKHz( 2000 );
-	}
-	this.mode4MHz = false;
-      }
-
-      if( (this.altFontEnabled != oldAltFontEnabled)
-	  || (this.mode64x16 != oldMode64x16) )
+    if( (port&0xfc) == 4 ) {
+      if (sysName.equals(SYSNAME_Z1013_128))
       {
-	this.screenFrm.setScreenDirty( true );
-      }
-      if( this.mode64x16 != oldMode64x16 ) {
-	this.screenFrm.clearScreenSelection();
-	this.screenFrm.fireScreenSizeChanged();
+         if ((value&0x40)>0) 
+         {
+            ramBank=1;
+         }  else
+         {
+            ramBank=0;
+         }
+         if ((value&0x20)>0) 
+         {
+            rom8000=false;
+         }  else
+         {
+            rom8000=true;
+         }
+      } else
+      {
+        boolean oldAltFontEnabled = this.altFontEnabled;
+        boolean oldMode64x16      = this.mode64x16;
+  
+        this.romDisabled    = ((value & 0x10) != 0);
+        this.altFontEnabled = ((value & 0x20) != 0);
+        this.mode64x16      = ((value & 0x80) != 0);
+
+        Z80CPU cpu = this.emuThread.getZ80CPU();
+        if( (value & 0x40) != 0 ) 
+        {
+          if( !this.mode4MHz && (cpu.getMaxSpeedKHz() == 2000) ) 
+          {
+            cpu.setMaxSpeedKHz( 4000 );
+            this.mode4MHz = true;
+          }
+        } else 
+        {
+          if( this.mode4MHz && (cpu.getMaxSpeedKHz() == 4000) ) 
+          {
+            cpu.setMaxSpeedKHz( 2000 );
+          }
+          this.mode4MHz = false;
+        }
+        if( (this.altFontEnabled != oldAltFontEnabled)
+             || (this.mode64x16 != oldMode64x16) )
+        {
+          this.screenFrm.setScreenDirty( true );
+        }
+        if( this.mode64x16 != oldMode64x16 ) {
+          this.screenFrm.clearScreenSelection();
+          this.screenFrm.fireScreenSizeChanged();
+        }
       }
     }
     else if( (port == 0x18) && (this.graphCCJ != null) ) {
@@ -2300,6 +2363,9 @@ public class Z1013 extends EmuSys implements
 	}
 	this.osBytes = mon202;
       }
+    }
+    if( rom8000Image == null ) {
+      rom8000Image = readResource( "/rom/z1013/rom_boot.bin" );
     }
     if( emulatesModuleBasic( props ) ) {
       this.romBasicFile = EmuUtil.getProperty(

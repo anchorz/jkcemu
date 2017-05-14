@@ -217,6 +217,7 @@ public class EmuThread extends Thread implements
 	case Z1013.SYSNAME_Z1013_12:
 	case Z1013.SYSNAME_Z1013_16:
 	case Z1013.SYSNAME_Z1013_64:
+    case Z1013.SYSNAME_Z1013_128:
 	  emuSys = new Z1013( this, props );
 	  break;
 	case ZXSpectrum.SYSNAME:
@@ -396,6 +397,7 @@ public class EmuThread extends Thread implements
 	case Z1013.SYSNAME_Z1013_12:
 	case Z1013.SYSNAME_Z1013_16:
 	case Z1013.SYSNAME_Z1013_64:
+    case Z1013.SYSNAME_Z1013_128:
 	  rv = Z1013.getDefaultSpeedKHz( props );
 	  break;
 	case Z9001.SYSNAME_KC85_1:

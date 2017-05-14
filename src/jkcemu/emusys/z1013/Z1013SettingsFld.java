@@ -48,6 +48,7 @@ public class Z1013SettingsFld extends AbstractSettingsFld
   private JRadioButton           btnZ1013_12;
   private JRadioButton           btnZ1013_16;
   private JRadioButton           btnZ1013_64;
+  private JRadioButton           btnZ1013_128;
   private JRadioButton           btnMon202;
   private JRadioButton           btnMonA2;
   private JRadioButton           btnMonRB_K7659;
@@ -146,6 +147,13 @@ public class Z1013SettingsFld extends AbstractSettingsFld
     gbcModel.gridy++;
     this.tabModel.add( this.btnZ1013_64, gbcModel );
 
+    this.btnZ1013_128 = new JRadioButton(
+				"Z1013-128 (2 MHz, 128 KByte RAM)",
+				false );
+    this.btnZ1013_128.addActionListener( this );
+    grpModel.add( this.btnZ1013_128 );
+    gbcModel.gridy++;
+    this.tabModel.add( this.btnZ1013_128, gbcModel );
 
     // Tab Monitorprogramm / Tastatur
     this.tabMon = new JPanel( new GridBagLayout() );
@@ -512,7 +520,10 @@ public class Z1013SettingsFld extends AbstractSettingsFld
       rv = Z1013.SYSNAME_Z1013_12;
     } else if( this.btnZ1013_16.isSelected() ) {
       rv = Z1013.SYSNAME_Z1013_16;
+    } else if( this.btnZ1013_128.isSelected() ) {
+      rv = Z1013.SYSNAME_Z1013_128;
     }
+
     return rv;
   }
 
@@ -766,6 +777,9 @@ public class Z1013SettingsFld extends AbstractSettingsFld
 	break;
       case Z1013.SYSNAME_Z1013_16:
 	this.btnZ1013_16.setSelected( true );
+	break;
+      case Z1013.SYSNAME_Z1013_128:
+	this.btnZ1013_128.setSelected( true );
 	break;
       default:
 	this.btnZ1013_64.setSelected( true );
