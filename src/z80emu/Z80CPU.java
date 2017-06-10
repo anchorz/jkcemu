@@ -1300,7 +1300,7 @@ public class Z80CPU implements Runnable
 	      && (this.haltPC != null) )
 	  {
 	    this.regPC  = this.haltPC.intValue();
-	    this.haltPC = null;
+	    //this.haltPC = null;
 	  } else {
 	    setHaltState( false );
 	  }
@@ -1373,8 +1373,13 @@ public class Z80CPU implements Runnable
 	}
 
 	// BefehlsOpCode lesen und PC weitersetzen
-	opCode     = readMemByteM1( this.regPC );
+	if (haltState) {
+	  opCode=0x00;
+        } else {
+	  opCode     = readMemByteM1( this.regPC );
+	}
 	this.regPC = (this.regPC + 1) & 0xFFFF;
+	//System.out.printf("%04x:%02x HALT=%s\n",regPC,opCode,haltState?"true":"false");
 	execInst( opCode );
 
 	Z80InstrTStatesMngr tStatesMngr = this.instTStatesMngr;
