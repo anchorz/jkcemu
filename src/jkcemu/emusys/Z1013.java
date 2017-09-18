@@ -168,7 +168,7 @@ public class Z1013 extends EmuSys implements
 			CENTR8_FA_10_1990 };
 
   private static int ramBank=0;
-  private static boolean rom8000=true;
+  private static boolean rom8000=false;
   private static byte[] rom8000Image   = null;
   private static byte[][] ram128         = {new byte[0x10000],new byte[0x10000]};
   private static byte[] mon202         = null;
@@ -260,6 +260,7 @@ public class Z1013 extends EmuSys implements
     this.ramEndAddr        = getRAMEndAddr( props );
     this.ramVideo          = new byte[ 0x0400 ];
     this.ramStatic         = null;
+
     if( this.ramEndAddr == 0x03FF ) {
       this.ramStatic = new byte[ 0x0400 ];
     }
@@ -1457,7 +1458,10 @@ public class Z1013 extends EmuSys implements
     this.altFontEnabled    = false;
     this.modeGraph         = false;
     this.ramBank           = 0;
-    this.rom8000           = true;
+    if (sysName.equals(SYSNAME_Z1013_128))
+    {
+        rom8000=true;//AZ
+    }
     if( this.mode64x16 || this.graphCCJActive ) {
       this.graphCCJActive = false;
       this.mode64x16      = false;

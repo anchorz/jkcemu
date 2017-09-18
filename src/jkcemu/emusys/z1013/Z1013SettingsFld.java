@@ -40,57 +40,54 @@ import jkcemu.base.UserInputException;
 import jkcemu.disk.GIDESettingsFld;
 import jkcemu.emusys.Z1013;
 
+public class Z1013SettingsFld extends AbstractSettingsFld {
+	private JTabbedPane tabbedPane;
+	private JRadioButton btnZ1013_01;
+	private JRadioButton btnZ1013_12;
+	private JRadioButton btnZ1013_16;
+	private JRadioButton btnZ1013_64;
+	private JRadioButton btnZ1013_128;
+	private JRadioButton btnMon202;
+	private JRadioButton btnMonA2;
+	private JRadioButton btnMonRB_K7659;
+	private JRadioButton btnMonRB_S6009;
+	private JRadioButton btnMonINCOM_K7669;
+	private JRadioButton btnMonJM_1992;
+	private JRadioButton btnBL4_K7659;
+	private JRadioButton btnPortNone;
+	private JRadioButton btnPortJoyJuTe_6_87;
+	private JRadioButton btnPortJoyPractic_4_87;
+	private JRadioButton btnPortJoyPractic_1_88;
+	private JRadioButton btnPortCentr7Practic_2_89;
+	private JRadioButton btnPortCentr8FA_10_90;
+	private JCheckBox btnModBasic;
+	private JCheckBox btnModMegaROM;
+	private JCheckBox btnFloppyDisk;
+	private JCheckBox btnRTC;
+	private JCheckBox btnKCNet;
+	private JCheckBox btnVDIP;
+	private JCheckBox btnGraphCCJ;
+	private JCheckBox btnGraphic;
+	private JCheckBox btnCatchPrintCalls;
+	private JCheckBox btnCatchJoyCalls;
+	private JCheckBox btnPasteFast;
+	private ROMFileSettingsFld fldAltOS;
+	private ROMFileSettingsFld fldAltFont;
+	private ROMFileSettingsFld fldAltGCCJFont;
+	private ROMFileSettingsFld fldAltBasic;
+	private ROMFileSettingsFld fldMegaROM;
+	private JPanel tabModel;
+	private JPanel tabMon;
+	private JPanel tabUserPort;
+	private RAMFloppiesSettingsFld tabRF;
+	private GIDESettingsFld tabGIDE;
+	private JPanel tabModROM;
+	private JPanel tabExt;
+	private JPanel tabEtc;
+	private AutoLoadSettingsFld tabAutoLoad;
+	private AutoInputSettingsFld tabAutoInput;
 
-public class Z1013SettingsFld extends AbstractSettingsFld
-{
-  private JTabbedPane            tabbedPane;
-  private JRadioButton           btnZ1013_01;
-  private JRadioButton           btnZ1013_12;
-  private JRadioButton           btnZ1013_16;
-  private JRadioButton           btnZ1013_64;
-  private JRadioButton           btnZ1013_128;
-  private JRadioButton           btnMon202;
-  private JRadioButton           btnMonA2;
-  private JRadioButton           btnMonRB_K7659;
-  private JRadioButton           btnMonRB_S6009;
-  private JRadioButton           btnMonINCOM_K7669;
-  private JRadioButton           btnMonJM_1992;
-  private JRadioButton           btnBL4_K7659;
-  private JRadioButton           btnPortNone;
-  private JRadioButton           btnPortJoyJuTe_6_87;
-  private JRadioButton           btnPortJoyPractic_4_87;
-  private JRadioButton           btnPortJoyPractic_1_88;
-  private JRadioButton           btnPortCentr7Practic_2_89;
-  private JRadioButton           btnPortCentr8FA_10_90;
-  private JCheckBox              btnModBasic;
-  private JCheckBox              btnModMegaROM;
-  private JCheckBox              btnFloppyDisk;
-  private JCheckBox              btnRTC;
-  private JCheckBox              btnKCNet;
-  private JCheckBox              btnVDIP;
-  private JCheckBox              btnGraphCCJ;
-  private JCheckBox              btnGraphic;
-  private JCheckBox              btnCatchPrintCalls;
-  private JCheckBox              btnCatchJoyCalls;
-  private JCheckBox              btnPasteFast;
-  private ROMFileSettingsFld     fldAltOS;
-  private ROMFileSettingsFld     fldAltFont;
-  private ROMFileSettingsFld     fldAltGCCJFont;
-  private ROMFileSettingsFld     fldAltBasic;
-  private ROMFileSettingsFld     fldMegaROM;
-  private JPanel                 tabModel;
-  private JPanel                 tabMon;
-  private JPanel                 tabUserPort;
-  private RAMFloppiesSettingsFld tabRF;
-  private GIDESettingsFld        tabGIDE;
-  private JPanel                 tabModROM;
-  private JPanel                 tabExt;
-  private JPanel                 tabEtc;
-  private AutoLoadSettingsFld    tabAutoLoad;
-  private AutoInputSettingsFld   tabAutoInput;
-
-
-  public Z1013SettingsFld( SettingsFrm settingsFrm, String propPrefix )
+	public Z1013SettingsFld( SettingsFrm settingsFrm, String propPrefix )
   {
     super( settingsFrm, propPrefix );
 
@@ -228,6 +225,16 @@ public class Z1013SettingsFld extends AbstractSettingsFld
     this.tabMon.add( this.btnBL4_K7659, gbcMon );
 
 
+    // Tab Z1013-128
+    this.tabUserPort = new JPanel( new GridBagLayout() );
+    this.tabbedPane.addTab( "Z1013-128", this.tabUserPort );
+    GridBagConstraints c = new GridBagConstraints();
+    //c.gridx=0;c.gridy=0;c.gridwidth=2;c.gridweightx=1;
+    this.tabUserPort.add(new JLabel("JP1"),c);
+    //c.gridx=2;c.gridy=0;c.gridwidth=2;c.gridweightx=1;
+    this.tabUserPort.add(new JLabel("JP2"),c);
+    //c.gridx=1;c.gridy=1;c.gridwidth=2;c.gridweightx=1;
+    this.tabUserPort.add(new JLabel("JP3"),c);
     // Tab Anwendertor
     this.tabUserPort = new JPanel( new GridBagLayout() );
     this.tabbedPane.addTab( "Anwendertor", this.tabUserPort );
@@ -510,402 +517,279 @@ public class Z1013SettingsFld extends AbstractSettingsFld
     this.tabbedPane.addTab( "AutoInput", this.tabAutoInput );
   }
 
+	public String getModelSysName() {
+		String rv = Z1013.SYSNAME_Z1013_64;
+		if (this.btnZ1013_01.isSelected()) {
+			rv = Z1013.SYSNAME_Z1013_01;
+		} else if (this.btnZ1013_12.isSelected()) {
+			rv = Z1013.SYSNAME_Z1013_12;
+		} else if (this.btnZ1013_16.isSelected()) {
+			rv = Z1013.SYSNAME_Z1013_16;
+		} else if (this.btnZ1013_128.isSelected()) {
+			rv = Z1013.SYSNAME_Z1013_128;
+		}
 
-  public String getModelSysName()
-  {
-    String rv = Z1013.SYSNAME_Z1013_64;
-    if( this.btnZ1013_01.isSelected() ) {
-      rv = Z1013.SYSNAME_Z1013_01;
-    } else if( this.btnZ1013_12.isSelected() ) {
-      rv = Z1013.SYSNAME_Z1013_12;
-    } else if( this.btnZ1013_16.isSelected() ) {
-      rv = Z1013.SYSNAME_Z1013_16;
-    } else if( this.btnZ1013_128.isSelected() ) {
-      rv = Z1013.SYSNAME_Z1013_128;
-    }
-
-    return rv;
-  }
-
+		return rv;
+	}
 
 	/* --- ueberschriebene Methoden --- */
 
-  @Override
-  public void applyInput(
-		Properties props,
-		boolean    selected ) throws
-					UserCancelException,
-					UserInputException
-  {
-    Component tab  = null;
-    String    text = null;
-    try {
+	@Override
+	public void applyInput(Properties props, boolean selected) throws UserCancelException, UserInputException {
+		Component tab = null;
+		String text = null;
+		try {
 
-      // Tab Monitorprogramm / Tastatur
-      tab  = this.tabModel;
-      text = Z1013.VALUE_MON_202;
-      if( this.btnMonA2.isSelected() ) {
-	text = Z1013.VALUE_MON_A2;
-      }
-      else if( this.btnMonRB_K7659.isSelected() ) {
-	text = Z1013.VALUE_MON_RB_K7659;
-      }
-      else if( this.btnMonRB_S6009.isSelected() ) {
-	text = Z1013.VALUE_MON_RB_S6009;
-      }
-      else if( this.btnMonINCOM_K7669.isSelected() ) {
-	text = Z1013.VALUE_MON_INCOM_K7669;
-      }
-      else if( this.btnMonJM_1992.isSelected() ) {
-	text = Z1013.VALUE_MON_JM_1992;
-      }
-      else if( this.btnBL4_K7659.isSelected() ) {
-	text = Z1013.VALUE_MON_BL4_K7659;
-      }
-      EmuUtil.setProperty(
-		props,
-		Z1013.PROP_PREFIX + Z1013.PROP_MONITOR,
-		text );
+			// Tab Monitorprogramm / Tastatur
+			tab = this.tabModel;
+			text = Z1013.VALUE_MON_202;
+			if (this.btnMonA2.isSelected()) {
+				text = Z1013.VALUE_MON_A2;
+			} else if (this.btnMonRB_K7659.isSelected()) {
+				text = Z1013.VALUE_MON_RB_K7659;
+			} else if (this.btnMonRB_S6009.isSelected()) {
+				text = Z1013.VALUE_MON_RB_S6009;
+			} else if (this.btnMonINCOM_K7669.isSelected()) {
+				text = Z1013.VALUE_MON_INCOM_K7669;
+			} else if (this.btnMonJM_1992.isSelected()) {
+				text = Z1013.VALUE_MON_JM_1992;
+			} else if (this.btnBL4_K7659.isSelected()) {
+				text = Z1013.VALUE_MON_BL4_K7659;
+			}
+			EmuUtil.setProperty(props, Z1013.PROP_PREFIX + Z1013.PROP_MONITOR, text);
 
-      // Tab Anwendertor
-      tab  = this.tabUserPort;
-      text = "none";
-      if( this.btnPortJoyJuTe_6_87.isSelected() ) {
-	text = Z1013.VALUE_JOY_JUTE0687;
-      } else if( this.btnPortJoyPractic_4_87.isSelected() ) {
-	text = Z1013.VALUE_JOY_PRAC0487;
-      } else if( this.btnPortJoyPractic_1_88.isSelected() ) {
-	text = Z1013.VALUE_JOY_PRAC0188;
-      } else if( this.btnPortCentr7Practic_2_89.isSelected() ) {
-	text = Z1013.VALUE_CEN7_PRAC0289;
-      } else if( this.btnPortCentr8FA_10_90.isSelected() ) {
-	text = Z1013.VALUE_CEN8_FA1090;
-      }
-      EmuUtil.setProperty(
-		props,
-		this.propPrefix + Z1013.PROP_USERPORT,
-		text );
+			// Tab Anwendertor
+			tab = this.tabUserPort;
+			text = "none";
+			if (this.btnPortJoyJuTe_6_87.isSelected()) {
+				text = Z1013.VALUE_JOY_JUTE0687;
+			} else if (this.btnPortJoyPractic_4_87.isSelected()) {
+				text = Z1013.VALUE_JOY_PRAC0487;
+			} else if (this.btnPortJoyPractic_1_88.isSelected()) {
+				text = Z1013.VALUE_JOY_PRAC0188;
+			} else if (this.btnPortCentr7Practic_2_89.isSelected()) {
+				text = Z1013.VALUE_CEN7_PRAC0289;
+			} else if (this.btnPortCentr8FA_10_90.isSelected()) {
+				text = Z1013.VALUE_CEN8_FA1090;
+			}
+			EmuUtil.setProperty(props, this.propPrefix + Z1013.PROP_USERPORT, text);
 
-      // Tab RAM-Floppies
-      tab = this.tabRF;
-      this.tabRF.applyInput( props, selected );
+			// Tab RAM-Floppies
+			tab = this.tabRF;
+			this.tabRF.applyInput(props, selected);
 
-      // Tab ROM-Module
-      tab = this.tabModROM;
-      EmuUtil.setProperty(
-		props,
-		this.propPrefix + Z1013.PROP_ROMBASIC_ENABLED,
-		this.btnModBasic.isSelected() );
-      this.fldAltBasic.applyInput( props, selected );
+			// Tab ROM-Module
+			tab = this.tabModROM;
+			EmuUtil.setProperty(props, this.propPrefix + Z1013.PROP_ROMBASIC_ENABLED, this.btnModBasic.isSelected());
+			this.fldAltBasic.applyInput(props, selected);
 
-      boolean stateMega = this.btnModMegaROM.isSelected();
-      if( stateMega && (this.fldMegaROM.getFile() == null) ) {
-	throw new UserInputException(
-			"Datei f\u00FCr Mega-ROM-Modul nicht ausgew\u00E4hlt" );
-      }
-      EmuUtil.setProperty(
-		props,
-		this.propPrefix + Z1013.PROP_ROMMEGA_ENABLED,
-		stateMega );
-      this.fldMegaROM.applyInput( props, selected );
+			boolean stateMega = this.btnModMegaROM.isSelected();
+			if (stateMega && (this.fldMegaROM.getFile() == null)) {
+				throw new UserInputException("Datei f\u00FCr Mega-ROM-Modul nicht ausgew\u00E4hlt");
+			}
+			EmuUtil.setProperty(props, this.propPrefix + Z1013.PROP_ROMMEGA_ENABLED, stateMega);
+			this.fldMegaROM.applyInput(props, selected);
 
-      // Tab GIDE
-      tab = this.tabGIDE;
-      this.tabGIDE.applyInput( props, selected );
+			// Tab GIDE
+			tab = this.tabGIDE;
+			this.tabGIDE.applyInput(props, selected);
 
-      // Tab Erweiterungen
-      tab = this.tabExt;
-      EmuUtil.setProperty(
-		props,
-		this.propPrefix + Z1013.PROP_FDC_ENABLED,
-		this.btnFloppyDisk.isSelected() );
-      EmuUtil.setProperty(
-		props,
-		this.propPrefix + Z1013.PROP_RTC_ENABLED,
-		this.btnRTC.isSelected() );
-      EmuUtil.setProperty(
-		props,
-		this.propPrefix + Z1013.PROP_KCNET_ENABLED,
-		this.btnKCNet.isSelected() );
-      EmuUtil.setProperty(
-		props,
-		this.propPrefix + Z1013.PROP_VDIP_ENABLED,
-		this.btnVDIP.isSelected() );
-      EmuUtil.setProperty(
-		props,
-		this.propPrefix + Z1013.PROP_GRAPHIC_ENABLED,
-		this.btnGraphic.isSelected() );
-      EmuUtil.setProperty(
-		props,
-		this.propPrefix + Z1013.PROP_GCCJ_ENABLED,
-		this.btnGraphCCJ.isSelected() );
-      this.fldAltGCCJFont.applyInput( props, selected );
+			// Tab Erweiterungen
+			tab = this.tabExt;
+			EmuUtil.setProperty(props, this.propPrefix + Z1013.PROP_FDC_ENABLED, this.btnFloppyDisk.isSelected());
+			EmuUtil.setProperty(props, this.propPrefix + Z1013.PROP_RTC_ENABLED, this.btnRTC.isSelected());
+			EmuUtil.setProperty(props, this.propPrefix + Z1013.PROP_KCNET_ENABLED, this.btnKCNet.isSelected());
+			EmuUtil.setProperty(props, this.propPrefix + Z1013.PROP_VDIP_ENABLED, this.btnVDIP.isSelected());
+			EmuUtil.setProperty(props, this.propPrefix + Z1013.PROP_GRAPHIC_ENABLED, this.btnGraphic.isSelected());
+			EmuUtil.setProperty(props, this.propPrefix + Z1013.PROP_GCCJ_ENABLED, this.btnGraphCCJ.isSelected());
+			this.fldAltGCCJFont.applyInput(props, selected);
 
-      // Tab Sonstiges
-      tab = this.tabEtc;
-      EmuUtil.setProperty(
-		props,
-		this.propPrefix + Z1013.PROP_CATCH_PRINT_CALLS,
-		this.btnCatchPrintCalls.isSelected() );
-      EmuUtil.setProperty(
-		props,
-		this.propPrefix + Z1013.PROP_CATCH_JOY_CALLS,
-		this.btnCatchJoyCalls.isSelected() );
-      EmuUtil.setProperty(
-		props,
-		this.propPrefix + Z1013.PROP_PASTE_FAST,
-		this.btnPasteFast.isSelected() );
-      this.fldAltOS.applyInput( props, selected );
-      this.fldAltFont.applyInput( props, selected );
+			// Tab Sonstiges
+			tab = this.tabEtc;
+			EmuUtil.setProperty(props, this.propPrefix + Z1013.PROP_CATCH_PRINT_CALLS,
+					this.btnCatchPrintCalls.isSelected());
+			EmuUtil.setProperty(props, this.propPrefix + Z1013.PROP_CATCH_JOY_CALLS,
+					this.btnCatchJoyCalls.isSelected());
+			EmuUtil.setProperty(props, this.propPrefix + Z1013.PROP_PASTE_FAST, this.btnPasteFast.isSelected());
+			this.fldAltOS.applyInput(props, selected);
+			this.fldAltFont.applyInput(props, selected);
 
-      // Tab AutoLoad
-      tab = this.tabAutoLoad;
-      this.tabAutoLoad.applyInput( props, selected );
+			// Tab AutoLoad
+			tab = this.tabAutoLoad;
+			this.tabAutoLoad.applyInput(props, selected);
 
-      // Tab AutoInput
-      tab = this.tabAutoInput;
-      this.tabAutoInput.applyInput( props, selected );
+			// Tab AutoInput
+			tab = this.tabAutoInput;
+			this.tabAutoInput.applyInput(props, selected);
 
-      // ggf. Warnung ausgeben
-      if( selected
-	  && this.btnMonA2.isSelected()
-	  && this.btnModBasic.isSelected()
-	  && (this.fldAltBasic.getFile() == null) )
-      {
-	if( !BaseDlg.showYesNoWarningDlg(
-		this,
-		"Das im ROM-Modul enthaltene KC-BASIC l\u00E4uft nicht"
-			+ " mit dem Monitorprogramm A.2 zusammen.\n"
-			+ "Sie sollten deshalb entweder ein anderes"
-			+ " Monitorprogramm ausw\u00E4hlen"
-			+ " oder f\u00FCr das ROM-Modul\n"
-			+ "einen alternativen, an das Monitorprogramm"
-			+ " angepassten Inhalt einbinden.\n"
-			+ "\n"
-			+ "M\u00F6chten Sie trotzdem die Einstellungen"
-			+ " \u00FCbernehmen?",
-		"Konflikt" ) )
-	{
-	  throw new UserCancelException();
+			// ggf. Warnung ausgeben
+			if (selected && this.btnMonA2.isSelected() && this.btnModBasic.isSelected()
+					&& (this.fldAltBasic.getFile() == null)) {
+				if (!BaseDlg.showYesNoWarningDlg(this, "Das im ROM-Modul enthaltene KC-BASIC l\u00E4uft nicht"
+						+ " mit dem Monitorprogramm A.2 zusammen.\n" + "Sie sollten deshalb entweder ein anderes"
+						+ " Monitorprogramm ausw\u00E4hlen" + " oder f\u00FCr das ROM-Modul\n"
+						+ "einen alternativen, an das Monitorprogramm" + " angepassten Inhalt einbinden.\n" + "\n"
+						+ "M\u00F6chten Sie trotzdem die Einstellungen" + " \u00FCbernehmen?", "Konflikt")) {
+					throw new UserCancelException();
+				}
+			}
+		} catch (UserInputException ex) {
+			if (tab != null) {
+				this.tabbedPane.setSelectedComponent(tab);
+			}
+			throw ex;
+		}
 	}
-      }
-    }
-    catch( UserInputException ex ) {
-      if( tab != null ) {
-	this.tabbedPane.setSelectedComponent( tab );
-      }
-      throw ex;
-    }
-  }
 
+	@Override
+	protected boolean doAction(EventObject e) {
+		this.settingsFrm.setWaitCursor(true);
 
-  @Override
-  protected boolean doAction( EventObject e )
-  {
-    this.settingsFrm.setWaitCursor( true );
-
-    boolean rv  = false;
-    Object  src = e.getSource();
-    if( src != null ) {
-      if( src == this.btnModBasic ) {
-	rv = true;
-	if( this.btnModBasic.isSelected()
-	    && this.btnModMegaROM.isSelected() )
-	{
-	  this.btnModMegaROM.setSelected( false );
+		boolean rv = false;
+		Object src = e.getSource();
+		if (src != null) {
+			if (src == this.btnModBasic) {
+				rv = true;
+				if (this.btnModBasic.isSelected() && this.btnModMegaROM.isSelected()) {
+					this.btnModMegaROM.setSelected(false);
+				}
+				updROMModFieldsEnabled();
+				fireDataChanged();
+			} else if (src == this.btnModMegaROM) {
+				rv = true;
+				if (this.btnModBasic.isSelected() && this.btnModMegaROM.isSelected()) {
+					this.btnModBasic.setSelected(false);
+				}
+				updROMModFieldsEnabled();
+				fireDataChanged();
+			} else if (src == this.btnGraphCCJ) {
+				rv = true;
+				updAltGCCJFontFieldsEnabled();
+				fireDataChanged();
+			} else if (src instanceof AbstractButton) {
+				rv = true;
+				fireDataChanged();
+			}
+		}
+		if (!rv) {
+			rv = this.tabGIDE.doAction(e);
+		}
+		if (!rv) {
+			rv = this.tabAutoLoad.doAction(e);
+		}
+		if (!rv) {
+			rv = this.tabAutoInput.doAction(e);
+		}
+		this.settingsFrm.setWaitCursor(false);
+		return rv;
 	}
-	updROMModFieldsEnabled();
-	fireDataChanged();
-      }
-      else if( src == this.btnModMegaROM ) {
-	rv = true;
-	if( this.btnModBasic.isSelected()
-	    && this.btnModMegaROM.isSelected() )
-	{
-	  this.btnModBasic.setSelected( false );
+
+	@Override
+	public void lookAndFeelChanged() {
+		this.fldAltOS.lookAndFeelChanged();
+		this.fldAltFont.lookAndFeelChanged();
+		this.fldAltGCCJFont.lookAndFeelChanged();
+		this.fldAltBasic.lookAndFeelChanged();
+		this.fldMegaROM.lookAndFeelChanged();
+		this.tabGIDE.lookAndFeelChanged();
+		this.tabAutoLoad.lookAndFeelChanged();
+		this.tabAutoInput.lookAndFeelChanged();
 	}
-	updROMModFieldsEnabled();
-	fireDataChanged();
-      }
-      else if( src == this.btnGraphCCJ ) {
-	rv = true;
-	updAltGCCJFontFieldsEnabled();
-	fireDataChanged();
-      }
-      else if( src instanceof AbstractButton ) {
-	rv = true;
-	fireDataChanged();
-      }
-    }
-    if( !rv ) {
-      rv = this.tabGIDE.doAction( e );
-    }
-    if( !rv ) {
-      rv = this.tabAutoLoad.doAction( e );
-    }
-    if( !rv ) {
-      rv = this.tabAutoInput.doAction( e );
-    }
-    this.settingsFrm.setWaitCursor( false );
-    return rv;
-  }
 
+	@Override
+	public void updFields(Properties props) {
+		switch (EmuUtil.getProperty(props, EmuThread.PROP_SYSNAME)) {
+		case Z1013.SYSNAME_Z1013_01:
+			this.btnZ1013_01.setSelected(true);
+			break;
+		case Z1013.SYSNAME_Z1013_12:
+			this.btnZ1013_12.setSelected(true);
+			break;
+		case Z1013.SYSNAME_Z1013_16:
+			this.btnZ1013_16.setSelected(true);
+			break;
+		case Z1013.SYSNAME_Z1013_128:
+			this.btnZ1013_128.setSelected(true);
+			break;
+		default:
+			this.btnZ1013_64.setSelected(true);
+		}
 
-  @Override
-  public void lookAndFeelChanged()
-  {
-    this.fldAltOS.lookAndFeelChanged();
-    this.fldAltFont.lookAndFeelChanged();
-    this.fldAltGCCJFont.lookAndFeelChanged();
-    this.fldAltBasic.lookAndFeelChanged();
-    this.fldMegaROM.lookAndFeelChanged();
-    this.tabGIDE.lookAndFeelChanged();
-    this.tabAutoLoad.lookAndFeelChanged();
-    this.tabAutoInput.lookAndFeelChanged();
-  }
+		String mon = EmuUtil.getProperty(props, Z1013.PROP_PREFIX + Z1013.PROP_MONITOR);
+		if (mon.equals(Z1013.VALUE_MON_A2)) {
+			this.btnMonA2.setSelected(true);
+		} else if (mon.equals(Z1013.VALUE_MON_RB_K7659)) {
+			this.btnMonRB_K7659.setSelected(true);
+		} else if (mon.equals(Z1013.VALUE_MON_RB_S6009)) {
+			this.btnMonRB_S6009.setSelected(true);
+		} else if (mon.equals(Z1013.VALUE_MON_INCOM_K7669)) {
+			this.btnMonINCOM_K7669.setSelected(true);
+		} else if (mon.equals(Z1013.VALUE_MON_JM_1992)) {
+			this.btnMonJM_1992.setSelected(true);
+		} else if (mon.equals(Z1013.VALUE_MON_BL4_K7659)) {
+			this.btnBL4_K7659.setSelected(true);
+		} else {
+			this.btnMon202.setSelected(true);
+		}
 
+		String port = EmuUtil.getProperty(props, this.propPrefix + Z1013.PROP_USERPORT);
+		if (port.equals(Z1013.VALUE_JOY_JUTE0687)) {
+			this.btnPortJoyJuTe_6_87.setSelected(true);
+		} else if (port.equals(Z1013.VALUE_JOY_PRAC0487)) {
+			this.btnPortJoyPractic_4_87.setSelected(true);
+		} else if (port.equals(Z1013.VALUE_JOY_PRAC0188)) {
+			this.btnPortJoyPractic_1_88.setSelected(true);
+		} else if (port.equals(Z1013.VALUE_CEN7_PRAC0289)) {
+			this.btnPortCentr7Practic_2_89.setSelected(true);
+		} else if (port.equals(Z1013.VALUE_CEN8_FA1090)) {
+			this.btnPortCentr8FA_10_90.setSelected(true);
+		} else {
+			this.btnPortNone.setSelected(true);
+		}
 
-  @Override
-  public void updFields( Properties props )
-  {
-    switch( EmuUtil.getProperty( props, EmuThread.PROP_SYSNAME ) ) {
-      case Z1013.SYSNAME_Z1013_01:
-	this.btnZ1013_01.setSelected( true );
-	break;
-      case Z1013.SYSNAME_Z1013_12:
-	this.btnZ1013_12.setSelected( true );
-	break;
-      case Z1013.SYSNAME_Z1013_16:
-	this.btnZ1013_16.setSelected( true );
-	break;
-      case Z1013.SYSNAME_Z1013_128:
-	this.btnZ1013_128.setSelected( true );
-	break;
-      default:
-	this.btnZ1013_64.setSelected( true );
-    }
+		this.tabRF.updFields(props);
+		this.tabGIDE.updFields(props);
 
-    String mon = EmuUtil.getProperty(
-			props,
-			Z1013.PROP_PREFIX + Z1013.PROP_MONITOR );
-    if( mon.equals( Z1013.VALUE_MON_A2 ) ) {
-      this.btnMonA2.setSelected( true );
-    } else if( mon.equals( Z1013.VALUE_MON_RB_K7659 ) ) {
-      this.btnMonRB_K7659.setSelected( true );
-    } else if( mon.equals( Z1013.VALUE_MON_RB_S6009 ) ) {
-      this.btnMonRB_S6009.setSelected( true );
-    } else if( mon.equals( Z1013.VALUE_MON_INCOM_K7669 ) ) {
-      this.btnMonINCOM_K7669.setSelected( true );
-    } else if( mon.equals( Z1013.VALUE_MON_JM_1992 ) ) {
-      this.btnMonJM_1992.setSelected( true );
-    } else if( mon.equals( Z1013.VALUE_MON_BL4_K7659 ) ) {
-      this.btnBL4_K7659.setSelected( true );
-    } else {
-      this.btnMon202.setSelected( true );
-    }
+		this.btnModBasic
+				.setSelected(EmuUtil.getBooleanProperty(props, this.propPrefix + Z1013.PROP_ROMBASIC_ENABLED, false));
+		this.btnModMegaROM.setSelected(!this.btnModBasic.isSelected()
+				&& EmuUtil.getBooleanProperty(props, this.propPrefix + Z1013.PROP_ROMMEGA_ENABLED, false));
+		updROMModFieldsEnabled();
+		this.fldAltBasic.updFields(props);
+		this.fldMegaROM.updFields(props);
 
-    String port = EmuUtil.getProperty(
-			props,
-			this.propPrefix + Z1013.PROP_USERPORT );
-    if( port.equals( Z1013.VALUE_JOY_JUTE0687 ) ) {
-      this.btnPortJoyJuTe_6_87.setSelected( true );
-    } else if( port.equals( Z1013.VALUE_JOY_PRAC0487 ) ) {
-      this.btnPortJoyPractic_4_87.setSelected( true );
-    } else if( port.equals( Z1013.VALUE_JOY_PRAC0188 ) ) {
-      this.btnPortJoyPractic_1_88.setSelected( true );
-    } else if( port.equals( Z1013.VALUE_CEN7_PRAC0289 ) ) {
-      this.btnPortCentr7Practic_2_89.setSelected( true );
-    } else if( port.equals( Z1013.VALUE_CEN8_FA1090 ) ) {
-      this.btnPortCentr8FA_10_90.setSelected( true );
-    } else {
-      this.btnPortNone.setSelected( true );
-    }
+		this.btnFloppyDisk
+				.setSelected(EmuUtil.getBooleanProperty(props, this.propPrefix + Z1013.PROP_FDC_ENABLED, false));
+		this.btnRTC.setSelected(EmuUtil.getBooleanProperty(props, this.propPrefix + Z1013.PROP_RTC_ENABLED, false));
+		this.btnKCNet.setSelected(EmuUtil.getBooleanProperty(props, this.propPrefix + Z1013.PROP_KCNET_ENABLED, false));
+		this.btnVDIP.setSelected(EmuUtil.getBooleanProperty(props, this.propPrefix + Z1013.PROP_VDIP_ENABLED, false));
+		this.btnGraphic
+				.setSelected(EmuUtil.getBooleanProperty(props, this.propPrefix + Z1013.PROP_GRAPHIC_ENABLED, false));
+		this.btnGraphCCJ
+				.setSelected(EmuUtil.getBooleanProperty(props, this.propPrefix + Z1013.PROP_GCCJ_ENABLED, false));
+		updAltGCCJFontFieldsEnabled();
+		this.fldAltGCCJFont.updFields(props);
 
-    this.tabRF.updFields( props );
-    this.tabGIDE.updFields( props );
+		this.btnCatchPrintCalls
+				.setSelected(EmuUtil.getBooleanProperty(props, this.propPrefix + Z1013.PROP_CATCH_PRINT_CALLS, true));
+		this.btnCatchJoyCalls
+				.setSelected(EmuUtil.getBooleanProperty(props, this.propPrefix + Z1013.PROP_CATCH_JOY_CALLS, true));
+		this.btnPasteFast.setSelected(EmuUtil.getBooleanProperty(props, this.propPrefix + Z1013.PROP_PASTE_FAST, true));
+		this.fldAltOS.updFields(props);
+		this.fldAltFont.updFields(props);
 
-    this.btnModBasic.setSelected(
-	EmuUtil.getBooleanProperty(
-			props,
-			this.propPrefix + Z1013.PROP_ROMBASIC_ENABLED,
-			false ) );
-    this.btnModMegaROM.setSelected(
-	!this.btnModBasic.isSelected()
-	&& EmuUtil.getBooleanProperty(
-			props,
-			this.propPrefix + Z1013.PROP_ROMMEGA_ENABLED,
-			false ) );
-    updROMModFieldsEnabled();
-    this.fldAltBasic.updFields( props );
-    this.fldMegaROM.updFields( props );
-
-    this.btnFloppyDisk.setSelected(
-	EmuUtil.getBooleanProperty(
-			props,
-			this.propPrefix + Z1013.PROP_FDC_ENABLED,
-			false ) );
-    this.btnRTC.setSelected(
-	EmuUtil.getBooleanProperty(
-			props,
-			this.propPrefix + Z1013.PROP_RTC_ENABLED,
-			false ) );
-    this.btnKCNet.setSelected(
-	EmuUtil.getBooleanProperty(
-			props,
-			this.propPrefix + Z1013.PROP_KCNET_ENABLED,
-			false ) );
-    this.btnVDIP.setSelected(
-	EmuUtil.getBooleanProperty(
-			props,
-			this.propPrefix + Z1013.PROP_VDIP_ENABLED,
-			false ) );
-    this.btnGraphic.setSelected(
-	EmuUtil.getBooleanProperty(
-			props,
-			this.propPrefix + Z1013.PROP_GRAPHIC_ENABLED,
-			false ) );
-    this.btnGraphCCJ.setSelected(
-	EmuUtil.getBooleanProperty(
-			props,
-			this.propPrefix + Z1013.PROP_GCCJ_ENABLED,
-			false ) );
-    updAltGCCJFontFieldsEnabled();
-    this.fldAltGCCJFont.updFields( props );
-
-    this.btnCatchPrintCalls.setSelected(
-	EmuUtil.getBooleanProperty(
-			props,
-			this.propPrefix + Z1013.PROP_CATCH_PRINT_CALLS,
-			true ) );
-    this.btnCatchJoyCalls.setSelected(
-	EmuUtil.getBooleanProperty(
-			props,
-			this.propPrefix + Z1013.PROP_CATCH_JOY_CALLS,
-			true ) );
-    this.btnPasteFast.setSelected(
-	EmuUtil.getBooleanProperty(
-			props,
-			this.propPrefix + Z1013.PROP_PASTE_FAST,
-			true ) );
-    this.fldAltOS.updFields( props );
-    this.fldAltFont.updFields( props );
-
-    this.tabAutoLoad.updFields( props );
-    this.tabAutoInput.updFields( props );
-  }
-
+		this.tabAutoLoad.updFields(props);
+		this.tabAutoInput.updFields(props);
+	}
 
 	/* --- private Methoden --- */
 
-  private void updAltGCCJFontFieldsEnabled()
-  {
-    this.fldAltGCCJFont.setEnabled( btnGraphCCJ.isSelected() );
-  }
+	private void updAltGCCJFontFieldsEnabled() {
+		this.fldAltGCCJFont.setEnabled(btnGraphCCJ.isSelected());
+	}
 
-
-  private void updROMModFieldsEnabled()
-  {
-    this.fldAltBasic.setEnabled( this.btnModBasic.isSelected() );
-    this.fldMegaROM.setEnabled( this.btnModMegaROM.isSelected() );
-  }
+	private void updROMModFieldsEnabled() {
+		this.fldAltBasic.setEnabled(this.btnModBasic.isSelected());
+		this.fldMegaROM.setEnabled(this.btnModMegaROM.isSelected());
+	}
 }
