@@ -60,7 +60,7 @@ public class Z1013 extends EmuSys implements
   public static final String SYSNAME_Z1013_12      = "Z1013.12";
   public static final String SYSNAME_Z1013_16      = "Z1013.16";
   public static final String SYSNAME_Z1013_64      = "Z1013.64";
-  public static final String SYSNAME_Z1013_128     = "Z1013-128";
+  public static final String SYSNAME_Z1013_128     = "Z1013.128";
   public static final String PROP_PREFIX           = "jkcemu.z1013.";
   public static final String PROP_CATCH_JOY_CALLS  = "catch_joystick_calls";
   public static final String PROP_GCCJ_FONT_FILE   = "graphic_ccj.font.file";
@@ -169,7 +169,8 @@ public class Z1013 extends EmuSys implements
 
   private static int ramBank=0;
   private static boolean rom8000=false;
-  private static byte[] rom8000Image   = null;
+  private static int rom8000Bank=0;
+  private static byte[] rom8000Image   = null; //Inhalt des EPROMs
   private static byte[][] ram128         = {new byte[0x10000],new byte[0x10000]};
   private static byte[] mon202         = null;
   private static byte[] monA2          = null;
@@ -515,24 +516,44 @@ public class Z1013 extends EmuSys implements
     if( rom != null ) {
       if( rom.length > 0 ) {
 	buf.append( String.format(
-			" (F000h-F%03X)",
+			" (F000h-F%03Xh):",
 			Math.min( rom.length, 0x1000 ) - 1 ) );
+	if (sysName.equals(SYSNAME_Z1013_128)) {
+            buf.append( "<br>BWS (EC00h-EFFFh)" );
+        } 
       }
     }
-    buf.append( ":</td><td>" );
+    buf.append( "</td><td>" );
     EmuUtil.appendOnOffText( buf, !this.romDisabled );
     buf.append( "</td></tr>\n" );
+    //if (sysName.equals(SYSNAME_Z1013_128)) {
+    //    buf.append( "<tr><td>128 id:</td><td>value</td></tr>\n" );
+    //} else {
+    //    buf.append( "<tr><td>otherid:</td><td>value</td></tr>\n" );
+    //}
+    
     if( this.romMega != null ) {
       buf.append( "<tr><td>Mega-ROM (C000h-E7FFh):</td><td>Bank " );
       buf.append( this.romMegaSeg );
       buf.append( "</td></tr>\n" );
     }
-    //if (sysName == SYSNAME_Z1013_128)
+    if (sysName.equals(SYSNAME_Z1013_128))
     {
       buf.append( "<tr><td>Ram Bank:</td><td>" );
       buf.append( ramBank );
       buf.append( "</td></tr>\n" );
-      buf.append( "<tr><td>Rom 8000:</td><td>" );
+      
+      buf.append( "<tr><td>ROM Bank:</td><td>" );
+      buf.append( String.format("%02Xh",rom8000Bank));
+      buf.append( "</td></tr>\n" );
+
+      buf.append( "<tr><td>ROM (8000h-");
+      if (this.romDisabled) {
+          buf.append( "FFFFh");
+      } else {
+          buf.append( "EBFFh");
+      }    
+      buf.append( "):</td><td>" );
       buf.append( rom8000? "ein":" aus" );
       buf.append( "</td></tr>\n" );
     }
@@ -960,6 +981,19 @@ public class Z1013 extends EmuSys implements
 	done = true;
       }
     }
+    if (rom8000 && addr>=0x8000) {
+        int endAddr=0xebff;
+        //System.out.printf("read %04x romdisabled=%s\n",addr,romDisabled);
+        if (this.romDisabled) {
+            endAddr=0xffff;  
+        }
+        if (addr<=endAddr) {
+            rv= this.rom8000Image[ (addr-0x8000) | rom8000Bank<<13 ] & 0xFF;
+            done = true;    
+            //System.out.printf("rom8000Image[%x]\n",(addr-0x8000) | rom8000Bank<<13);    
+        }
+    }
+    
     if( !done && (addr <= this.ramEndAddr) ) {
         if (addr<0xec00)
         {
@@ -1458,9 +1492,11 @@ public class Z1013 extends EmuSys implements
     this.altFontEnabled    = false;
     this.modeGraph         = false;
     this.ramBank           = 0;
+    this.rom8000Bank       = 0;
+    this.rom8000           = false;
     if (sysName.equals(SYSNAME_Z1013_128))
     {
-        rom8000=true;//AZ
+        this.rom8000=true;//AZ
     }
     if( this.mode64x16 || this.graphCCJActive ) {
       this.graphCCJActive = false;
@@ -1841,6 +1877,7 @@ public class Z1013 extends EmuSys implements
          {
             rom8000=true;
          }
+         this.romDisabled    = ((value & 0x10) != 0);
       } else
       {
         boolean oldAltFontEnabled = this.altFontEnabled;
@@ -2024,7 +2061,10 @@ public class Z1013 extends EmuSys implements
 	    this.screenFrm.setScreenDirty( true );
 	  }
 	  break;
-      }
+	case 0x14:				// IOSEL5
+	  rom8000Bank=value;
+	  break;      
+        }
     }
     z80AddressChanged( port );
   }
@@ -2370,6 +2410,10 @@ public class Z1013 extends EmuSys implements
     }
     if( rom8000Image == null ) {
       rom8000Image = readResource( "/rom/z1013/rom_boot.bin" );
+      //if (rom8000Image.length%32768!=0) {
+	//     
+      //}
+	      
     }
     if( emulatesModuleBasic( props ) ) {
       this.romBasicFile = EmuUtil.getProperty(

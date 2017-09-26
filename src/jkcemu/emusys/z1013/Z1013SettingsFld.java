@@ -145,7 +145,7 @@ public class Z1013SettingsFld extends AbstractSettingsFld {
     this.tabModel.add( this.btnZ1013_64, gbcModel );
 
     this.btnZ1013_128 = new JRadioButton(
-				"Z1013-128 (2 MHz, 128 KByte RAM)",
+				"Z1013.128 (2 MHz, 128 KByte RAM)",
 				false );
     this.btnZ1013_128.addActionListener( this );
     grpModel.add( this.btnZ1013_128 );
@@ -227,7 +227,7 @@ public class Z1013SettingsFld extends AbstractSettingsFld {
 
     // Tab Z1013-128
     this.tabUserPort = new JPanel( new GridBagLayout() );
-    this.tabbedPane.addTab( "Z1013-128", this.tabUserPort );
+    this.tabbedPane.addTab( "Z1013.128", this.tabUserPort );
     GridBagConstraints c = new GridBagConstraints();
     //c.gridx=0;c.gridy=0;c.gridwidth=2;c.gridweightx=1;
     this.tabUserPort.add(new JLabel("JP1"),c);
