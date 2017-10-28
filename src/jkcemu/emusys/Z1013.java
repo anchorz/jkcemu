@@ -1283,6 +1283,7 @@ public class Z1013 extends EmuSys implements
   @Override
   public int readIOByte( int port, int tStates )
   {
+    z80AddressChanged( port );
     int rv = 0x0F;			// wird von unbelegten Ports gelesen
 
     port &= 0xFF;
@@ -1400,7 +1401,6 @@ public class Z1013 extends EmuSys implements
 	  break;
       }
     }
-    z80AddressChanged( port );
     return rv;
   }
 
