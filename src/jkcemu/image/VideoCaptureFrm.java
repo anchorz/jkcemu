@@ -111,6 +111,13 @@ public class VideoCaptureFrm extends BaseFrm implements Runnable
 
 	/* --- Runnable --- */
 
+  File getVideoFileText() {
+    FileSystemView fsv = FileSystemView.getFileSystemView();
+    File homeDir = fsv.getHomeDirectory();
+    File file = new File(homeDir, "jkcemu_video_text.txt");
+    return file;
+  }
+
   @Override
   public void run()
   {
@@ -118,14 +125,18 @@ public class VideoCaptureFrm extends BaseFrm implements Runnable
     boolean   delete    = false;
     Exception errEx     = null;
     File      file      = this.fldFile.getFile();
+    File      fileText  = this.getVideoFileText();
     if( file != null ) {
       OutputStream out = null;
+      BufferedOutputStream outText = null;
       try {
 	boolean smoothColorReduction = true;
 	if( this.btnColorReductionSmooth != null ) {
 	  smoothColorReduction = this.btnColorReductionSmooth.isSelected();
 	}
 	out = new BufferedOutputStream( new FileOutputStream( file ) );
+    outText = new BufferedOutputStream( new FileOutputStream( fileText ) );
+
 	AnimatedGIFWriter animGIF = new AnimatedGIFWriter(
 				out,
 				smoothColorReduction,
@@ -157,6 +168,8 @@ public class VideoCaptureFrm extends BaseFrm implements Runnable
 	      }
 	      if( image != null ) {
 		animGIF.addFrame( this.frameMillis, image );
+                outText.write( screenFrm.createSnapshotText() );
+
 		this.recordedMillis += this.frameMillis;
 		this.capturing = true;
 	      } else {
@@ -170,7 +183,9 @@ public class VideoCaptureFrm extends BaseFrm implements Runnable
 	  delete = true;
 	}
         out.close();
-	out = null;
+     	out = null;
+        outText.close();
+     	outText = null;
       }
       catch( Exception ex ) {
 	errEx = ex;
@@ -180,6 +195,7 @@ public class VideoCaptureFrm extends BaseFrm implements Runnable
       }
       finally {
 	EmuUtil.closeSilent( out );
+	EmuUtil.closeSilent( outText );
       }
       if( (file != null) && delete ) {
 	file.delete();

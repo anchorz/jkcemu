@@ -20,13 +20,16 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.BufferedWriter;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.lang.*;
 import java.util.EventObject;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.ButtonGroup;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JMenu;
@@ -72,6 +75,7 @@ public abstract class AbstractScreenFrm
   protected static final String ACTION_SCREENTEXT_SAVE  = "screen.text.save";
   protected static final String ACTION_SCREENSHOT       = "screenshot";
   protected static final String ACTION_SCREENVIDEO      = "screen.video";
+  protected static final String ACTION_SCREENTEXT_QUICK = "screen.text.quick";
 
   protected JButton              btnCopy;
   protected JButton              btnPaste;
@@ -81,6 +85,7 @@ public abstract class AbstractScreenFrm
   protected JMenuItem            mnuPasteCancel;
   protected JMenuItem            mnuScreenTextCopy;
   protected JMenuItem            mnuScreenTextSave;
+  protected JMenuItem            mnuScreenTextQuick;
   protected JMenuItem            mnuScreenTextShow;
   protected JMenuItem            mnuPopupCopy;
   protected JMenuItem            mnuPopupPaste;
@@ -112,6 +117,7 @@ public abstract class AbstractScreenFrm
     this.mnuPasteCancel      = null;
     this.mnuScreenTextCopy   = null;
     this.mnuScreenTextSave   = null;
+    this.mnuScreenTextQuick  = null;
     this.mnuScreenTextShow   = null;
     this.mnuPopupCopy        = null;
     this.mnuPopupPaste       = null;
@@ -363,6 +369,16 @@ public abstract class AbstractScreenFrm
 				"als Textdatei speichern...",
 				ACTION_SCREENTEXT_SAVE );
       mnuScreen.add( this.mnuScreenTextSave );
+
+      mnuScreen.addSeparator();
+      this.mnuScreenTextQuick = createJMenuItem(
+				"als Binärdaten speichern...",
+				ACTION_SCREENTEXT_QUICK,
+				KeyStroke.getKeyStroke(
+					KeyEvent.VK_U,
+					InputEvent.ALT_MASK| InputEvent.SHIFT_MASK  ) );
+      mnuScreen.add( this.mnuScreenTextQuick );
+
     }
     return mnuScreen;
   }
@@ -434,7 +450,62 @@ public abstract class AbstractScreenFrm
     return rv;
   }
 
+  public void showStatusText( String text ) 
+  {
+  }
 
+  public byte [] createSnapshotText()
+  {
+    AbstractScreenDevice screenDevice = getScreenDevice();
+    CharRaster chRaster = screenDevice.getCurScreenCharRaster();
+    int nCols = chRaster.getColCount();
+    int nRows = chRaster.getRowCount();
+    byte buf[] = new byte[nRows * nCols];
+    for (int y=0;y<nRows;y++) {
+      for (int x=0;x<nCols;x++) {
+      int b = screenDevice.getScreenCharRaw( chRaster, x, y );
+      buf[y*nCols+x]=(byte)b;
+      }
+    }
+    return buf;
+  }
+
+  protected boolean doScreenTextQuick()
+  {
+    byte [] text=createSnapshotText();
+
+    FileSystemView fsv = FileSystemView.getFileSystemView();
+    if( fsv != null ) {
+      File homeDir = fsv.getHomeDirectory();
+      if( homeDir != null ) {
+        int num = 1;
+        String save = String.format("jkcemu_screen_%02d.txt",num);
+        File file = new File(homeDir, save);
+        while(file.exists()) {
+          save = String.format("jkcemu_screen_%02d.txt",++num);
+          file = new File(homeDir, save); 
+        }
+        BufferedOutputStream out = null;
+        try {
+          out = new BufferedOutputStream( new FileOutputStream( file ) );
+          out.write( text );
+		  out.close();
+	      out = null;
+	      showStatusText( "Textdatei gespeichert: "+save  );
+	    } catch( Exception ex ) {
+	      BasicDlg.showErrorDlg(
+		    this,
+		    save + ":\nSpeichern der Datei fehlgeschlagen\n\n"
+		    + ex.getMessage() );
+	    }
+	    finally {
+	      EmuUtil.closeSilent( out );
+	    }
+      }
+    }
+    return true;
+  }
+  
   public void firePastingTextFinished()
   {
     EventQueue.invokeLater(
@@ -686,7 +757,11 @@ public abstract class AbstractScreenFrm
 	  rv = true;
 	  doScreenTextSave();
 	}
-	else if( actionCmd.equals( ACTION_SCREENTEXT_COPY ) ) {
+	else if( actionCmd.equals( ACTION_SCREENTEXT_QUICK ) ) {
+	  rv = true;
+	  doScreenTextQuick();
+	}
+    else if( actionCmd.equals( ACTION_SCREENTEXT_COPY ) ) {
 	  rv = true;
 	  doScreenTextCopy();
 	}

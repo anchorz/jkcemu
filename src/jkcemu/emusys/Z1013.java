@@ -1019,6 +1019,20 @@ public class Z1013 extends EmuSys implements
     return 0xF000;
   }
 
+  @Override
+  protected byte getScreenCharRaw( CharRaster chRaster, int chX, int chY )
+  {
+    if( (this.graphCCJ != null) && this.graphCCJActive ) {
+      return (byte) this.graphCCJ.getScreenChar( chX, chY );
+    } else {
+      int idx = (chY * (this.mode64x16 ? 64 : 32)) + chX;
+      if( (idx >= 0) && (idx < this.ramVideo.length) ) {
+	    return this.ramVideo[ idx ];
+	  }
+    }
+    return -1;
+  }
+
 
   @Override
   protected int getScreenChar( CharRaster chRaster, int chX, int chY )

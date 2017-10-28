@@ -145,6 +145,11 @@ public abstract class AbstractScreenDevice
     return value;
   }
 
+  //Ohne Umcodierung
+  protected byte getScreenCharRaw( CharRaster chRaster, int chX, int chY )
+  {
+    return -1;
+  }
 
   protected int getScreenChar( CharRaster chRaster, int chX, int chY )
   {

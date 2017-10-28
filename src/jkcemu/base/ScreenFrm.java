@@ -167,7 +167,6 @@ public class ScreenFrm
   private static final String ACTION_TEXTEDITOR        = "texteditor";
   private static final String ACTION_USB               = "usb";
 
-
   private JMenuBar           mnuBar;
   private JMenu              mnuExtra;
   private JMenuItem          mnuBasicOpen;
