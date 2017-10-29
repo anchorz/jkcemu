@@ -90,7 +90,6 @@ import z80emu.Z80InterruptSource;
 import z80emu.Z80Memory;
 import z80emu.Z80StatusListener;
 
-
 public class ScreenFrm
 		extends AbstractScreenFrm
 		implements
@@ -136,6 +135,7 @@ public class ScreenFrm
   private static final String ACTION_DISKVIEWER        = "diskviewer";
   private static final String ACTION_FILEBROWSER       = "filebrowser";
   private static final String ACTION_FILECONVERTER     = "fileconverter";
+  private static final String ACTION_WEB_LOAD          = "web.load";
   private static final String ACTION_FILE_LOAD         = "file.load";
   private static final String ACTION_FILE_SAVE         = "file.save";
   private static final String ACTION_FIND_FILES        = "find_files";
@@ -223,7 +223,6 @@ public class ScreenFrm
   private ReassFrm           secondReassFrm;
   private SecondaryScreenFrm secondScreenFrm;
 
-
   public ScreenFrm()
   {
     setTitle( "JKCEMU" );
@@ -259,6 +258,12 @@ public class ScreenFrm
     mnuFile.setMnemonic( KeyEvent.VK_D );
 
     mnuFile.add( createJMenuItem(
+			"Online Suchen...",
+			ACTION_WEB_LOAD,
+            KeyStroke.getKeyStroke(
+					KeyEvent.VK_O,
+					InputEvent.ALT_MASK | InputEvent.SHIFT_MASK  ) ) );
+   mnuFile.add( createJMenuItem(
 			"Laden...",
 			ACTION_FILE_LOAD,
 			KeyStroke.getKeyStroke(
@@ -543,6 +548,7 @@ public class ScreenFrm
     this.mnuPopup.add( this.mnuPopupPaste );
     this.mnuPopup.addSeparator();
 
+    this.mnuPopup.add( createJMenuItem( "Online...", ACTION_WEB_LOAD ) );
     this.mnuPopup.add( createJMenuItem( "Laden...", ACTION_FILE_LOAD ) );
     this.mnuPopup.add( createJMenuItem( "Speichern...", ACTION_FILE_SAVE ) );
     this.mnuPopup.addSeparator();
@@ -1473,7 +1479,12 @@ public class ScreenFrm
 	  rv = true;
 	  doClose();
 	}
-	else if( actionCmd.equals( ACTION_FILE_LOAD ) ) {
+	else if( actionCmd.equals( ACTION_WEB_LOAD ) ) {
+	  rv = true;
+      WebAccessFrm webload=new WebAccessFrm(this,this);
+	  webload.download();
+	} 
+    else if( actionCmd.equals( ACTION_FILE_LOAD ) ) {
 	  rv = true;
 	  doFileLoad( true );
 	}
