@@ -9,15 +9,11 @@
 package jkcemu.base;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 
 import java.io.IOException;
@@ -29,7 +25,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -86,8 +81,8 @@ public class WebAccessFrm extends JDialog {
         }
 
         @SuppressWarnings("unchecked")
-        public Class getColumnClass(int c) {
-            return getValueAt(0, c).getClass();
+        public Class<? extends String> getColumnClass(int c) {
+            return (Class<? extends String>) getValueAt(0, c).getClass();
         }
     }
 
@@ -105,6 +100,8 @@ public class WebAccessFrm extends JDialog {
         JRootPane rootPane = new JRootPane();
         KeyStroke stroke = KeyStroke.getKeyStroke("ESCAPE");
         Action actionListener = new AbstractAction() {
+            private static final long serialVersionUID = -2221563287411606852L;
+
             public void actionPerformed(ActionEvent actionEvent) {
                 setVisible(false);
             }
@@ -151,6 +148,7 @@ public class WebAccessFrm extends JDialog {
         }
 
         setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+
         searchTerm = new JTextField();
         searchTerm.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
@@ -219,7 +217,6 @@ public class WebAccessFrm extends JDialog {
     private void loadFile(String[] entry, String link) {
         String url = databasePrefix + link;
         int aadr = Integer.parseInt(entry[COL_AADR], 16);
-        int eadr = Integer.parseInt(entry[COL_EADR], 16);
         try {
             byte[] bytes = Jsoup.connect(url).ignoreContentType(true).execute().bodyAsBytes();
             EmuThread emuThread = this.screenFrm.getEmuThread();
