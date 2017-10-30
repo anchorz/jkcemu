@@ -481,7 +481,7 @@ public class ZXSpectrumKeyboardFld extends AbstractKeyboardFld<ZXSpectrum>
   }
 
 
-  private static void drawStringCenter(
+  protected static void drawStringCenter(
 				Graphics g,
 				String   text,
 				int      x,
@@ -501,7 +501,7 @@ public class ZXSpectrumKeyboardFld extends AbstractKeyboardFld<ZXSpectrum>
   }
 
 
-  private static void drawStringRight(
+  protected static void drawStringRight(
 				Graphics g,
 				String   text,
 				int      x,

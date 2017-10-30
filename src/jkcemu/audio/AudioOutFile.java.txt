@@ -24,6 +24,7 @@ public class AudioOutFile extends AudioOut
   private File                 file;
   private AudioFileFormat.Type fileType;
   private AudioDataQueue       queue;
+
   private int                  sampleRate;
   private int                  maxPauseTStates;
 

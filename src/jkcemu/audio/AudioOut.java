@@ -58,7 +58,11 @@ public class AudioOut extends AudioIO
   private int                     maxRecPauseFrames;
   private boolean                 stereo;
 
-
+  protected AudioFormat           audioFmt; //AZ 
+  protected AudioFrm              audioFrm; //AZ 
+  protected String                errorText;//AZ
+  protected boolean               enabled;  //AZ
+  protected static final int      MAX_OUT_VALUE=250;
   public AudioOut(
 		AudioIOObserver observer,
 		Z80CPU          z80cpu,
