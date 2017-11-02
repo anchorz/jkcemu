@@ -914,6 +914,7 @@ public class Main
     }
     if( !iconImages.isEmpty() ) {
       window.setIconImages( iconImages );
+      MacOs.setIconImages( window,iconResources[iconResources.length-1]);
     }
   }
 
