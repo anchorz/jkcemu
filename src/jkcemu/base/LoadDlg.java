@@ -879,7 +879,7 @@ public class LoadDlg extends BaseDlg implements DocumentListener
   }
 
 
-  private static void showLoadMsg( ScreenFrm screenFrm, LoadData loadData )
+  private static  void showLoadMsg( ScreenFrm screenFrm, LoadData loadData )
   {
     if( loadData != null ) {
       int endAddr = loadData.getEndAddr();

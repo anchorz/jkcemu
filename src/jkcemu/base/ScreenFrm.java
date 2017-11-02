@@ -94,7 +94,8 @@ public class ScreenFrm
 		extends AbstractScreenFrm
 		implements
 			DropTargetListener,
-			Z80StatusListener
+			Z80StatusListener,
+			StatusUpdateListener
 {
   public static final String PROP_CONFIRM_NMI       = "confirm.nmi";
   public static final String PROP_CONFIRM_RESET     = "confirm.reset";
@@ -1481,7 +1482,7 @@ public class ScreenFrm
 	}
 	else if( actionCmd.equals( ACTION_WEB_LOAD ) ) {
 	  rv = true;
-      WebAccessFrm webload=new WebAccessFrm(this,this);
+      WebAccessFrm webload=new WebAccessFrm(this,this,this.getEmuThread());
 	  webload.download();
 	} 
     else if( actionCmd.equals( ACTION_FILE_LOAD ) ) {
