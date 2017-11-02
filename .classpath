@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="jkcemu_097az.jar"/>
+	<classpathentry kind="lib" path="src/jsoup-1.10.3.jar"/>
 	<classpathentry kind="output" path="src"/>
 </classpath>

@@ -186,7 +186,6 @@ public class WebAccessFrm extends JDialog {
         JLabel btnCut = new JLabel();
         Image img=Main.getImage( this, "/images/extra/magnifying-glass.png");
         Image newimg = img.getScaledInstance(24, 24,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
-        System.out.println(img.toString());
         ImageIcon iconLogo = new ImageIcon(newimg);
         btnCut.setIcon(iconLogo);
         btnCut.setBorder(BorderFactory.createEmptyBorder(0,0,0,4));
