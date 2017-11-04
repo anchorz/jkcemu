@@ -8,7 +8,6 @@
 
 package jkcemu.emusys;
 
-import java.lang.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
@@ -70,6 +69,7 @@ public class Z1013 extends EmuSys implements
   public static final String PROP_ROMBASIC_PREFIX  = "rom_basic.";
   public static final String PROP_ROMMEGA_PREFIX   = "rom_mega.";
   public static final String PROP_USERPORT         = "userport";
+
   public static final String VALUE_MON_202         = "2.02";
   public static final String VALUE_MON_A2          = "A.2";
   public static final String VALUE_MON_RB_K7659    = "RB_K7659";
@@ -82,6 +82,7 @@ public class Z1013 extends EmuSys implements
   public static final String VALUE_JOY_JUTE0687  = "joystick:jute0687";
   public static final String VALUE_JOY_PRAC0487  = "joystick:practic0487";
   public static final String VALUE_JOY_PRAC0188  = "joystick:practic0188";
+
 
   public static final String PROP_ROMBASIC_ENABLED = PROP_ROMBASIC_PREFIX
 								+ "enabled";
@@ -167,9 +168,6 @@ public class Z1013 extends EmuSys implements
 			CENTR7_PRACTIC_2_1989,
 			CENTR8_FA_10_1990 };
 
-  private static int ramBank=0;
-  private static boolean rom8000=false;
-  private static int rom8000Bank=0;
   private static byte[] rom8000Image   = null; //Inhalt des EPROMs
   private static byte[][] ram128         = {new byte[0x10000],new byte[0x10000]};
   private static byte[] mon202         = null;
@@ -189,7 +187,7 @@ public class Z1013 extends EmuSys implements
   private RTC7242X            rtc;
   private GraphicCCJ          graphCCJ;
   private Z1013Keyboard       keyboard;
-  private AbstractKeyboardFld keyboardFld;
+  private AbstractKeyboardFld<Z1013> keyboardFld;
   private KCNet               kcNet;
   private VDIP                vdip;
   private RAMFloppy           ramFloppy1;
@@ -229,11 +227,13 @@ public class Z1013 extends EmuSys implements
   private volatile int        joy0ActionMask;
   private volatile int        joy1ActionMask;
   private volatile boolean    catchJoyCalls;
-
+  private jkcemu.emusys.z1013.v128.Settings v128Settings;
 
   public Z1013( EmuThread emuThread, Properties props )
   {
     super( emuThread, props, PROP_PREFIX );
+    v128Settings=new jkcemu.emusys.z1013.v128.Settings(PROP_PREFIX,"128");
+    v128Settings.updFields(props);
     this.stdFontBytes      = null;
     this.altFontBytes      = null;
     this.osBytes           = null;
@@ -515,22 +515,21 @@ public class Z1013 extends EmuSys implements
     byte[] rom = this.osBytes;
     if( rom != null ) {
       if( rom.length > 0 ) {
-	buf.append( String.format(
+	    buf.append( String.format(
 			" (F000h-F%03Xh):",
 			Math.min( rom.length, 0x1000 ) - 1 ) );
-	if (sysName.equals(SYSNAME_Z1013_128)) {
-            buf.append( "<br>BWS (EC00h-EFFFh)" );
-        } 
+	        if (sysName.equals(SYSNAME_Z1013_128)) {
+              buf.append( "<br>BWS (EC00h-EFFFh)" );
+            } 
       }
     }
     buf.append( "</td><td>" );
-    EmuUtil.appendOnOffText( buf, !this.romDisabled );
+    if (sysName.equals(SYSNAME_Z1013_128)) {
+        EmuUtil.appendOnOffText( buf, !this.v128Settings.bwsDisabled );
+    } else {
+        EmuUtil.appendOnOffText( buf, !this.romDisabled );
+    }
     buf.append( "</td></tr>\n" );
-    //if (sysName.equals(SYSNAME_Z1013_128)) {
-    //    buf.append( "<tr><td>128 id:</td><td>value</td></tr>\n" );
-    //} else {
-    //    buf.append( "<tr><td>otherid:</td><td>value</td></tr>\n" );
-    //}
     
     if( this.romMega != null ) {
       buf.append( "<tr><td>Mega-ROM (C000h-E7FFh):</td><td>Bank " );
@@ -540,21 +539,21 @@ public class Z1013 extends EmuSys implements
     if (sysName.equals(SYSNAME_Z1013_128))
     {
       buf.append( "<tr><td>Ram Bank:</td><td>" );
-      buf.append( ramBank );
+      buf.append( this.v128Settings.ramBank );
       buf.append( "</td></tr>\n" );
       
       buf.append( "<tr><td>ROM Bank:</td><td>" );
-      buf.append( String.format("%02Xh",rom8000Bank));
+      buf.append( String.format("%02Xh",this.v128Settings.epromBank));
       buf.append( "</td></tr>\n" );
 
       buf.append( "<tr><td>ROM (8000h-");
-      if (this.romDisabled) {
+      if (this.v128Settings.bwsDisabled) {
           buf.append( "FFFFh");
       } else {
           buf.append( "EBFFh");
       }    
       buf.append( "):</td><td>" );
-      buf.append( rom8000? "ein":" aus" );
+      buf.append( this.v128Settings.epromActive ? "ein":" aus" );
       buf.append( "</td></tr>\n" );
     }
         if( this.ramPixel != null ) {
@@ -612,6 +611,7 @@ public class Z1013 extends EmuSys implements
     if( this.vdip != null ) {
       this.vdip.applySettings( props );
     }
+    v128Settings.updFields( props );
   }
 
 
@@ -721,10 +721,10 @@ public class Z1013 extends EmuSys implements
 
 
   @Override
-  public AbstractKeyboardFld createKeyboardFld()
+  public AbstractKeyboardFld<Z1013> createKeyboardFld()
 					throws UnsupportedOperationException
   {
-    AbstractKeyboardFld kbFld    = null;
+    AbstractKeyboardFld<Z1013> kbFld    = null;
     KeyboardMatrix      kbMatrix = this.keyboard.getKeyboardMatrix();
     if( kbMatrix != null ) {
       if( kbMatrix instanceof KeyboardMatrix8x4 ) {
@@ -946,7 +946,7 @@ public class Z1013 extends EmuSys implements
 	}
       }
     }
-    else if( (addr >= 0xEC00) && (addr < (0xEC00 + this.ramVideo.length)) ) {
+    else if( (!v128Settings.bwsDisabled) && (addr >= 0xEC00) && (addr < (0xEC00 + this.ramVideo.length)) ) {
       byte[] ram = null;
       if( (this.ramPixel != null) && this.modeGraph ) {
 	if( (this.ramPixelBank >= 0)
@@ -965,7 +965,7 @@ public class Z1013 extends EmuSys implements
       }
       done = true;
     }
-    else if( (addr >= 0xF000) && !this.romDisabled ) {
+    else if( (addr >= 0xF000) && !this.romDisabled && !this.v128Settings.bwsDisabled)  {
       byte[] rom = this.osBytes;
       if( rom != null ) {
 	int idx = addr - 0xF000;
@@ -981,29 +981,22 @@ public class Z1013 extends EmuSys implements
 	done = true;
       }
     }
-    if (rom8000 && addr>=0x8000) {
+    if (this.v128Settings.epromActive && addr>=0x8000) {
         int endAddr=0xebff;
         //System.out.printf("read %04x romdisabled=%s\n",addr,romDisabled);
-        if (this.romDisabled) {
-            endAddr=0xffff;  
+        if (this.v128Settings.bwsDisabled) {
+            endAddr=0xffff; 
         }
         if (addr<=endAddr) {
-            rv= this.rom8000Image[ (addr-0x8000) | rom8000Bank<<13 ] & 0xFF;
-            done = true;    
-            //System.out.printf("rom8000Image[%x]\n",(addr-0x8000) | rom8000Bank<<13);    
+            rv= this.rom8000Image[ (addr-0x8000) | this.v128Settings.epromBank<<13 ] & 0xFF;
+            done = true;
         }
     }
     
     if( !done && (addr <= this.ramEndAddr) ) {
-        if (addr<0xec00)
+        if (this.v128Settings.jp6_64k_enable.value)
         {
-          if (rom8000 && addr>=0x8000)
-          {
-            rv= this.rom8000Image[ (addr-0x8000) & 0xFFFF ] & 0xFF;
-          } else
-          {
-            rv = this.ram128[ramBank][ addr & 0xFFFF ] & 0xFF;
-          }
+            rv = this.ram128[this.v128Settings.ramBank][ addr & 0xFFFF ] & 0xFF;
         } else
         {
             rv=this.emuThread.getRAMByte(addr);
@@ -1138,6 +1131,8 @@ public class Z1013 extends EmuSys implements
 	case JOY_PRACTIC_1_1988:
 	  rv = 2;
 	  break;
+    default:
+        break;
       }
     }
     return rv;
@@ -1505,13 +1500,7 @@ public class Z1013 extends EmuSys implements
     this.romDisabled       = false;
     this.altFontEnabled    = false;
     this.modeGraph         = false;
-    this.ramBank           = 0;
-    this.rom8000Bank       = 0;
-    this.rom8000           = false;
-    if (sysName.equals(SYSNAME_Z1013_128))
-    {
-        this.rom8000=true;//AZ
-    }
+
     if( this.mode64x16 || this.graphCCJActive ) {
       this.graphCCJActive = false;
       this.mode64x16      = false;
@@ -1561,6 +1550,7 @@ public class Z1013 extends EmuSys implements
     if( this.userPort == UserPort.CENTR7_PRACTIC_2_1989 ) {
       this.pio.putInValuePortA( 0, 0x80 );
     }
+    v128Settings.reset();
   }
 
 
@@ -1667,6 +1657,8 @@ public class Z1013 extends EmuSys implements
       case JOY_PRACTIC_1_1988:
 	putJoyPractic0188ValuesToPort();
 	break;
+    default:
+        break;
     }
   }
 
@@ -1735,12 +1727,12 @@ public class Z1013 extends EmuSys implements
         addr &= 0xFFFF;
         if (addr<0xec00)
         {
-            if (rom8000 && addr>=0x8000)
+            if (this.v128Settings.epromActive && addr>=0x8000)
             {
                rv=false;
             } else
             {
-              this.ram128[ramBank][ addr ] = (byte) value;
+              this.ram128[this.v128Settings.ramBank][ addr ] = (byte) value;
               rv = true;
             }
         } else
@@ -1877,21 +1869,21 @@ public class Z1013 extends EmuSys implements
     if( (port&0xfc) == 4 ) {
       if (sysName.equals(SYSNAME_Z1013_128))
       {
-         if ((value&0x40)>0) 
-         {
-            ramBank=1;
-         }  else
-         {
-            ramBank=0;
-         }
-         if ((value&0x20)>0) 
-         {
-            rom8000=false;
-         }  else
-         {
-            rom8000=true;
-         }
-         this.romDisabled    = ((value & 0x10) != 0);
+          v128Settings.port4=value&0xf0;
+          int ramBank=0;
+          if (v128Settings.jp6_64k_enable.value){
+              if (((value&0x40)>0) ^ v128Settings.jp19_64k_resetHigh.value) {
+                  ramBank=1;
+              }
+          } 
+          v128Settings.ramBank=ramBank;
+          
+          boolean epromActive=false;
+          if (!v128Settings.jp11_eprom_inactive.value){
+              epromActive= ((value&0x20)>0) ^ v128Settings.jp8_eprom_resetActive.value ;
+          }
+          v128Settings.epromActive=epromActive;          
+          v128Settings.bwsDisabled = ((value & 0x10) ==0) ^ v128Settings.jp9_bws_resetActive.value ;
       } else
       {
         boolean oldAltFontEnabled = this.altFontEnabled;
@@ -2076,7 +2068,7 @@ public class Z1013 extends EmuSys implements
 	  }
 	  break;
 	case 0x14:				// IOSEL5
-	  rom8000Bank=value;
+	    this.v128Settings.epromBank=value;
 	  break;      
         }
     }
@@ -2153,6 +2145,8 @@ public class Z1013 extends EmuSys implements
 	  case CENTR8_FA_10_1990:
 	    this.pio.strobePortA();
 	    break;
+    default:
+        break;
 	}
       }
     }
