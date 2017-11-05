@@ -985,7 +985,7 @@ public class Z1013 extends EmuSys implements
             endAddr=0xffff; 
         }
         if (addr<=endAddr) {
-            rv= this.v128Settings.eprom[ (addr-0x8000) | this.v128Settings.epromBank<<13 ] & 0xFF;
+            rv= this.v128Settings.eprom[ (addr-0x8000) | this.v128Settings.epromBank<<15 ] & 0xFF;
             done = true;
         }
     }
@@ -1874,12 +1874,12 @@ public class Z1013 extends EmuSys implements
               ramBank=((value&0x40)>0) ^ v128Settings.jp19_64k_resetHigh.value;
           } 
           v128Settings.ramHigh=ramBank;
-          
+
           boolean epromActive=false;
           if (!v128Settings.jp11_eprom_inactive.value){
               epromActive= ((value&0x20)>0) ^ v128Settings.jp8_eprom_resetActive.value ;
           }
-          v128Settings.epromActive=epromActive;          
+          v128Settings.epromActive=epromActive;
           v128Settings.bwsDisabled = ((value & 0x10) ==0) ^ v128Settings.jp9_bws_resetActive.value ;
       } else
       {
@@ -2065,7 +2065,7 @@ public class Z1013 extends EmuSys implements
 	  }
 	  break;
 	case 0x14:				// IOSEL5
-	    this.v128Settings.epromBank=value;
+	    this.v128Settings.epromBank=value>>2;
 	  break;      
         }
     }
