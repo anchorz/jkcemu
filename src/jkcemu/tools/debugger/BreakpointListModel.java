@@ -8,7 +8,6 @@
 
 package jkcemu.tools.debugger;
 
-import java.lang.*;
 import java.util.ArrayList;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;

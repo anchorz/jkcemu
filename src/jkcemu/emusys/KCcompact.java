@@ -10,7 +10,6 @@ package jkcemu.emusys;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -657,7 +656,7 @@ public class KCcompact extends EmuSys implements
 
 
   @Override
-  public AbstractKeyboardFld createKeyboardFld()
+  public AbstractKeyboardFld<KCcompact> createKeyboardFld()
   {
     this.keyboardFld = new KCcompactKeyboardFld( this );
     return this.keyboardFld;

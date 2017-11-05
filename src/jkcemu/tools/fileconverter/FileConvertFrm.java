@@ -23,7 +23,6 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import java.util.Collections;
 import java.util.EventObject;
 import java.util.Vector;

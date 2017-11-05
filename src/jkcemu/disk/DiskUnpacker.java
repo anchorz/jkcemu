@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.*;
 import java.util.ArrayList;
 import jkcemu.base.AbstractThreadDlg;
 import jkcemu.base.BaseDlg;

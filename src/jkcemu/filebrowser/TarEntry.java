@@ -10,7 +10,6 @@ package jkcemu.filebrowser;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.*;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
 import java.util.Set;

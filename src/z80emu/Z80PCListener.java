@@ -9,7 +9,6 @@
 
 package z80emu;
 
-import java.lang.*;
 
 
 public interface Z80PCListener

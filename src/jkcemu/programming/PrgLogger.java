@@ -8,7 +8,6 @@
 
 package jkcemu.programming;
 
-import java.lang.*;
 import jkcemu.base.EmuUtil;
 
 

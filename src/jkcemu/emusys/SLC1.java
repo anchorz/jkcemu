@@ -12,7 +12,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Properties;
 import jkcemu.base.AbstractKeyboardFld;
@@ -127,7 +126,7 @@ public class SLC1 extends EmuSys implements Z80PCListener
 
 
   @Override
-  public AbstractKeyboardFld createKeyboardFld()
+  public AbstractKeyboardFld<SLC1> createKeyboardFld()
   {
     this.keyboardFld = new SLC1KeyboardFld( this );
     return this.keyboardFld;

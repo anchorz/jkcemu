@@ -8,7 +8,6 @@
 
 package jkcemu.base;
 
-import java.lang.*;
 
 
 public interface FileTimesView

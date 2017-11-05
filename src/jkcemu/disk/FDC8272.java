@@ -9,7 +9,6 @@
 
 package jkcemu.disk;
 
-import java.lang.*;
 import java.util.Arrays;
 import jkcemu.Main;
 import jkcemu.base.EmuThread;

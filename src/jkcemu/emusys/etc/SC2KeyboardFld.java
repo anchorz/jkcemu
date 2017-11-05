@@ -15,7 +15,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
-import java.lang.*;
 import java.util.Arrays;
 import jkcemu.base.EmuSys;
 import jkcemu.base.AbstractKeyboardFld;

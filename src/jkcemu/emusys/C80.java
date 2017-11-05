@@ -11,7 +11,6 @@ package jkcemu.emusys;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Properties;
 import jkcemu.base.AbstractKeyboardFld;
@@ -116,7 +115,7 @@ public class C80 extends EmuSys
 
 
   @Override
-  public AbstractKeyboardFld createKeyboardFld()
+  public AbstractKeyboardFld<C80> createKeyboardFld()
   {
     this.keyboardFld = new C80KeyboardFld( this );
     return this.keyboardFld;

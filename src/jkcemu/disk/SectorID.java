@@ -8,7 +8,6 @@
 
 package jkcemu.disk;
 
-import java.lang.*;
 
 
 public class SectorID

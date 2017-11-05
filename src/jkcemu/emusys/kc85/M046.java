@@ -9,7 +9,6 @@
 package jkcemu.emusys.kc85;
 
 import java.awt.Component;
-import java.lang.*;
 
 
 public class M046 extends AbstractKC85UserPROMModule

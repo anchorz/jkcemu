@@ -10,7 +10,6 @@ package jkcemu.base;
 
 import java.awt.Component;
 import java.io.File;
-import java.lang.*;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;

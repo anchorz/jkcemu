@@ -18,8 +18,6 @@
 package jkcemu.emusys.z1013;
 
 import java.io.IOException;
-import java.lang.*;
-import java.util.NoSuchElementException;
 import jkcemu.audio.BitSampleBuffer;
 import jkcemu.base.ByteIterator;
 

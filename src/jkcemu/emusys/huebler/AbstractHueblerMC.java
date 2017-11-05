@@ -10,7 +10,6 @@ package jkcemu.emusys.huebler;
 
 import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Properties;

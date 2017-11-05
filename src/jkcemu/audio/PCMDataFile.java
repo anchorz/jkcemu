@@ -12,7 +12,6 @@ package jkcemu.audio;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.lang.*;
 
 
 public class PCMDataFile extends AbstractPCMDataReader

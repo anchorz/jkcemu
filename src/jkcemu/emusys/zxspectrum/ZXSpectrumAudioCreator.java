@@ -9,7 +9,6 @@
 package jkcemu.emusys.zxspectrum;
 
 import java.io.IOException;
-import java.lang.*;
 import java.util.NoSuchElementException;
 import jkcemu.audio.BitSampleBuffer;
 import jkcemu.base.ByteIterator;

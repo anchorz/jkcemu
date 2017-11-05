@@ -8,7 +8,6 @@
 
 package jkcemu.emusys.kc85;
 
-import java.lang.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.CRC32;

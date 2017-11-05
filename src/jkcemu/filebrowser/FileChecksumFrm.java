@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.EventObject;

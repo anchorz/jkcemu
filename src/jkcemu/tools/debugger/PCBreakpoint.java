@@ -8,7 +8,6 @@
 
 package jkcemu.tools.debugger;
 
-import java.lang.*;
 import z80emu.Z80CPU;
 import z80emu.Z80InterruptSource;
 

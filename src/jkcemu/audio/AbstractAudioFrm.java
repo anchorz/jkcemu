@@ -8,7 +8,6 @@
 
 package jkcemu.audio;
 
-import java.lang.*;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Mixer;
 import javax.swing.JComboBox;

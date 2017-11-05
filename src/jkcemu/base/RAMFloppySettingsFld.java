@@ -15,7 +15,6 @@ import java.awt.Insets;
 import java.awt.dnd.DropTargetContext;
 import java.awt.dnd.DropTargetDragEvent;
 import java.io.File;
-import java.lang.*;
 import java.util.EventObject;
 import java.util.Properties;
 import javax.swing.JButton;

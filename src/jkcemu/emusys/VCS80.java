@@ -11,7 +11,6 @@ package jkcemu.emusys;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Properties;
 import jkcemu.base.AbstractKeyboardFld;
@@ -120,7 +119,7 @@ public class VCS80 extends EmuSys implements Z80AddressListener
 
 
   @Override
-  public AbstractKeyboardFld createKeyboardFld()
+  public AbstractKeyboardFld<VCS80> createKeyboardFld()
   {
     this.keyboardFld = new VCS80KeyboardFld( this );
     return this.keyboardFld;

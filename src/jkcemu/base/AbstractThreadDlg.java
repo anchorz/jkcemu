@@ -17,7 +17,6 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import java.util.EventObject;
 import javax.swing.JButton;
 import javax.swing.JProgressBar;

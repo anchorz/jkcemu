@@ -8,7 +8,6 @@
 
 package jkcemu.tools;
 
-import java.lang.*;
 
 
 public interface Label extends Comparable<Label>

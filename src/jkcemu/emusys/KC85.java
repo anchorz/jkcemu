@@ -12,7 +12,6 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -970,7 +969,7 @@ public class KC85 extends EmuSys implements Z80CTCListener
 
 
   @Override
-  public AbstractKeyboardFld createKeyboardFld() throws UserCancelException
+  public AbstractKeyboardFld<KC85> createKeyboardFld() throws UserCancelException
   {
     if( this.kcTypeNum >= 4 ) {
       switch( BaseDlg.showOptionDlg(

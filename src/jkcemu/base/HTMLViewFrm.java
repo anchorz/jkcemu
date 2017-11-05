@@ -17,7 +17,6 @@ import java.awt.event.KeyEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
-import java.lang.*;
 import java.util.EventObject;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

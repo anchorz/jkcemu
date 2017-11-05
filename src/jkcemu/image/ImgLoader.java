@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.*;
 import java.util.Arrays;
 import javax.imageio.ImageIO;
 import jkcemu.base.EmuUtil;

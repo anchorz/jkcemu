@@ -16,7 +16,6 @@ import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.ByteArrayOutputStream;
-import java.lang.*;
 import java.text.ParseException;
 import java.util.EventObject;
 import javax.swing.ButtonGroup;

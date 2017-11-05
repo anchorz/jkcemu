@@ -11,7 +11,6 @@ package jkcemu.disk;
 import java.awt.Frame;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.*;
 import java.util.zip.GZIPInputStream;
 import jkcemu.base.EmuUtil;
 

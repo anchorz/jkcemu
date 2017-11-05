@@ -12,7 +12,6 @@
 
 package jkcemu.audio;
 
-import java.lang.*;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 import jkcemu.Main;

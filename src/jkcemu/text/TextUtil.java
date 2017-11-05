@@ -9,7 +9,6 @@
 package jkcemu.text;
 
 import java.awt.Component;
-import java.lang.*;
 import jkcemu.base.BaseDlg;
 
 

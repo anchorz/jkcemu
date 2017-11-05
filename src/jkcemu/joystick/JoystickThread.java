@@ -8,7 +8,6 @@
 
 package jkcemu.joystick;
 
-import java.lang.*;
 import jkcemu.Main;
 import jkcemu.base.DeviceIO;
 import jkcemu.base.EmuThread;

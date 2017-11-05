@@ -8,7 +8,6 @@
 
 package jkcemu.programming.basic;
 
-import java.lang.*;
 import java.text.CharacterIterator;
 import jkcemu.programming.PrgSource;
 import jkcemu.programming.PrgUtil;

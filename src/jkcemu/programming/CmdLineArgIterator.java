@@ -11,7 +11,6 @@ package jkcemu.programming;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
-import java.lang.*;
 
 
 public class CmdLineArgIterator implements Closeable

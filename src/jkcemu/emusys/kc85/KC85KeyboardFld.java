@@ -14,7 +14,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.lang.*;
 import jkcemu.base.EmuSys;
 import jkcemu.emusys.KC85;
 

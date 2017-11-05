@@ -23,7 +23,6 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import javax.swing.ButtonGroup;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;

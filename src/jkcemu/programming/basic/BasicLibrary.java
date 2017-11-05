@@ -8,7 +8,6 @@
 
 package jkcemu.programming.basic;
 
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;

@@ -11,7 +11,6 @@ package jkcemu.disk;
 import java.awt.EventQueue;
 import java.awt.Frame;
 import java.io.IOException;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Properties;
 import jkcemu.base.BaseDlg;

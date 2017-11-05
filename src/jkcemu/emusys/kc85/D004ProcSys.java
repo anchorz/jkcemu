@@ -9,7 +9,6 @@
 package jkcemu.emusys.kc85;
 
 import java.awt.EventQueue;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Properties;
 import jkcemu.base.EmuUtil;

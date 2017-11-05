@@ -9,7 +9,6 @@
 package jkcemu.emusys.etc;
 
 import java.awt.*;
-import java.lang.*;
 import java.util.Arrays;
 import jkcemu.Main;
 import jkcemu.base.*;

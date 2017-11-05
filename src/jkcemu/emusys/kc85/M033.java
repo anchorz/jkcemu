@@ -8,7 +8,6 @@
 
 package jkcemu.emusys.kc85;
 
-import java.lang.*;
 import jkcemu.base.EmuThread;
 import jkcemu.base.EmuUtil;
 

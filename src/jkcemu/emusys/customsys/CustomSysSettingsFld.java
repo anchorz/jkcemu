@@ -18,7 +18,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.lang.*;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.EventObject;

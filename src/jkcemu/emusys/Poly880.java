@@ -11,7 +11,6 @@ package jkcemu.emusys;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Properties;
 import jkcemu.base.AbstractKeyboardFld;
@@ -207,7 +206,7 @@ public class Poly880 extends EmuSys implements Z80CTCListener
 
 
   @Override
-  public AbstractKeyboardFld createKeyboardFld()
+  public AbstractKeyboardFld<Poly880> createKeyboardFld()
   {
     this.keyboardFld = new Poly880KeyboardFld( this );
     return this.keyboardFld;

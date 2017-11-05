@@ -11,7 +11,6 @@
 
 package z80emu;
 
-import java.lang.*;
 
 
 public class Z80ExternalException extends Exception

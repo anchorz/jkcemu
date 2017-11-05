@@ -20,7 +20,6 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.Window;
 import java.io.File;
-import java.lang.*;
 import java.util.EventObject;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;

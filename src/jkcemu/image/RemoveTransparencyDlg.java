@@ -16,7 +16,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
-import java.lang.*;
 import java.util.EventObject;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;

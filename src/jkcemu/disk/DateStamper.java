@@ -9,7 +9,6 @@
 package jkcemu.disk;
 
 import java.io.File;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Calendar;
 import jkcemu.base.FileTimesView;

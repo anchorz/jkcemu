@@ -9,8 +9,8 @@
 
 package jkcemu.emusys.z1013;
 
-import java.lang.*;
 import jkcemu.base.AbstractKeyboardFld;
+import jkcemu.base.EmuSys;
 
 
 public abstract class KeyboardMatrix
@@ -91,7 +91,7 @@ public abstract class KeyboardMatrix
   }
 
 
-  public void updKeyboardFld( AbstractKeyboardFld keyboardFld )
+  public void updKeyboardFld( AbstractKeyboardFld<? extends EmuSys> keyboardFld )
   {
     // leer
   }

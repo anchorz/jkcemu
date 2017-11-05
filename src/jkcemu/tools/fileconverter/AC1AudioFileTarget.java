@@ -10,7 +10,6 @@ package jkcemu.tools.fileconverter;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import jkcemu.audio.AudioFile;
 import jkcemu.audio.PCMDataSource;
 import jkcemu.base.UserInputException;

@@ -9,7 +9,6 @@
 package jkcemu.emusys.ac1_llc2;
 
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Properties;

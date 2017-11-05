@@ -10,7 +10,6 @@ package jkcemu.etc;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.lang.*;
 
 
 public class ByteQueue

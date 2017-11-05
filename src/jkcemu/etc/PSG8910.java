@@ -16,7 +16,6 @@
 
 package jkcemu.etc;
 
-import java.lang.*;
 import java.util.Random;
 import jkcemu.Main;
 

@@ -8,7 +8,6 @@
 
 package jkcemu.disk;
 
-import java.lang.*;
 import jkcemu.base.EmuUtil;
 import jkcemu.text.TextUtil;
 

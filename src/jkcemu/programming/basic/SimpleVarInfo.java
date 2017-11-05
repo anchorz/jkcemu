@@ -9,7 +9,6 @@
 
 package jkcemu.programming.basic;
 
-import java.lang.*;
 import jkcemu.programming.PrgException;
 
 

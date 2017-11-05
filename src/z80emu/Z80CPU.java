@@ -11,7 +11,6 @@
 
 package z80emu;
 
-import java.lang.*;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;

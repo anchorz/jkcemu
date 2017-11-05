@@ -9,7 +9,6 @@
 package jkcemu.filebrowser;
 
 import java.awt.Component;
-import java.lang.*;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import javax.swing.JLabel;

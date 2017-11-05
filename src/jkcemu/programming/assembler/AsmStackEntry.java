@@ -8,7 +8,6 @@
 
 package jkcemu.programming.assembler;
 
-import java.lang.*;
 import jkcemu.programming.PrgException;
 
 

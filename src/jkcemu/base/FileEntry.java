@@ -9,7 +9,6 @@
 package jkcemu.base;
 
 import java.io.File;
-import java.lang.*;
 
 
 public class FileEntry

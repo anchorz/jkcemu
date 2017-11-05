@@ -11,7 +11,6 @@ package jkcemu.audio;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import jkcemu.base.EmuUtil;
 import jkcemu.base.FileInfo;
 import jkcemu.emusys.kc85.KCAudioCreator;

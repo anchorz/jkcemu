@@ -16,7 +16,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
-import java.lang.*;
 import java.util.EventObject;
 import java.util.Hashtable;
 import javax.swing.JButton;

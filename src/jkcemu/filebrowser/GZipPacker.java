@@ -16,7 +16,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
-import java.lang.*;
 import java.util.zip.GZIPOutputStream;
 import javax.swing.ProgressMonitor;
 import javax.swing.ProgressMonitorInputStream;

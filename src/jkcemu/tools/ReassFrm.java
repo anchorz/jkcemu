@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
-import java.lang.*;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.HashMap;

@@ -11,7 +11,6 @@ package jkcemu.base;
 import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
-import java.lang.*;
 import java.util.EventObject;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -27,7 +26,7 @@ public class KeyboardFrm extends BaseFrm
   private static final String HELP_PAGE = "/help/keyboard.htm";
 
   private ScreenFrm           screenFrm;
-  private AbstractKeyboardFld keyboardFld;
+  private AbstractKeyboardFld<? extends EmuSys> keyboardFld;
   private JMenuItem           mnuClose;
   private JCheckBoxMenuItem   mnuHoldShiftBtn;
   private JSeparator          mnuHoldShiftSep;
@@ -37,7 +36,7 @@ public class KeyboardFrm extends BaseFrm
   public KeyboardFrm(
 		ScreenFrm           screenFrm,
 		EmuSys              emuSys,
-		AbstractKeyboardFld keyboardFld )
+		AbstractKeyboardFld<? extends EmuSys> keyboardFld )
   {
     this.screenFrm   = screenFrm;
     this.keyboardFld = keyboardFld;

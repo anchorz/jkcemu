@@ -17,7 +17,6 @@ import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
 import java.io.File;
-import java.lang.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.EventObject;

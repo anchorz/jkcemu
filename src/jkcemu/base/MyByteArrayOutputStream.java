@@ -15,7 +15,6 @@ package jkcemu.base;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.lang.*;
 
 
 public class MyByteArrayOutputStream extends ByteArrayOutputStream

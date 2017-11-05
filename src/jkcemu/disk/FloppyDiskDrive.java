@@ -8,7 +8,6 @@
 
 package jkcemu.disk;
 
-import java.lang.*;
 import java.util.Properties;
 
 

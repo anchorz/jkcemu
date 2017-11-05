@@ -11,7 +11,6 @@ package jkcemu.tools.debugger;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.Window;
-import java.lang.*;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;

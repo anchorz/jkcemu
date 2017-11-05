@@ -25,7 +25,6 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EventObject;

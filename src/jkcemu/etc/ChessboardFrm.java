@@ -13,7 +13,6 @@ import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.util.EventObject;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;

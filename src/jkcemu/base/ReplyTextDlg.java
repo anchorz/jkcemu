@@ -10,7 +10,6 @@ package jkcemu.base;
 
 import java.awt.Component;
 import java.awt.Window;
-import java.lang.*;
 
 
 public class ReplyTextDlg extends AbstractReplyDlg

@@ -10,7 +10,6 @@ package jkcemu.filebrowser;
 
 import java.awt.Component;
 import java.io.File;
-import java.lang.*;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;

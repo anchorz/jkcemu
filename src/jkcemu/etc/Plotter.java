@@ -12,7 +12,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
-import java.lang.*;
 import java.util.Properties;
 import jkcemu.base.EmuUtil;
 import jkcemu.base.UserInputException;

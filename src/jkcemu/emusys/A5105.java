@@ -18,7 +18,6 @@ package jkcemu.emusys;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
@@ -548,7 +547,7 @@ private static int lastAA = -1;
 
 
   @Override
-  public AbstractKeyboardFld createKeyboardFld()
+  public AbstractKeyboardFld<A5105> createKeyboardFld()
   {
     this.keyboardFld = new A5105KeyboardFld( this );
     return this.keyboardFld;

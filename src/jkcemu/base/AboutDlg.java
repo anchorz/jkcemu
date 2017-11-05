@@ -16,7 +16,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.io.IOException;
-import java.lang.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;

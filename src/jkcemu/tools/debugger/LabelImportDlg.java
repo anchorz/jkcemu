@@ -10,7 +10,6 @@ package jkcemu.tools.debugger;
 
 import java.awt.*;
 import java.io.File;
-import java.lang.*;
 import java.util.EventObject;
 import javax.swing.*;
 import jkcemu.Main;

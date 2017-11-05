@@ -9,7 +9,6 @@
 package jkcemu.emusys;
 
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Properties;
 import jkcemu.base.AbstractKeyboardFld;
@@ -590,7 +589,7 @@ public class BCS3 extends EmuSys implements Z80CTCListener
 
 
   @Override
-  public AbstractKeyboardFld createKeyboardFld()
+  public AbstractKeyboardFld<BCS3> createKeyboardFld()
   {
     this.keyboardFld = new BCS3KeyboardFld( this );
     return this.keyboardFld;

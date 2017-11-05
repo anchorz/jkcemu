@@ -13,7 +13,6 @@
 
 package jkcemu.base;
 
-import java.lang.*;
 import java.io.File;
 import jkcemu.base.FileTreeNode;
 

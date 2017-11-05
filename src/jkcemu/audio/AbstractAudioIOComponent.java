@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.*;
 import javax.sound.sampled.Mixer;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;

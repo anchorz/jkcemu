@@ -19,7 +19,6 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.ImageObserver;
 import java.awt.image.IndexColorModel;
 import java.awt.image.Raster;
-import java.lang.*;
 import java.util.Arrays;
 
 

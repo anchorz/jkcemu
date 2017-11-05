@@ -11,7 +11,6 @@ package jkcemu.filebrowser;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;

@@ -8,7 +8,6 @@
 
 package jkcemu.programming.basic;
 
-import java.lang.*;
 import java.util.HashMap;
 import java.util.Map;
 import jkcemu.base.EmuSys;

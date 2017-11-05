@@ -8,7 +8,6 @@
 
 package jkcemu.programming;
 
-import java.lang.*;
 
 
 public class PrgException extends Exception

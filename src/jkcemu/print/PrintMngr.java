@@ -8,7 +8,6 @@
 
 package jkcemu.print;
 
-import java.lang.*;
 import java.util.ArrayList;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;

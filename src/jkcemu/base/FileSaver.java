@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.*;
 import java.util.Arrays;
 import jkcemu.Main;
 import jkcemu.emusys.Z1013;

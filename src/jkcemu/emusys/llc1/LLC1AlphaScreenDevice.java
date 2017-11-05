@@ -10,7 +10,6 @@ package jkcemu.emusys.llc1;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.lang.*;
 import java.util.Properties;
 import jkcemu.Main;
 import jkcemu.base.AbstractScreenDevice;

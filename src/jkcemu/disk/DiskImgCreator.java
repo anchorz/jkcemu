@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Calendar;
 import jkcemu.base.EmuUtil;

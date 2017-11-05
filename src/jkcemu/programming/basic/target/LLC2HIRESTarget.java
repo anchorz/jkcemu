@@ -13,7 +13,6 @@
 
 package jkcemu.programming.basic.target;
 
-import java.lang.*;
 import java.util.Set;
 import jkcemu.base.EmuSys;
 import jkcemu.emusys.LLC2;

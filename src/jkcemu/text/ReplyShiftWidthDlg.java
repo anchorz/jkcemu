@@ -10,7 +10,6 @@ package jkcemu.text;
 
 import java.awt.*;
 import java.awt.event.WindowEvent;
-import java.lang.*;
 import java.util.EventObject;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;

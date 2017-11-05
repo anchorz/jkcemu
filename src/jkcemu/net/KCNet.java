@@ -8,7 +8,6 @@
 
 package jkcemu.net;
 
-import java.lang.*;
 import java.util.Arrays;
 import jkcemu.Main;
 import z80emu.Z80CPU;

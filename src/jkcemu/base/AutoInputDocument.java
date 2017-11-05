@@ -8,7 +8,6 @@
 
 package jkcemu.base;
 
-import java.lang.*;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.text.AttributeSet;

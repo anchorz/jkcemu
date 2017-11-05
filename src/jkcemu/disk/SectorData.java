@@ -11,7 +11,6 @@ package jkcemu.disk;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.lang.*;
 import java.util.Arrays;
 
 

@@ -8,7 +8,6 @@
 
 package jkcemu.programming.assembler;
 
-import java.lang.*;
 
 
 public class AsmLabel implements jkcemu.tools.Label

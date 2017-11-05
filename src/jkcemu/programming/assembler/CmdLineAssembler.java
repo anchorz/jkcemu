@@ -11,7 +11,6 @@ package jkcemu.programming.assembler;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.*;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.AbstractMap;

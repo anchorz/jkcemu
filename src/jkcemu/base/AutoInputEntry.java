@@ -9,7 +9,6 @@
 package jkcemu.base;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.*;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Properties;

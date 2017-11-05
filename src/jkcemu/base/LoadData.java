@@ -10,7 +10,6 @@
 package jkcemu.base;
 
 import java.io.IOException;
-import java.lang.*;
 import jkcemu.base.EmuMemView;
 
 

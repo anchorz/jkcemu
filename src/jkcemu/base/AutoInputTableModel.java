@@ -8,7 +8,6 @@
 
 package jkcemu.base;
 
-import java.lang.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collection;

@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.*;
 import javax.swing.JComboBox;
 import jkcemu.base.EmuUtil;
 import jkcemu.base.FileInfo;

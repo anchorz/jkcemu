@@ -12,7 +12,6 @@ package jkcemu.base;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FocusTraversalPolicy;
-import java.lang.*;
 
 
 public class ListFocusTraversalPolicy extends FocusTraversalPolicy

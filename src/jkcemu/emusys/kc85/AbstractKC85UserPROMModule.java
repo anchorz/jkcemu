@@ -9,7 +9,6 @@
 package jkcemu.emusys.kc85;
 
 import java.awt.Component;
-import java.lang.*;
 import jkcemu.base.EmuUtil;
 
 

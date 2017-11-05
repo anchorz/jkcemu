@@ -10,7 +10,6 @@ package jkcemu.base;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import java.util.Properties;
 import jkcemu.Main;
 import jkcemu.audio.AudioUtil;

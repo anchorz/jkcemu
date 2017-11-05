@@ -18,7 +18,6 @@ import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.io.File;
-import java.lang.*;
 import java.util.EventObject;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;

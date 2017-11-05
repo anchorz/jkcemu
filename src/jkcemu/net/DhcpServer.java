@@ -12,7 +12,6 @@
 package jkcemu.net;
 
 import java.io.IOException;
-import java.lang.*;
 import java.net.DatagramPacket;
 
 

@@ -13,7 +13,6 @@ import java.io.File;
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.util.EventObject;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Mixer;

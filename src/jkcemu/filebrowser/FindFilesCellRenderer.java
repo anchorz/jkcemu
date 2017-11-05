@@ -11,7 +11,6 @@ package jkcemu.filebrowser;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.lang.*;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 

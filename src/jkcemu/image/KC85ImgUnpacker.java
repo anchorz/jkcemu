@@ -8,7 +8,6 @@
 
 package jkcemu.image;
 
-import java.lang.*;
 import java.util.Arrays;
 import jkcemu.base.EmuUtil;
 import z80emu.Z80CPU;

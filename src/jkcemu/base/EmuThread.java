@@ -12,7 +12,6 @@ import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Properties;
 import jkcemu.Main;

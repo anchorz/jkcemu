@@ -10,7 +10,6 @@ package jkcemu.programming.assembler;
 
 import java.awt.EventQueue;
 import java.io.IOException;
-import java.lang.*;
 import java.util.Collection;
 import jkcemu.Main;
 import jkcemu.base.EmuSys;

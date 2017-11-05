@@ -12,7 +12,6 @@ import java.awt.Transparency;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
-import java.lang.*;
 import java.util.Hashtable;
 import jkcemu.Main;
 import jkcemu.base.CancelableProgressDlg;

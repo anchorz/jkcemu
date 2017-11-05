@@ -13,7 +13,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.*;
 import java.util.ArrayList;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;

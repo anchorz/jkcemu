@@ -18,7 +18,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.lang.*;
 import java.util.EventObject;
 import javax.swing.JLabel;
 import javax.swing.JMenu;

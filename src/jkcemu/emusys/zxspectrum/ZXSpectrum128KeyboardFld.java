@@ -16,7 +16,6 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.event.MouseEvent;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;

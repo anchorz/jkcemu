@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.*;
 import jkcemu.base.EmuUtil;
 import jkcemu.base.UserInputException;
 

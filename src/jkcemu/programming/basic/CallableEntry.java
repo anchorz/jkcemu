@@ -8,7 +8,6 @@
 
 package jkcemu.programming.basic;
 
-import java.lang.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;

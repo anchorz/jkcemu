@@ -10,7 +10,6 @@ package jkcemu.base;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.lang.*;
 import java.util.Properties;
 
 

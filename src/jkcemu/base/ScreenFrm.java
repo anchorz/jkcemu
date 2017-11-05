@@ -36,7 +36,6 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -1958,7 +1957,7 @@ public class ScreenFrm
 	try {
 	  if( emuSys.supportsKeyboardFld() ) {
 	    try {
-	      AbstractKeyboardFld kbFld = emuSys.createKeyboardFld();
+	      AbstractKeyboardFld<? extends EmuSys> kbFld = emuSys.createKeyboardFld();
 	      if( kbFld != null ) {
 		this.keyboardFrm = new KeyboardFrm( this, emuSys, kbFld );
 	      }

@@ -13,7 +13,6 @@ package jkcemu.audio;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import javax.sound.sampled.AudioFormat;

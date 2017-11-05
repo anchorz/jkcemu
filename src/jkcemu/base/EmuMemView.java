@@ -8,7 +8,6 @@
 
 package jkcemu.base;
 
-import java.lang.*;
 import z80emu.Z80MemView;
 
 

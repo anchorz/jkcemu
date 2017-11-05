@@ -11,7 +11,6 @@ package jkcemu.audio;
 import java.io.Closeable;
 import java.io.IOException;
 
-import java.lang.*;
 
 
 public interface PCMDataSource extends AutoCloseable, Closeable, PCMDataInfo

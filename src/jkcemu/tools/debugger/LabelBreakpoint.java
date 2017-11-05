@@ -8,7 +8,6 @@
 
 package jkcemu.tools.debugger;
 
-import java.lang.*;
 
 
 public class LabelBreakpoint extends PCBreakpoint

@@ -21,7 +21,6 @@ import java.awt.Insets;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
-import java.lang.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.EventObject;
 import javax.swing.BorderFactory;

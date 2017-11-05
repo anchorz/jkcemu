@@ -12,7 +12,6 @@ package jkcemu.audio;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import java.util.Random;
 import java.util.zip.GZIPInputStream;
 import jkcemu.base.EmuUtil;

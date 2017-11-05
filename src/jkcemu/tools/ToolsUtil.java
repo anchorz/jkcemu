@@ -11,7 +11,6 @@ package jkcemu.tools;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.*;
 import java.io.Reader;
 import java.util.Set;
 import java.util.TreeSet;

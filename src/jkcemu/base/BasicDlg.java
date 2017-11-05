@@ -11,7 +11,6 @@ package jkcemu.base;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.lang.*;
 import java.util.*;
 import javax.swing.*;
 

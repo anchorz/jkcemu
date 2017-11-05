@@ -9,7 +9,6 @@
 
 package jkcemu.print;
 
-import java.lang.*;
 
 
 public class PrintDataScanner

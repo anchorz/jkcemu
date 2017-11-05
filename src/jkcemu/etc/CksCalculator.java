@@ -8,7 +8,6 @@
 
 package jkcemu.etc;
 
-import java.lang.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.Adler32;

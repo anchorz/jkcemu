@@ -20,7 +20,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import java.util.EventObject;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;

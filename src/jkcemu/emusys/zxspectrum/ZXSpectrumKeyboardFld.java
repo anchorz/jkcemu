@@ -10,7 +10,6 @@ package jkcemu.emusys.zxspectrum;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.lang.*;
 import java.util.Arrays;
 import jkcemu.base.*;
 import jkcemu.emusys.ZXSpectrum;

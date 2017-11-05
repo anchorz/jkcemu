@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.*;
 import java.util.EventObject;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;

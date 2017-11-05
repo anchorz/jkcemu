@@ -11,7 +11,6 @@ package jkcemu.filebrowser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.lang.*;
 import java.util.Arrays;
 import jkcemu.audio.AudioUtil;
 import jkcemu.base.EmuUtil;

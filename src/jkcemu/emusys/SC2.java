@@ -13,7 +13,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Properties;
 import jkcemu.base.AbstractKeyboardFld;
@@ -120,7 +119,7 @@ public class SC2 extends EmuSys
 
 
   @Override
-  public AbstractKeyboardFld createKeyboardFld()
+  public AbstractKeyboardFld<SC2> createKeyboardFld()
   {
     this.keyboardFld = new SC2KeyboardFld( this );
     return this.keyboardFld;

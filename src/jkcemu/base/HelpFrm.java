@@ -15,7 +15,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.EmptyStackException;

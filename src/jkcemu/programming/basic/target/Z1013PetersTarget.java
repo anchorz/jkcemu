@@ -9,7 +9,6 @@
 
 package jkcemu.programming.basic.target;
 
-import java.lang.*;
 import jkcemu.programming.basic.AsmCodeBuf;
 import jkcemu.programming.basic.BasicCompiler;
 import jkcemu.programming.basic.BasicLibrary;

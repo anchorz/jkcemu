@@ -8,7 +8,6 @@
 
 package z80emu;
 
-import java.lang.*;
 
 
 public interface Z80Memory extends Z80MemView

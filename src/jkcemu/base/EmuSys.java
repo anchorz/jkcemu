@@ -15,7 +15,6 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.image.ImageObserver;
 import java.io.File;
-import java.lang.*;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Arrays;
@@ -161,7 +160,7 @@ public abstract class EmuSys
   }
 
 
-  public AbstractKeyboardFld createKeyboardFld()
+  public AbstractKeyboardFld<? extends EmuSys> createKeyboardFld()
 		throws UnsupportedOperationException, UserCancelException
   {
     throw new UnsupportedOperationException();

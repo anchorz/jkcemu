@@ -8,7 +8,6 @@
 
 package jkcemu.emusys.z1013;
 
-import java.lang.*;
 import jkcemu.base.CharRaster;
 import jkcemu.base.EmuUtil;
 import jkcemu.base.ScreenFrm;

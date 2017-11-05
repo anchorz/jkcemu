@@ -8,7 +8,6 @@
 
 package jkcemu.emusys.kc85;
 
-import java.lang.*;
 
 
 public class M008 extends KC85JoystickModule

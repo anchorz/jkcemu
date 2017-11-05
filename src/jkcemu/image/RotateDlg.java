@@ -17,7 +17,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
-import java.lang.*;
 import java.util.EventObject;
 import javax.swing.BorderFactory;
 import javax.swing.Box;

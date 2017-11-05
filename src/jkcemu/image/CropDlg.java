@@ -19,7 +19,6 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
-import java.lang.*;
 import java.util.EventObject;
 import javax.swing.JButton;
 import javax.swing.JComboBox;

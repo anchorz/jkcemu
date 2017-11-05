@@ -17,7 +17,6 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
-import java.lang.*;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;

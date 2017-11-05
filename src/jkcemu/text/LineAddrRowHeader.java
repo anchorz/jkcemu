@@ -21,7 +21,6 @@ import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.*;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;

@@ -11,7 +11,6 @@ package jkcemu.image;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
 import java.io.File;
-import java.lang.*;
 
 
 public class ImgEntry

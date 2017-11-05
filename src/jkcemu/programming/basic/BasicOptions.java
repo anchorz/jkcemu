@@ -8,7 +8,6 @@
 
 package jkcemu.programming.basic;
 
-import java.lang.*;
 import java.util.Properties;
 import jkcemu.base.EmuSys;
 import jkcemu.programming.PrgOptions;

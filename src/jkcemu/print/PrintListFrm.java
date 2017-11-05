@@ -21,7 +21,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.EventObject;
 import javax.swing.JButton;

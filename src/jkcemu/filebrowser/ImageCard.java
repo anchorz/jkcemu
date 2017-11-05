@@ -11,7 +11,6 @@ package jkcemu.filebrowser;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.lang.*;
 
 
 public class ImageCard extends Component

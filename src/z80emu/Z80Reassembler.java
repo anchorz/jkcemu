@@ -8,7 +8,6 @@
 
 package z80emu;
 
-import java.lang.*;
 
 
 public class Z80Reassembler

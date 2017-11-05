@@ -15,7 +15,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import java.util.Collection;
 import java.util.EventObject;
 import javax.swing.BorderFactory;

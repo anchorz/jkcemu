@@ -11,7 +11,6 @@ package jkcemu.programming.basic;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.io.IOException;
-import java.lang.*;
 import jkcemu.base.EmuSys;
 import jkcemu.base.EmuThread;
 import jkcemu.programming.PrgLogger;

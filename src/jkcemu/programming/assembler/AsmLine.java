@@ -8,7 +8,6 @@
 
 package jkcemu.programming.assembler;
 
-import java.lang.*;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;

@@ -9,7 +9,6 @@
 package jkcemu.base;
 
 import java.awt.Frame;
-import java.lang.*;
 
 
 public class ReplyIntDlg extends AbstractReplyDlg

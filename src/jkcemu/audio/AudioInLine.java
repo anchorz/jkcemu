@@ -10,7 +10,6 @@
 package jkcemu.audio;
 
 import java.io.IOException;
-import java.lang.*;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;

@@ -11,7 +11,6 @@
 
 package jkcemu.etc;
 
-import java.lang.*;
 import java.util.Calendar;
 
 

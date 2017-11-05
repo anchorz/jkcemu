@@ -13,7 +13,6 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.lang.*;
 import java.util.EventObject;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;

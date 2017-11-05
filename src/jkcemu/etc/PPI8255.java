@@ -8,7 +8,6 @@
 
 package jkcemu.etc;
 
-import java.lang.*;
 
 
 public class PPI8255

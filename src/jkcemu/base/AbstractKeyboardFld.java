@@ -14,7 +14,6 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.lang.*;
 import java.util.ArrayList;
 import java.util.TimerTask;
 import javax.swing.JComponent;
@@ -26,7 +25,10 @@ public abstract class AbstractKeyboardFld<T extends EmuSys>
 				extends JComponent
 				implements MouseListener
 {
-  public static class KeyData
+	private static final long serialVersionUID = 1149659322721423235L;
+
+
+public static class KeyData
   {
     public int     x;
     public int     y;

@@ -16,7 +16,6 @@ import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.EventObject;
 import javax.swing.DefaultListModel;

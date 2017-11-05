@@ -11,7 +11,6 @@ package jkcemu.audio;
 import java.awt.Component;
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.lang.*;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;

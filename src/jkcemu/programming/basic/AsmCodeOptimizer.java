@@ -13,7 +13,6 @@
 
 package jkcemu.programming.basic;
 
-import java.lang.*;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;

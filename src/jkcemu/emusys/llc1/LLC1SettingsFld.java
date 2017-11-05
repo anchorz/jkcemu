@@ -10,7 +10,6 @@ package jkcemu.emusys.llc1;
 
 import java.awt.Component;
 import java.awt.BorderLayout;
-import java.lang.*;
 import java.util.EventObject;
 import java.util.Properties;
 import javax.swing.AbstractButton;

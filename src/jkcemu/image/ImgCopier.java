@@ -19,7 +19,6 @@ package jkcemu.image;
 
 import java.awt.Window;
 import java.awt.image.BufferedImage;
-import java.lang.*;
 import jkcemu.Main;
 import jkcemu.base.CancelableProgressDlg;
 

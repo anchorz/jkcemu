@@ -15,7 +15,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
-import java.lang.*;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.Properties;

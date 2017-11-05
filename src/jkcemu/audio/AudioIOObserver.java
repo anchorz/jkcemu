@@ -8,7 +8,6 @@
 
 package jkcemu.audio;
 
-import java.lang.*;
 
 
 public interface AudioIOObserver

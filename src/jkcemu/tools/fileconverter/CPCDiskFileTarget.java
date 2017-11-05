@@ -10,7 +10,6 @@ package jkcemu.tools.fileconverter;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import jkcemu.base.EmuUtil;
 import jkcemu.disk.AbstractFloppyDisk;
 import jkcemu.disk.CPCDisk;

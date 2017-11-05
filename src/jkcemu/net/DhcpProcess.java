@@ -11,7 +11,6 @@ package jkcemu.net;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.*;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import jkcemu.Main;

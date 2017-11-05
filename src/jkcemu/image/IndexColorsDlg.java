@@ -20,7 +20,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
 import java.io.File;
 import java.io.IOException;
-import java.lang.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventObject;

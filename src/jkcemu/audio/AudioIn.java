@@ -9,7 +9,6 @@
 
 package jkcemu.audio;
 
-import java.lang.*;
 import z80emu.Z80CPU;
 
 

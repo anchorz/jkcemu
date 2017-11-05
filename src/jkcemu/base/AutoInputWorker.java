@@ -8,7 +8,6 @@
 
 package jkcemu.base;
 
-import java.lang.*;
 import java.util.Properties;
 import jkcemu.Main;
 

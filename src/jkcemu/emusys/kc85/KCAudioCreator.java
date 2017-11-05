@@ -22,7 +22,6 @@
 package jkcemu.emusys.kc85;
 
 import java.io.IOException;
-import java.lang.*;
 import jkcemu.audio.BitSampleBuffer;
 import jkcemu.base.ByteIterator;
 import jkcemu.base.FileInfo;

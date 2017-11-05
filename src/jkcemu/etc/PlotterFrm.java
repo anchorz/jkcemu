@@ -19,7 +19,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.lang.*;
 import java.util.EventObject;
 import java.util.Properties;
 import javax.swing.ButtonGroup;

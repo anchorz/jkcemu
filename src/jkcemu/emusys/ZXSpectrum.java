@@ -10,7 +10,6 @@ package jkcemu.emusys;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -145,7 +144,7 @@ public class ZXSpectrum extends EmuSys implements
   private byte[]              screenColorNums;
   private byte[]              ram;
   private PSG8910             psg;
-  private AbstractKeyboardFld keyboardFld;
+  private AbstractKeyboardFld<ZXSpectrum> keyboardFld;
 
 
   public ZXSpectrum( EmuThread emuThread, Properties props )
@@ -385,7 +384,7 @@ public class ZXSpectrum extends EmuSys implements
 
 
   @Override
-  public AbstractKeyboardFld createKeyboardFld()
+  public AbstractKeyboardFld<ZXSpectrum> createKeyboardFld()
   {
     if( this.mode128k ) {
       this.keyboardFld = new ZXSpectrum128KeyboardFld( this );

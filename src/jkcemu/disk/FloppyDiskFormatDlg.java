@@ -15,7 +15,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
-import java.lang.*;
 import java.util.EventObject;
 import java.util.ArrayList;
 import javax.swing.ButtonGroup;

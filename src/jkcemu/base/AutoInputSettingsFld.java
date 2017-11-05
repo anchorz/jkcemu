@@ -16,7 +16,6 @@ import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.UnsupportedEncodingException;
-import java.lang.*;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.EventObject;

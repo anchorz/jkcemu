@@ -14,7 +14,6 @@ import java.awt.Graphics;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
-import java.lang.*;
 import jkcemu.Main;
 
 

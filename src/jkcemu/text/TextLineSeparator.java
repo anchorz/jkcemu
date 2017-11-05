@@ -8,7 +8,6 @@
 
 package jkcemu.text;
 
-import java.lang.*;
 
 
 public class TextLineSeparator

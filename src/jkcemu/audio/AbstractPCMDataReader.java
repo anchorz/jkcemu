@@ -10,7 +10,6 @@
 package jkcemu.audio;
 
 import java.io.IOException;
-import java.lang.*;
 
 
 public abstract class AbstractPCMDataReader implements PCMDataSource

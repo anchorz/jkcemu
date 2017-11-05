@@ -12,7 +12,6 @@ package jkcemu.audio;
 import java.io.File;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
-import java.lang.*;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;

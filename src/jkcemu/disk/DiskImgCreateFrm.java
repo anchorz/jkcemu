@@ -34,7 +34,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.*;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.Arrays;

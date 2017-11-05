@@ -9,7 +9,6 @@
 package jkcemu.base;
 
 import java.awt.Component;
-import java.lang.*;
 
 
 public class SourceUtil

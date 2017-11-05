@@ -14,7 +14,6 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.lang.*;
 
 
 public class ImgSelection implements ClipboardOwner, Transferable

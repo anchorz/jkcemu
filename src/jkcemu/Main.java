@@ -21,7 +21,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.lang.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -137,7 +136,6 @@ public class Main
   private static File                     lastDirsFile      = null;
   private static File                     profileFile       = null;
   private static Properties               properties        = null;
-  private static Integer                  nProcessors       = null;
   private static boolean                  firstExec         = true;
   private static boolean                  printPageNum      = true;
   private static boolean                  printFileName     = true;

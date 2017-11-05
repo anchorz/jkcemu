@@ -12,7 +12,6 @@ package jkcemu.audio;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.lang.*;
 
 
 public class PCMDataStream extends AbstractPCMDataReader

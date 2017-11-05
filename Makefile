@@ -7,3 +7,6 @@ run:
 
 $(OUT):
 	mkdir $(OUT)
+
+find_and_replace:
+	find src -type f -name "*.java" -exec /usr/bin/perl -i -p -e 's/import.*java\.lang\.\*;.*\n//g' {} \;

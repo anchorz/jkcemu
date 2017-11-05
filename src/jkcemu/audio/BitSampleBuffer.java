@@ -16,7 +16,6 @@
 package jkcemu.audio;
 
 import java.io.IOException;
-import java.lang.*;
 import jkcemu.base.EmuUtil;
 
 
