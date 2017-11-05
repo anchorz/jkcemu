@@ -116,6 +116,7 @@ public class FileBrowserFrm
 				TreeSelectionListener,
 				TreeWillExpandListener
 {
+  private static final long serialVersionUID = -603481430611949696L;
   private static FileBrowserFrm instance = null;
 
   private static final String HELP_PAGE = "/help/tools/filebrowser.htm";
@@ -213,7 +214,7 @@ public class FileBrowserFrm
   }
 
 
-  public static void fireFilesChanged( Collection files )
+  public static void fireFilesChanged( Collection<?> files )
   {
     if( files != null ) {
       for( Object f : files ) {
@@ -285,7 +286,7 @@ public class FileBrowserFrm
 	      Object o = t.getTransferData( DataFlavor.javaFileListFlavor );
 	      if( o != null ) {
 		if( o instanceof Collection ) {
-		  fireRefreshParentNodesFor( (Collection) o );
+		  fireRefreshParentNodesFor( (Collection<Path>) o );
 		}
 	      }
 	    }
@@ -400,7 +401,7 @@ public class FileBrowserFrm
 	  Object o = t.getTransferData( DataFlavor.javaFileListFlavor );
 	  if( o != null ) {
 	    if( o instanceof Collection ) {
-	      Collection files = (Collection) o;
+	      Collection<File> files = (Collection<File>) o;
 
 	      // Pruefung und Sicherheitsabfrage
 	      boolean status    = true;
@@ -1024,11 +1025,11 @@ public class FileBrowserFrm
 	  if( this.clipboard != null ) {
 	    Object o = this.clipboard.getData( DataFlavor.javaFileListFlavor );
 	    if( o != null ) {
-	      Collection files = null;
+	      Collection<File> files = null;
 	      if( o instanceof File ) {
 		files = Collections.singletonList( (File) o );
 	      } else if( o instanceof Collection ) {
-		files = (Collection) o;
+		files = (Collection<File>) o;
 	      }
 	      if( !files.isEmpty() ) {
 		(new FileCopier(
@@ -1097,7 +1098,7 @@ public class FileBrowserFrm
       if( (parent != null) && (file != null) ) {
 	File dirFile = EmuUtil.createDir( this, file );
 	if( dirFile != null ) {
-	  boolean selected = false;
+	  //boolean selected = false;
 	  try {
 	    this.rootNode.refreshNodeFor(
 				file.toPath(),
@@ -1543,21 +1544,6 @@ public class FileBrowserFrm
     return status;
   }
 
-
-  private void collapseNode( TreeNode node )
-  {
-    if( node != null ) {
-      try {
-	TreeNode[] path = this.treeModel.getPathToRoot( node );
-	if( path != null ) {
-	  this.tree.collapsePath( new TreePath( path ) );
-	}
-      }
-      catch( Exception ex ) {}
-    }
-  }
-
-
   private void dragInternal( DropTargetDragEvent e, boolean dragEnter )
   {
     boolean status = false;
@@ -1637,7 +1623,7 @@ public class FileBrowserFrm
   }
 
 
-  private void fireRefreshParentNodesFor( Collection files )
+  private void fireRefreshParentNodesFor( Collection<Path> files )
   {
     if( files != null ) {
       Set<Path> parents = EmuUtil.createPathSet();
@@ -1917,7 +1903,7 @@ public class FileBrowserFrm
   {
     if( (parent != null) && (file != null) ) {
       Object      childNode = null;
-      Enumeration children  = parent.children();
+      Enumeration<?> children  = parent.children();
       if( children != null ) {
 	try {
 	  while( children.hasMoreElements() ) {

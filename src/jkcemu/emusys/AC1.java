@@ -435,7 +435,7 @@ public class AC1
   private byte[]            osBytes;
   private byte[]            pio2Rom2010Bytes;
   private byte[]            romBank2010Bytes;
-  private String            fontFile;
+  //private String            fontFile;
   private String            osFile;
   private String            osVersion;
   private String            pio2Rom2010File;
@@ -1818,12 +1818,12 @@ public class AC1
     int               endAddr      = -1;
     BasicType         ac1BasicType = null;
     SaveDlg.BasicType dstBasicType = SaveDlg.BasicType.NO_BASIC;
-    String            title        = "BASIC-Programm speichern";
+    //String            title       = "BASIC-Programm speichern";
     int               preIdx       = -1;
     if( this.lastBasicType != null ) {
       switch( this.lastBasicType ) {
 	case AC1_MINI:
-	  title  = "Mini-BASIC-Programm speichern";
+	  //title  = "Mini-BASIC-Programm speichern";
 	  preIdx = 0;
 	  break;
 
@@ -1850,7 +1850,7 @@ public class AC1
     if( (preIdx < 0) && this.modeSCCH ) {
       preIdx = 1;
     }
-    String                             fileInfo   = null;
+    //String                             fileInfo   = null;
     javax.swing.filechooser.FileFilter fileFilter = null;
     switch( OptionDlg.showOptionDlg(
 		this.screenFrm,
@@ -1881,7 +1881,7 @@ public class AC1
 	dstBasicType = SaveDlg.BasicType.MS_DERIVED_BASIC;
 	begAddr      = 0x60F7;
 	endAddr      = SourceUtil.getBasicEndAddr( this.emuThread, begAddr );
-	fileInfo     = "BASIC-Programmdatei (*.bas)";
+	//fileInfo     = "BASIC-Programmdatei (*.bas)";
 	fileFilter   = EmuUtil.getBasicFileFilter();
 	break;
 
@@ -1890,7 +1890,7 @@ public class AC1
 	dstBasicType = SaveDlg.BasicType.MS_DERIVED_BASIC;
 	begAddr      = 0x6FB7;
 	endAddr      = SourceUtil.getBasicEndAddr( this.emuThread, begAddr );
-	fileInfo     = "BASIC-Programmdatei (*.bas)";
+	//fileInfo     = "BASIC-Programmdatei (*.bas)";
 	fileFilter   = EmuUtil.getBasicFileFilter();
 	break;
 
@@ -1899,7 +1899,7 @@ public class AC1
 	dstBasicType = SaveDlg.BasicType.MS_DERIVED_BASIC;
 	begAddr      = 0x6300;
 	endAddr      = SourceUtil.getBasicEndAddr( this.emuThread, begAddr );
-	fileInfo     = "AC1-BASIC6-Programmdatei (*.abc)";
+	//fileInfo     = "AC1-BASIC6-Programmdatei (*.abc)";
 	fileFilter   = EmuUtil.getAC1Basic6FileFilter();
 	break;
 
@@ -1908,7 +1908,7 @@ public class AC1
 	dstBasicType = SaveDlg.BasicType.MS_DERIVED_BASIC;
 	begAddr      = 0x60F7;
 	endAddr      = SourceUtil.getBasicEndAddr( this.emuThread, begAddr );
-	fileInfo     = "BASIC-Programmdatei (*.bas)";
+	//fileInfo     = "BASIC-Programmdatei (*.bas)";
 	fileFilter   = EmuUtil.getBasicFileFilter();
 	break;
 

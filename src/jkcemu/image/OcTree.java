@@ -73,7 +73,6 @@ public class OcTree
 
   private class Node
   {
-    private Node   parent;
     private int    colorMask;
     private int    pixelCnt;
     private long   totalR;
@@ -83,7 +82,6 @@ public class OcTree
 
     private Node( Node parent, int colorMask )
     {
-      this.parent    = parent;
       this.colorMask = colorMask;
       this.pixelCnt  = 0;
       this.totalR    = 0;

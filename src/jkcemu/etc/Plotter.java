@@ -176,9 +176,6 @@ public class Plotter
 	    paintPixel();
 	  }
 	  this.clean = false;
-	  if( this.plotterFrm != null ) {
-	    this.plotterFrm.setDirty();
-	  }
 	}
       }
     }
@@ -253,9 +250,6 @@ public class Plotter
       if( state ) {
 	if( paintPixel() ) {
 	  this.clean = false;
-	  if( this.plotterFrm != null ) {
-	    this.plotterFrm.setDirty();
-	  }
 	}
       }
     }
@@ -295,9 +289,6 @@ public class Plotter
       g.fillRect( 0, 0, this.image.getWidth(), this.image.getHeight() );
       g.dispose();
       this.clean = true;
-      if( this.plotterFrm != null ) {
-	this.plotterFrm.setDirty();
-      }
     }
   }
 

@@ -376,16 +376,16 @@ public class IFFFile
       if( cmap != null ) {
 	int colorCnt = cmap.length / 3;
 	if( colorCnt > 0 ) {
-	  int bits = 8;
+	  //int bits = 8;
 	  imgType  = BufferedImage.TYPE_BYTE_INDEXED;
 	  if( colorCnt <= 16 ) {
 	    imgType = BufferedImage.TYPE_BYTE_BINARY;
 	    if( colorCnt <= 2 ) {
-	      bits = 1;
+	      //bits = 1;
 	    } else if( colorCnt <= 4 ) {
-	      bits = 2;
+	      //bits = 2;
 	    } else {
-	      bits = 4;
+	      //bits = 4;
 	    }
 	  }
 	  byte[] alphas = null;

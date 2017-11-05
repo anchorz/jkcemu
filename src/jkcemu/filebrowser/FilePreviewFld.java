@@ -52,6 +52,7 @@ import jkcemu.base.EmuUtil;
 import jkcemu.base.FileEntry;
 import jkcemu.base.FileInfo;
 import jkcemu.base.FileTableModel;
+import jkcemu.base.FileTreeNode;
 import jkcemu.disk.AbstractFloppyDisk;
 import jkcemu.disk.DiskUtil;
 import jkcemu.image.ImgEntry;
@@ -64,6 +65,7 @@ public class FilePreviewFld extends JPanel
 					MouseListener,
 					Runnable
 {
+  private static final long serialVersionUID = -250193155529125377L;
   private static final String CARD_NAME_FILE_TABLE = "file.table";
   private static final String CARD_NAME_IMAGE      = "image";
   private static final String CARD_NAME_TEXT       = "text";
@@ -72,7 +74,7 @@ public class FilePreviewFld extends JPanel
   private Frame          owner;
   private long           maxFileSize;
   private Object         lockMonitor;
-  private boolean        fieldsAdded;
+  //private boolean        fieldsAdded;
   private boolean        sortCaseSensitive;
   private boolean        fileChanged;
   private FileNode       fileNode;
@@ -92,7 +94,7 @@ public class FilePreviewFld extends JPanel
     this.owner             = owner;
     this.maxFileSize       = 0;
     this.lockMonitor       = "lock monitor";
-    this.fieldsAdded       = false;
+    //this.fieldsAdded       = false;
     this.sortCaseSensitive = false;
     this.fileChanged       = false;
     this.fileNode          = null;
@@ -554,10 +556,10 @@ public class FilePreviewFld extends JPanel
 
   private void addDirectoryInfo(
 			Map<FileInfoFld.Item,Object> infoItems,
-			Enumeration                  children,
+			Enumeration<FileTreeNode>    children,
 			boolean                      sortCaseSensitive )
   {
-    boolean rv = false;
+    //boolean rv = false;
     infoItems.put( FileInfoFld.Item.TYPE, "Verzeichnis" );
     this.fileTableModel.clear( false );
     if( children != null ) {

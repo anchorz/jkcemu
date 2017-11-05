@@ -31,6 +31,7 @@ import jkcemu.base.EmuUtil;
 
 public class TarUnpacker extends AbstractThreadDlg
 {
+  private static final long serialVersionUID = -4063350816000182104L;
   private File    srcFile;
   private File    outDir;
   private boolean compression;

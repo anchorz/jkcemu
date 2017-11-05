@@ -324,10 +324,10 @@ public class W5100
 	}
 	if( !done ) {
 	  if( (getDebugMask() & DEBUG_MASK_MSG) != 0 ) {
-	    String s = null;
-	    if( socketAddr != null ) {
-	      s = socketAddr.toString();
-	    }
+	    //String s = null;
+	    //if( socketAddr != null ) {
+	    //  s = socketAddr.toString();
+	    //}
 	    System.out.printf(
 			"connect: %s, timeout=%dms\n",
 			socketAddr,
@@ -1672,7 +1672,7 @@ public class W5100
   private SocketFactory                     socketFactory;
   private DhcpServer                        dhcpServer;
   private NetConfig                         netConfig;
-  private boolean                           threadsEnabled;
+  //private boolean                           threadsEnabled;
   private int                               debugMask;
 
 
@@ -1694,7 +1694,7 @@ public class W5100
     this.reservedDatagramSockets = new ArrayList<>();
     this.pings                   = new ArrayList<>();
     this.netConfig               = null;
-    this.threadsEnabled          = true;
+    //this.threadsEnabled          = true;
     this.debugMask               = 0;
 
     String text = System.getProperty( KCNet.SYSPROP_DEBUG );
@@ -1717,7 +1717,7 @@ public class W5100
 
   public void die()
   {
-    this.threadsEnabled = false;
+    //this.threadsEnabled = false;
     for( SocketData socket : this.sockets ) {
       socket.die();
     }

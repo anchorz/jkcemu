@@ -438,7 +438,8 @@ public abstract class AbstractHexCharFrm
 
   protected void doChecksum()
   {
-    int dataLen  = getDataLength();
+    //int dataLen  = 
+            getDataLength();
     int caretPos = this.hexCharFld.getCaretPosition();
     int markPos  = this.hexCharFld.getMarkPosition();
     int m1       = -1;

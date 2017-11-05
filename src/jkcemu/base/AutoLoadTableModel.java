@@ -142,7 +142,7 @@ public class AutoLoadTableModel extends AbstractTableModel
   {
     Object rv = null;
     if( (row >= 0) && (row < this.rows.size())
-	&& (col >= 0) && (col < this.colNames.length) )
+	&& (col >= 0) && (col < colNames.length) )
     {
       AutoLoadEntry entry = this.rows.get( row );
       if( entry != null ) {

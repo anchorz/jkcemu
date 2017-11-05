@@ -136,8 +136,8 @@ public abstract class AudioIn extends AudioIO
       } else {
 
 	long tStates     = z80cpu.getProcessedTStates();
-	long diffTStates = z80cpu.calcTStatesDiff(
-					this.lastTStates,
+	long diffTStates = Z80CPU.calcTStatesDiff(
+					lastTStates,
 					tStates );
 
 	if( diffTStates > 0 ) {
@@ -203,10 +203,10 @@ public abstract class AudioIn extends AudioIO
 	       * Anzahl der verstrichenen Taktzyklen auf den Wert
 	       * des letzten gelesenen Samples korrigieren
 	       */
-	      this.lastTStates += nSamples * this.tStatesPerFrame;
+	      lastTStates += nSamples * this.tStatesPerFrame;
 	    }
 	  } else {
-	    this.lastTStates = this.z80cpu.getProcessedTStates();
+	    lastTStates = this.z80cpu.getProcessedTStates();
 	  }
 	}
       }

@@ -40,6 +40,7 @@ public class AutoLoadSettingsFld
 				ListSelectionListener,
 				MouseListener
 {
+  private static final long serialVersionUID = -7529168804242293039L;
   private int                defaultFirstMillisToWait;
   private boolean            checkAddrs;
   private AutoLoadTableModel tableModel;

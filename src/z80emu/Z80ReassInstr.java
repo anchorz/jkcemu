@@ -12,6 +12,7 @@ package z80emu;
 
 public class Z80ReassInstr extends Exception
 {
+  private static final long serialVersionUID = -4467597243298208886L;
   private int     len;
   private String  name;
   private String  arg1;

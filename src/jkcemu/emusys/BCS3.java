@@ -162,7 +162,7 @@ public class BCS3 extends EmuSys implements Z80CTCListener
   private int              screenChar1Y;
   private int[]            kbMatrix;
   private long             lastTapeOutTStates;
-  private boolean          lastTapeOutPhase;
+  //private boolean          lastTapeOutPhase;
   private boolean          removeHSyncFromAudio;
   private volatile boolean screenEnabled;
   private CharRaster       charRaster;
@@ -235,7 +235,7 @@ public class BCS3 extends EmuSys implements Z80CTCListener
     this.screenChar0Y         = -1;
     this.screenChar1Y         = -1;
     this.lastTapeOutTStates   = 0;
-    this.lastTapeOutPhase     = false;
+    //this.lastTapeOutPhase     = false;
     this.removeHSyncFromAudio = getRemoveHSyncFromAudio( props );
     this.charRaster           = null;
     this.keyboardFld          = null;
@@ -1204,7 +1204,7 @@ public class BCS3 extends EmuSys implements Z80CTCListener
     this.screenChar0Y        = -1;
     this.screenChar1Y        = -1;
     this.lastTapeOutTStates  = 0;
-    this.lastTapeOutPhase    = false;
+    //this.lastTapeOutPhase    = false;
     this.charRaster          = null;
     Arrays.fill( this.kbMatrix, 0 );
     Arrays.fill( this.screenChars, (byte) 0x20 );
@@ -1571,7 +1571,7 @@ public class BCS3 extends EmuSys implements Z80CTCListener
     if( this.removeHSyncFromAudio ) {
       Z80CPU cpu = this.emuThread.getZ80CPU();
       long t = cpu.getProcessedTStates();
-      long d = cpu.calcTStatesDiff( this.lastTapeOutTStates, t );
+      long d = Z80CPU.calcTStatesDiff( this.lastTapeOutTStates, t );
       this.lastTapeOutTStates = t;
       if( (d > 300) && (d < 40000) ) {
 	this.tapeOutPhase = phase;

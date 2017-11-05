@@ -21,6 +21,7 @@ public class BasicDlg extends JDialog implements
 					KeyListener,
 					WindowListener
 {
+  private static final long serialVersionUID = -5661989744488869204L;
   public BasicDlg( Window owner, String title )
   {
     super( owner, title, Dialog.ModalityType.DOCUMENT_MODAL );

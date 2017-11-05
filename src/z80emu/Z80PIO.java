@@ -346,7 +346,7 @@ public class Z80PIO implements Z80InterruptSource
     buf.append( "</tr>\n"
 	+ "<tr><td>Interrupt-Vektor:</td>" );
     for( int i = 0; i < ports.length; i++ ) {
-      int iv = ports[ i ].interruptVector;
+      //int iv = ports[ i ].interruptVector;
       buf.append( String.format(
 			"<td>%02Xh</td>",
 			ports[ i ].interruptVector ) );

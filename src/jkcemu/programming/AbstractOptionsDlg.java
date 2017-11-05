@@ -26,13 +26,13 @@ import jkcemu.base.EmuSys;
 import jkcemu.base.EmuThread;
 import jkcemu.base.EmuUtil;
 import jkcemu.base.FileNameFld;
-import jkcemu.base.LimitedDocument;
 import jkcemu.base.UserInputException;
 import jkcemu.programming.PrgOptions;
 
 
 public abstract class AbstractOptionsDlg extends BaseDlg
 {
+  private static final long serialVersionUID = -6962910567731546450L;
   protected PrgOptions appliedOptions;
   protected EmuThread  emuThread;
 
@@ -52,7 +52,7 @@ public abstract class AbstractOptionsDlg extends BaseDlg
   private JButton         btnFileSelect;
   private JButton         btnApply;
   private JButton         btnCancel;
-  private LimitedDocument docFileDesc;
+  //private LimitedDocument docFileDesc;
 
 
   public PrgOptions getAppliedOptions()

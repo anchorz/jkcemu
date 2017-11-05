@@ -376,7 +376,7 @@ public class ImgSaver
 	     * anschliessend eine IllegalArgumentException
 	     * statt einer IOException geworfen.
 	     */
-	    boolean      exists = file.exists();
+	    //boolean      exists = file.exists();
 	    boolean      done   = false;
 	    OutputStream out    = null;
 	    try {

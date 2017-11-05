@@ -178,13 +178,13 @@ public class KeyboardMatrix8x8 extends KeyboardMatrix
       ctrl        = true;
     }
 
-    int pos = this.matrixNormal.indexOf( keyCharCode );
+    int pos = matrixNormal.indexOf( keyCharCode );
     if( pos >= 0 ) {
       int m = (1 << (pos / 6));
       this.keyboardMatrix[ pos % 6 ] |= m;
       rv = true;
     } else {
-      pos = this.matrixShift.indexOf( keyCharCode );
+      pos = matrixShift.indexOf( keyCharCode );
       if( pos >= 0 ) {
 	int m = (1 << (pos / 6));
 	this.keyboardMatrix[ pos % 6 ] |= m;

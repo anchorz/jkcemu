@@ -261,7 +261,7 @@ public class FindTextDlg extends BaseDlg
 	findHistory.remove( this.findText );
 	int n = findHistory.size();
 	while( n >= 10 ) {
-	  this.findHistory.remove( n - 1 );
+	  findHistory.remove( n - 1 );
 	  --n;
 	}
 	findHistory.add( 0, this.findText );

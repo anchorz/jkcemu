@@ -29,6 +29,7 @@ import jkcemu.base.ScreenFrm;
 
 public class AudioFrm extends AbstractAudioFrm
 {
+  private static final long serialVersionUID = 320148531616694612L;
   private static final String HELP_PAGE = "/help/audio.htm";
 
   private static AudioFrm instance = null;

@@ -13,7 +13,7 @@ import jkcemu.programming.PrgSource;
 
 public class VarDecl extends BasicSourcePos
 {
-  private String  varName;
+  //private String  varName;
   private int     dim1;
   private int     dim2;
   private int     nDims;
@@ -31,7 +31,7 @@ public class VarDecl extends BasicSourcePos
 		int       dim2 )
   {
     super( source, basicLineNum );
-    this.varName = varName;
+    //this.varName = varName;
     this.dim1    = dim1;
     this.dim2    = dim2;
     this.nDims   = 0;

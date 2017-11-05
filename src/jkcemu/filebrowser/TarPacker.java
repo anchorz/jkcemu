@@ -13,7 +13,6 @@ import java.awt.Window;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -40,12 +39,12 @@ import jkcemu.base.FileProgressInputStream;
 public class TarPacker extends AbstractThreadDlg
 			implements FileVisitor<Path>
 {
+  private static final long serialVersionUID = 4276185331443221998L;
   private Collection<Path> srcPaths;
   private Path             curRootPath;
   private File             outFile;
   private OutputStream     out;
   private boolean          compression;
-  private boolean          ownerEnabled;
   private boolean          posixEnabled;
 
 
@@ -230,7 +229,6 @@ public class TarPacker extends AbstractThreadDlg
   protected void doProgress()
   {
     boolean     failed  = false;
-    InputStream in      = null;
     try {
       this.out = new BufferedOutputStream(
 				new FileOutputStream( this.outFile ) );
@@ -292,7 +290,6 @@ public class TarPacker extends AbstractThreadDlg
     this.outFile      = outFile;
     this.out          = null;
     this.compression  = compression;
-    this.ownerEnabled = true;
     this.posixEnabled = true;
   }
 
@@ -386,7 +383,6 @@ public class TarPacker extends AbstractThreadDlg
 	owner = Files.getOwner( path, LinkOption.NOFOLLOW_LINKS );
       }
       catch( UnsupportedOperationException ex ) {
-	this.ownerEnabled = false;
       }
       catch( Exception ex ) {}
     }

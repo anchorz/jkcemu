@@ -12,7 +12,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Frame;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -42,6 +41,7 @@ import jkcemu.print.PrintUtil;
 
 public class PlotterFrm extends AbstractImageFrm
 {
+  private static final long serialVersionUID = 6098041641485308465L;
   private static final String ACTION_CLOSE         = "close";
   private static final String ACTION_COLOR_PAPER   = "color.paper";
   private static final String ACTION_COLOR_PEN     = "color.pen";
@@ -52,10 +52,8 @@ public class PlotterFrm extends AbstractImageFrm
   private static PlotterFrm instance = null;
 
   private Plotter              plotter;
-  private Image                image;
   private File                 file;
   private javax.swing.Timer    refreshTimer;
-  private volatile boolean     dirty;
   private JMenuItem            mnuNewPage;
   private JMenuItem            mnuPrint;
   private JMenuItem            mnuSaveAs;
@@ -106,13 +104,6 @@ public class PlotterFrm extends AbstractImageFrm
     instance.toFront();
     instance.setVisible( true );
   }
-
-
-  public void setDirty()
-  {
-    this.dirty = true;
-  }
-
 
   public void setPenThickness( int value )
   {
@@ -275,8 +266,6 @@ public class PlotterFrm extends AbstractImageFrm
   private PlotterFrm( Plotter plotter )
   {
     this.plotter = plotter;
-    this.dirty   = false;
-    this.image   = null;
     this.file    = null;
     setTitle( "JKCEMU Plotter" );
     Main.updIcon( this );
@@ -506,17 +495,8 @@ public class PlotterFrm extends AbstractImageFrm
     }
   }
 
-
-  private boolean isClean()
-  {
-    Plotter plotter = this.plotter;
-    return plotter != null ? plotter.isClean() : true;
-  }
-
-
   private void repaintImage()
   {
-    this.dirty = false;
     updActionBtns();
     repaint();
   }

@@ -72,6 +72,7 @@ public class ImageFrm extends AbstractImageFrm implements
 						FlavorListener,
 						MouseMotionListener
 {
+  private static final long serialVersionUID = -465339695090929028L;
   private static final String PROP_AUTORESIZE = "auto_resize";
   private static final String PROP_BACKGROUND = "background";
   private static final String VALUE_BLACK     = "black";
@@ -1422,7 +1423,7 @@ public class ImageFrm extends AbstractImageFrm implements
   {
     int nEntries = this.imgStack.size();
     if( nEntries > 0 ) {
-      ImgEntry entry = this.imgStack.peek();
+      //ImgEntry entry = this.imgStack.peek();
       File     file  = null;
       int      idx   = nEntries - 1;
       while( (file == null) && (idx >= 0) ) {

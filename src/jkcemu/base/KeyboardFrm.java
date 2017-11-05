@@ -23,6 +23,7 @@ import jkcemu.base.BaseFrm;
 
 public class KeyboardFrm extends BaseFrm
 {
+  private static final long serialVersionUID = 6640291885142279125L;
   private static final String HELP_PAGE = "/help/keyboard.htm";
 
   private ScreenFrm           screenFrm;

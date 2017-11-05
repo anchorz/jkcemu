@@ -843,7 +843,7 @@ public class EmuUtil
 	  Object o = t.getTransferData( DataFlavor.javaFileListFlavor );
 	  if( o != null ) {
 	    if( o instanceof Collection ) {
-	      for( Object f : (Collection) o ) {
+	      for( Object f : (Collection<?>) o ) {
 		if( f != null ) {
 		  if( f instanceof File ) {
 		    if( file == null ) {

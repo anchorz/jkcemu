@@ -113,14 +113,14 @@ public class AutoInputTableModel extends AbstractTableModel
   @Override
   public int getColumnCount()
   {
-    return this.colNames.length;
+    return colNames.length;
   }
 
 
   @Override
   public String getColumnName( int col )
   {
-    return (col >= 0) && (col < this.colNames.length) ? colNames[ col ] : "";
+    return (col >= 0) && (col < colNames.length) ? colNames[ col ] : "";
   }
 
 
@@ -135,8 +135,8 @@ public class AutoInputTableModel extends AbstractTableModel
   public Object getValueAt( int row, int col )
   {
     Object rv = null;
-    if( (row >= 0) && (row < this.rows.size())
-	&& (col >= 0) && (col < this.colNames.length) )
+    if( (row >= 0) && (row < rows.size())
+	&& (col >= 0) && (col < colNames.length) )
     {
       AutoInputEntry entry = this.rows.get( row );
       if( entry != null ) {

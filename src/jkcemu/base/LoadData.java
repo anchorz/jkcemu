@@ -23,7 +23,7 @@ public class LoadData implements EmuMemView
   private int        fileType;
   private FileFormat fileFmt;
   private String     infoMsg;
-  private FileInfo   fileInfo;
+  //private FileInfo   fileInfo;
 
 
   public LoadData(

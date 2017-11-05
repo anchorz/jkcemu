@@ -253,10 +253,10 @@ public class FileTreeNode implements TreeNode
 	/* --- TreeNode --- */
 
   @Override
-  public Enumeration children()
+  public Enumeration <FileTreeNode> children()
   {
     if( this.vChildren == null ) {
-      this.vChildren = new Vector<>();
+      this.vChildren = new Vector<FileTreeNode>();
     }
     return this.vChildren.elements();
   }

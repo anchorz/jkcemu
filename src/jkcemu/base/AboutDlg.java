@@ -35,6 +35,7 @@ import jkcemu.Main;
 
 public class AboutDlg extends BaseDlg
 {
+  private static final long serialVersionUID = 4415443407316483763L;
   private JButton btnOK;
 
 

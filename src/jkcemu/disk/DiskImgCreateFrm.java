@@ -1406,7 +1406,7 @@ public class DiskImgCreateFrm
 	if( o != null ) {
 	  if( o instanceof Collection ) {
 	    int firstRowToSelect = this.table.getRowCount();
-	    for( Object item : (Collection) o ) {
+	    for( Object item : (Collection<?>) o ) {
 	      if( item != null ) {
 		File file = null;
 		if( item instanceof File ) {

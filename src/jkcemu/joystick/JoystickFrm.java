@@ -33,6 +33,7 @@ import jkcemu.base.HelpFrm;
 
 public class JoystickFrm extends BaseFrm
 {
+  private static final long serialVersionUID = 6230551229888736106L;
   private static final String HELP_PAGE          = "/help/joystick.htm";
   private static final String TEXT_NOT_EMULATED  = "Nicht emuliert";
   private static final String TEXT_NOT_CONNECTED = "Nicht verbunden";

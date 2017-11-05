@@ -152,7 +152,7 @@ public class BitSampleBuffer
   private int    size;
   private int    frameRate;
   private long   frameCount;
-  private String errorText;
+  //private String errorText;
 
 
   public BitSampleBuffer( int frameRate, int initSize )
@@ -161,7 +161,7 @@ public class BitSampleBuffer
     this.frameCount = 0;
     this.size       = 0;
     this.data       = new byte[ initSize ];
-    this.errorText  = null;
+    //this.errorText  = null;
   }
 
 

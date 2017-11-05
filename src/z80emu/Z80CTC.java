@@ -117,7 +117,6 @@ public class Z80CTC implements Z80InterruptSource, Z80TStatesListener
   @Override
   public void appendInterruptStatusHTMLTo( StringBuilder buf )
   {
-    boolean showISR = false;
     buf.append( "<table border=\"1\">\n"
 	+ "<tr><th></th><th>Kanal&nbsp;0</th><th>Kanal&nbsp;1</th>"
 	+ "<th>Kanal&nbsp;2</th><th>Kanal&nbsp;3</th></tr>\n"
@@ -185,13 +184,10 @@ public class Z80CTC implements Z80InterruptSource, Z80TStatesListener
       buf.append( "<td>" );
       if( this.timer[ i ].interruptAccepted ) {
 	buf.append( "angenommen (wird gerade bedient)" );
-	showISR = true;
       } else if( this.timer[ i ].interruptRequested ) {
 	buf.append( "angemeldet" );
-	showISR = true;
       } else if( this.timer[ i ].interruptEnabled ) {
 	buf.append( "freigegeben" );
-	showISR = true;
       } else {
 	buf.append( "gesperrt" );
       }

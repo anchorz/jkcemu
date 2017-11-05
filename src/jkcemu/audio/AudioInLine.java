@@ -137,7 +137,7 @@ public class AudioInLine extends AudioIn
   @Override
   protected byte[] readFrame()
   {
-    int            value        = -1;
+    //int            value        = -1;
     TargetDataLine line         = this.dataLine;
     byte[]         audioDataBuf = this.audioDataBuf;
     byte[]         frameBuf     = this.frameBuf;

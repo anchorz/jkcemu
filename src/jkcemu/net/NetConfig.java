@@ -88,7 +88,6 @@ public class NetConfig
 
   public static NetConfig readNetConfig()
   {
-    NetConfig netConfig = null;
     int       debugMask = 0;
     String    text      = System.getProperty( KCNet.SYSPROP_DEBUG );
     if( text != null ) {

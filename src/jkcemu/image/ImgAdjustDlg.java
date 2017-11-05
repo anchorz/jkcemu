@@ -40,6 +40,7 @@ public class ImgAdjustDlg
 				ChangeListener,
 				Runnable
 {
+  private static final long serialVersionUID = -6872321503228183899L;
   private static final int   VALUE_MAX       = 100;
   private static final float FLOAT_VALUE_MAX = (float) VALUE_MAX;
 

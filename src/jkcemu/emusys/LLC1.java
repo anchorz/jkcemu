@@ -40,7 +40,7 @@ public class LLC1 extends EmuSys
   public static final int     DEFAULT_PROMPT_AFTER_RESET_MILLIS_MAX = 500;
   public static final boolean DEFAULT_SWAP_KEY_CHAR_CASE            = true;
 
-  private static final int DISPLAY_DISTANCE     = 30;
+  //private static final int DISPLAY_DISTANCE     = 30;
   private static final int PASTE_READS_PER_CHAR = 10;
 
   private static byte[] rom0000 = null;

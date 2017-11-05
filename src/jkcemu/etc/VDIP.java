@@ -1557,7 +1557,8 @@ public class VDIP implements
        * um das vollstaendige Einlesen der Kommandozeile sicherzustellen.
        */
       try {
-	long v = nextArgNumber( 4 );
+	//long v = 
+          nextArgNumber( 4 );
       }
       catch( VdipException ex ) {}
     }
@@ -2609,17 +2610,6 @@ public class VDIP implements
     this.ioCount      = value;
     fireRunIOTask();
   }
-
-
-  private void startIOTask(
-			IOCmd  cmd,
-			File   file,
-			String text,
-			long   value )
-  {
-    startIOTask( cmd, null, null, null, 0 );
-  }
-
 
   private void startIOTask( IOCmd cmd )
   {

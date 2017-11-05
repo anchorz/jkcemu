@@ -45,6 +45,7 @@ import jkcemu.emusys.Z9001;
 
 public class LoadDlg extends BaseDlg implements DocumentListener
 {
+  private static final long serialVersionUID = 1516231111434903910L;
   public static final String PROP_KEEP_HEADER = "jkcemu.loadsave.header.keep";
 
   private static final String HELP_PAGE = "/help/loadsave.htm";
@@ -76,7 +77,7 @@ public class LoadDlg extends BaseDlg implements DocumentListener
 
   private static boolean suppressAudioMsg = false;
 
-  private Frame             owner;
+  //private Frame             owner;
   private ScreenFrm         screenFrm;
   private boolean           startEnabled;
   private File              file;
@@ -179,7 +180,7 @@ public class LoadDlg extends BaseDlg implements DocumentListener
 	if( (begAddr == null) && !interactive && (fileFmt != null) ) {
 	  LoadData loadData = null;
 	  try {
-	    loadData = fileInfo.createLoadData( fileBuf, fileFmt );
+	    loadData = FileInfo.createLoadData( fileBuf, fileFmt );
 	  }
 	  catch( IOException ex ) {}
 	  if( loadData != null ) {
@@ -382,7 +383,7 @@ public class LoadDlg extends BaseDlg implements DocumentListener
 	setTitle( getTitle() + ": " + fileName );
       }
     }
-    this.owner        = owner;
+    //this.owner        = owner;
     this.screenFrm    = screenFrm;
     this.file         = file;
     this.fileBuf      = fileBuf;
@@ -740,7 +741,7 @@ public class LoadDlg extends BaseDlg implements DocumentListener
 	// Eingaben pruefen
 	int begAddr = -1;
 	int endAddr = -1;
-	int len     = endAddr - begAddr;
+	//int len     = endAddr - begAddr;
 	if( this.docLoadBegAddr.getLength() > 0 ) {
 	  begAddr = (this.docLoadBegAddr.intValue() & 0xFFFF);
 	}
@@ -900,8 +901,8 @@ public class LoadDlg extends BaseDlg implements DocumentListener
     boolean isKCC               = false;
     boolean isKCTAP_SYS         = false;
     boolean isKCTAP_BASIC_PRG   = false;
-    boolean isKCTAP_BASIC_DATA  = false;
-    boolean isKCTAP_BASIC_ASC   = false;
+    //boolean isKCTAP_BASIC_DATA  = false;
+    //boolean isKCTAP_BASIC_ASC   = false;
     boolean isKCBASIC_HEAD_PRG  = false;
     boolean isKCBASIC_PRG       = false;
     boolean isRMC               = false;

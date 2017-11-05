@@ -15,6 +15,7 @@ package z80emu;
 
 public class Z80ExternalException extends Exception
 {
+  private static final long serialVersionUID = 2021042559298172849L;
   private int addr;
 
 

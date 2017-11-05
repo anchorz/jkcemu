@@ -10,7 +10,6 @@ package jkcemu.emusys.bcs3;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -22,12 +21,13 @@ import jkcemu.emusys.BCS3;
 
 public class BCS3KeyboardFld extends AbstractKeyboardFld<BCS3>
 {
+  private static final long serialVersionUID = -6118611648396766599L;
   private static final int MARGIN    = 20;
-  private static final int FONT_SIZE = 12;
+  //private static final int FONT_SIZE = 12;
   private static final int KEY_SIZE  = 40;
 
   private Image   imgLeft;
-  private Font    fontText;
+  //private Font    fontText;
   private int[]   kbMatrix;
   private int     curIdx;
   private int     curX;
@@ -38,7 +38,7 @@ public class BCS3KeyboardFld extends AbstractKeyboardFld<BCS3>
   {
     super( bcs3, 40, true );
     this.imgLeft    = getImage( "/images/keyboard/left.png" );
-    this.fontText   = new Font( "SansSerif", Font.PLAIN, FONT_SIZE );
+    //this.fontText   = new Font( "SansSerif", Font.PLAIN, FONT_SIZE );
     this.kbMatrix   = new int[ 10 ];
     this.curIdx     = 0;
     this.curX       = MARGIN;

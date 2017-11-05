@@ -48,6 +48,7 @@ import jkcemu.programming.basic.target.Z9001Target;
 
 public class BasicOptionsDlg extends AbstractOptionsDlg
 {
+  private static final long serialVersionUID = -8137214208630112008L;
   private static final String textCodeBegAddr =
 			"Anfangsadresse Programmcode:";
   private static final String textHeapSize =
@@ -703,7 +704,7 @@ public class BasicOptionsDlg extends AbstractOptionsDlg
 
       labelText       = textCodeBegAddr;
       int codeBegAddr = this.docCodeBegAddr.intValue();
-      int actualAddr  = codeBegAddr;
+      //int actualAddr  = codeBegAddr;
 
       labelText      = "Anfangsadresse Variablen/Speicherzellen:";
       int bssBegAddr = -1;
@@ -841,12 +842,12 @@ public class BasicOptionsDlg extends AbstractOptionsDlg
     if( this.emuThread != null ) {
       EmuSys curEmuSys = this.emuThread.getEmuSys();
       if( curEmuSys != null ) {
-	boolean state = true;
-	if( this.emuSys != null ) {
-	  if( this.emuSys.equals( curEmuSys ) ) {
-	    state = false;
-	  }
-	}
+	//boolean state = true;
+	//if( this.emuSys != null ) {
+	  //if( this.emuSys.equals( curEmuSys ) ) {
+	    //state = false;
+	  //}
+	//}
 	int   targetIdx = 0;
 	this.emuSys     = curEmuSys;
 	if( emuSys != null ) {

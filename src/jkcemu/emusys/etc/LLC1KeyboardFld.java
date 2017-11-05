@@ -70,7 +70,7 @@ public class LLC1KeyboardFld extends AbstractKeyboardFld<LLC1>
     addKey( "DL", 1, 0x84, "G oder J" );
     addKey( "ST", 2, 0x82, "X oder Enter" );
 
-    int h = this.curY + KEY_SIZE + MARGIN;
+    //int h = this.curY + KEY_SIZE + MARGIN;
     setPreferredSize(
 	new Dimension(
 		(2 * MARGIN) + (6 * KEY_SIZE) + (KEY_SIZE / 2),

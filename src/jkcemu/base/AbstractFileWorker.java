@@ -73,7 +73,7 @@ public abstract class AbstractFileWorker
    */
   protected AbstractFileWorker(
 			Window                         owner,
-			Collection                     files,
+			Collection<?>                  files,
 			PathListener                   pathListener,
 			Collection<AbstractFileWorker> register )
   {
@@ -134,7 +134,7 @@ public abstract class AbstractFileWorker
 
   protected void checkSrcPathsAgainstDstPath(
 				Path       dstPath,
-				Collection files,
+				Collection<?> files,
 				String     errMsg ) throws IOException
   {
     for( Object f : files ) {

@@ -920,7 +920,7 @@ public class CustomSys
     addr &= 0xFFFF;
 
     int     rv   = -1;
-    boolean done = false;
+    //boolean done = false;
     for( CustomSysROM rom : roms ) {
       if( rom.isEnabled() ) {
 	rv = rom.getMemByte( addr );

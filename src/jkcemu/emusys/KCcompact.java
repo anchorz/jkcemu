@@ -1273,10 +1273,10 @@ public class KCcompact extends EmuSys implements
 	case 0x40:				// Farbwert
 	  if( (value & 0xC0) == 0x40 ) {
 	    if( (this.regColorNum & 0x10) != 0 ) {
-	      this.borderColorIdx = this.colorPalette2Idx[ value & 0x1F ];
+	      this.borderColorIdx = colorPalette2Idx[ value & 0x1F ];
 	    } else {
 	      this.regColors[ this.regColorNum & 0x0F ]
-				= this.colorPalette2Idx[ value & 0x1F ];
+				= colorPalette2Idx[ value & 0x1F ];
 	    }
 	  } else {
 	    if( (this.regColorNum & 0x10) != 0 ) {
