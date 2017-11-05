@@ -168,8 +168,6 @@ public class Z1013 extends EmuSys implements
 			CENTR7_PRACTIC_2_1989,
 			CENTR8_FA_10_1990 };
 
-  private static byte[] rom8000Image   = null; //Inhalt des EPROMs
-  private static byte[][] ram128         = {new byte[0x10000],new byte[0x10000]};
   private static byte[] mon202         = null;
   private static byte[] monA2          = null;
   private static byte[] monRB_K7659    = null;
@@ -232,7 +230,7 @@ public class Z1013 extends EmuSys implements
   public Z1013( EmuThread emuThread, Properties props )
   {
     super( emuThread, props, PROP_PREFIX );
-    v128Settings=new jkcemu.emusys.z1013.v128.Settings(PROP_PREFIX,"128");
+    v128Settings=new jkcemu.emusys.z1013.v128.Settings(screenFrm,PROP_PREFIX,"128");
     v128Settings.updFields(props);
     this.stdFontBytes      = null;
     this.altFontBytes      = null;
@@ -538,8 +536,8 @@ public class Z1013 extends EmuSys implements
     }
     if (sysName.equals(SYSNAME_Z1013_128))
     {
-      buf.append( "<tr><td>Ram Bank:</td><td>" );
-      buf.append( this.v128Settings.ramBank );
+      buf.append( "<tr><td>Ram High:</td><td>" );
+      EmuUtil.appendOnOffText( buf, this.v128Settings.ramHigh );
       buf.append( "</td></tr>\n" );
       
       buf.append( "<tr><td>ROM Bank:</td><td>" );
@@ -913,8 +911,8 @@ public class Z1013 extends EmuSys implements
   public int getMemByte( int addr, boolean m1 )
   {
     addr &= 0xFFFF;
-
     int     rv   = 0xFF;
+    
     boolean done = false;
     if( (addr >= 0xC000) && (addr < 0xEC00) ) {
       byte[] rom = this.romBasic;
@@ -983,20 +981,19 @@ public class Z1013 extends EmuSys implements
     }
     if (this.v128Settings.epromActive && addr>=0x8000) {
         int endAddr=0xebff;
-        //System.out.printf("read %04x romdisabled=%s\n",addr,romDisabled);
         if (this.v128Settings.bwsDisabled) {
             endAddr=0xffff; 
         }
         if (addr<=endAddr) {
-            rv= this.rom8000Image[ (addr-0x8000) | this.v128Settings.epromBank<<13 ] & 0xFF;
+            rv= this.v128Settings.eprom[ (addr-0x8000) | this.v128Settings.epromBank<<13 ] & 0xFF;
             done = true;
         }
     }
     
     if( !done && (addr <= this.ramEndAddr) ) {
-        if (this.v128Settings.jp6_64k_enable.value)
+        if (this.v128Settings.ramHigh)
         {
-            rv = this.ram128[this.v128Settings.ramBank][ addr & 0xFFFF ] & 0xFF;
+            rv = v128Settings.ram[ addr & 0xFFFF ] & 0xFF;
         } else
         {
             rv=this.emuThread.getRAMByte(addr);
@@ -1489,8 +1486,6 @@ public class Z1013 extends EmuSys implements
   {
     super.reset( resetLevel, props );
 
-    boolean old64x16 = this.mode64x16;
-
     this.centrTStatesToAck = 0;
     this.joy0ActionMask    = 0;
     this.joy1ActionMask    = 0;
@@ -1688,7 +1683,7 @@ public class Z1013 extends EmuSys implements
 	done = false;
       }
     }
-    else if( (addr >= 0xEC00) && (addr < (0xEC00 + this.ramVideo.length)) ) {
+    else if(!this.v128Settings.bwsDisabled && (addr >= 0xEC00) && (addr < (0xEC00 + this.ramVideo.length)) ) {
       byte[] ram = null;
       if( (this.ramPixel != null) && this.modeGraph ) {
 	if( (this.ramPixelBank >= 0)
@@ -1709,7 +1704,7 @@ public class Z1013 extends EmuSys implements
       }
       done = true;
     }
-    else if( (addr >= 0xF000) && !this.romDisabled
+    else if( (addr >= 0xF000) && !this.romDisabled && !v128Settings.bwsDisabled
 	     && (this.osBytes != null) )
     {
       if( addr < (0xF000 + this.osBytes.length) ) {
@@ -1723,23 +1718,27 @@ public class Z1013 extends EmuSys implements
 	done = true;
       }
     }
-    if( !done && (addr <= this.ramEndAddr) ) {
-        addr &= 0xFFFF;
-        if (addr<0xec00)
-        {
-            if (this.v128Settings.epromActive && addr>=0x8000)
-            {
-               rv=false;
-            } else
-            {
-              this.ram128[this.v128Settings.ramBank][ addr ] = (byte) value;
-              rv = true;
-            }
-        } else
-        {
-            this.emuThread.setRAMByte(addr,value);
+    
+    if (!done && this.v128Settings.epromActive && addr>=0x8000) {
+        int endAddr=0xebff;
+        if (this.v128Settings.bwsDisabled) {
+            endAddr=0xffff; 
+        }
+        if (addr<=endAddr) {
+            done = true;
         }
     }
+    
+    if( !done && (addr <= this.ramEndAddr) ) {
+        if (this.v128Settings.ramHigh)
+        {
+            v128Settings.ram[ addr ] = (byte) value;
+        } else {
+            this.emuThread.setRAMByte(addr,value);
+
+        }
+        rv = true;
+    }    
     return rv;
   }
 
@@ -1870,13 +1869,11 @@ public class Z1013 extends EmuSys implements
       if (sysName.equals(SYSNAME_Z1013_128))
       {
           v128Settings.port4=value&0xf0;
-          int ramBank=0;
+          boolean ramBank=false;
           if (v128Settings.jp6_64k_enable.value){
-              if (((value&0x40)>0) ^ v128Settings.jp19_64k_resetHigh.value) {
-                  ramBank=1;
-              }
+              ramBank=((value&0x40)>0) ^ v128Settings.jp19_64k_resetHigh.value;
           } 
-          v128Settings.ramBank=ramBank;
+          v128Settings.ramHigh=ramBank;
           
           boolean epromActive=false;
           if (!v128Settings.jp11_eprom_inactive.value){
@@ -2415,13 +2412,6 @@ public class Z1013 extends EmuSys implements
 	}
 	this.osBytes = mon202;
       }
-    }
-    if( rom8000Image == null ) {
-      rom8000Image = readResource( "/rom/z1013/rom_boot.bin" );
-      //if (rom8000Image.length%32768!=0) {
-	//     
-      //}
-	      
     }
     if( emulatesModuleBasic( props ) ) {
       this.romBasicFile = EmuUtil.getProperty(

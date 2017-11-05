@@ -11,7 +11,7 @@ public class OptionPanel extends AbstractSettingsFld {
 
     public OptionPanel(SettingsFrm settingsFrm, String propPrefix) {
         super(settingsFrm, propPrefix);
-        settings = new Settings(propPrefix, "128");
+        settings = new Settings(settingsFrm,propPrefix, "128");
         setLayout(null); // Das Layout basiert auf den absoluten Koordinaten der
                          // Jumper.
         this.propPrefix = propPrefix;

@@ -1,17 +1,38 @@
 package jkcemu.emusys.z1013.v128;
 
+import java.awt.Component;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Properties;
 
 import javax.swing.event.ChangeListener;
 
 import jkcemu.base.EmuUtil;
+import jkcemu.base.ScreenFrm;
 import jkcemu.emusys.z1013.v128.Settings.BooleanProperty;
 
 public class Settings {
 
-    public Settings(String propPrefix, String subclass) {
+    public Settings(Component owner, String propPrefix, String subclass) {
         this.propPrefix = propPrefix + subclass + ".";
+        eprom = readResourcePadded(owner, 32768, 512 * 1024, "/rom/z1013/rom_boot.bin");
+    }
+
+    private byte[] readResourcePadded(Component owner, int pad, int len, String name) {
+        byte[] f = EmuUtil.readResource(owner, name);
+        int inputLen = f.length;
+        if (inputLen == len) {
+            return f;
+        }
+        byte[] aligned = new byte[len];
+        Arrays.fill(aligned, 0, len, (byte) 0xff);
+        System.arraycopy(f, 0, aligned, 0, inputLen);
+        for (int size = pad; size < len; size *= 2) {
+            if (inputLen <= size) {
+                System.arraycopy(aligned, 0, aligned, size, size);
+            }
+        }
+        return aligned;
     }
 
     private abstract class BaseProperty {
@@ -74,7 +95,9 @@ public class Settings {
     public BooleanProperty jp19_64k_resetHigh = new BooleanProperty(false);
     public BooleanProperty jp11_eprom_inactive = new BooleanProperty(false);
 
-    public int ramBank;
+    public byte ram[] = new byte[65536];
+    public byte eprom[];
+    public boolean ramHigh;
     public boolean epromActive;
     public boolean bwsDisabled;
     public int epromBank;
@@ -112,7 +135,7 @@ public class Settings {
         port4 = 0;
         epromBank = 0;
         bwsDisabled = !jp9_bws_resetActive.value;
-        epromActive = jp8_eprom_resetActive.value;
-        ramBank = (this.jp19_64k_resetHigh.value && this.jp6_64k_enable.value) ? 1 : 0;
+        epromActive = !jp11_eprom_inactive.value && jp8_eprom_resetActive.value;
+        ramHigh = jp19_64k_resetHigh.value && this.jp6_64k_enable.value;
     }
 }
