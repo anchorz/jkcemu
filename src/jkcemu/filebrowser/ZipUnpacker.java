@@ -26,6 +26,7 @@ import jkcemu.base.EmuUtil;
 
 public class ZipUnpacker extends AbstractThreadDlg
 {
+  private static final long serialVersionUID = 7015580489642750171L;
   private File srcFile;
   private File outDir;
 

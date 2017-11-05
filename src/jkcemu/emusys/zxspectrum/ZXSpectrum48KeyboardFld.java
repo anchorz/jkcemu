@@ -22,6 +22,7 @@ import jkcemu.emusys.ZXSpectrum;
 
 public class ZXSpectrum48KeyboardFld extends AbstractKeyboardFld<ZXSpectrum>
 {
+  private static final long serialVersionUID = 1782886062639847032L;
   private static final int FONT_LARGE_H  = 12;
   private static final int FONT_LETTER_H = 18;
   private static final int FONT_H        = 9;
@@ -52,10 +53,6 @@ public class ZXSpectrum48KeyboardFld extends AbstractKeyboardFld<ZXSpectrum>
   private Image   imgG6;
   private Image   imgG7;
   private Image   imgG8;
-  private Image   imgLeft;
-  private Image   imgRight;
-  private Image   imgUp;
-  private Image   imgDown;
   private Image   imgKey;
   private Image   imgKeyPressed;
   private Image   imgKeyCs;
@@ -64,10 +61,6 @@ public class ZXSpectrum48KeyboardFld extends AbstractKeyboardFld<ZXSpectrum>
   private Image   imgKeySpPressed;
   private Color   colorRed;
   private Color   colorGreen;
-  private Color   colorBlue;
-  private Color   colorMagenta;
-  private Color   colorCyan;
-  private Color   colorYellow;
   private Color   colorKeyNormal;
   private Color   colorKeyPressed;
   private Font    fontLarge;
@@ -91,10 +84,6 @@ public class ZXSpectrum48KeyboardFld extends AbstractKeyboardFld<ZXSpectrum>
     this.imgG6           = getImage( "g6.png" );
     this.imgG7           = getImage( "g7.png" );
     this.imgG8           = getImage( "g8.png" );
-    this.imgLeft         = getImage( "left.png" );
-    this.imgRight        = getImage( "right.png" );
-    this.imgUp           = getImage( "up.png" );
-    this.imgDown         = getImage( "down.png" );
     this.imgKey          = getImage( "key45.png" );
     this.imgKeyPressed   = getImage( "key45_pressed.png" );
     this.imgKeyCs        = getImage( "key65.png" );
@@ -103,10 +92,6 @@ public class ZXSpectrum48KeyboardFld extends AbstractKeyboardFld<ZXSpectrum>
     this.imgKeySpPressed = getImage( "key75_pressed.png" );
     this.colorRed        = new Color( 192, 0, 0 );
     this.colorGreen      = new Color( 0, 192, 0 );
-    this.colorBlue       = new Color( 0, 0, 255 );
-    this.colorMagenta    = new Color( 192, 0, 192 );
-    this.colorCyan       = new Color( 0, 192, 192 );
-    this.colorYellow     = new Color( 192, 192, 0 );
     this.colorKeyNormal  = new Color( 150, 150, 150 );
     this.colorKeyPressed = new Color( 100, 100, 100 );
     this.fontLarge  = new Font( Font.SANS_SERIF, Font.BOLD, FONT_LARGE_H );

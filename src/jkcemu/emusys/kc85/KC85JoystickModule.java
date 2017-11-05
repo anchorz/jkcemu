@@ -8,7 +8,6 @@
 
 package jkcemu.emusys.kc85;
 
-import jkcemu.base.EmuThread;
 import jkcemu.joystick.JoystickThread;
 import z80emu.Z80InterruptSource;
 import z80emu.Z80PIO;

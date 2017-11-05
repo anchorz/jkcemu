@@ -40,6 +40,7 @@ public class CropDlg extends BaseDlg
 				ChangeListener,
 				Runnable
 {
+  private static final long serialVersionUID = 153058596872009269L;
   private Object[][] ratios = {
 	{ "frei \u00E4nderbar",  null },
 	{ "beibehalten",         null },

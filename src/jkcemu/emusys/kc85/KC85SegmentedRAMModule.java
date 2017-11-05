@@ -9,7 +9,6 @@
 package jkcemu.emusys.kc85;
 
 import java.util.Arrays;
-import jkcemu.base.EmuThread;
 
 
 public class KC85SegmentedRAMModule extends AbstractKC85Module

@@ -21,6 +21,7 @@ import jkcemu.emusys.Z1013;
 
 public class Z1013KeyboardFld8x8 extends AbstractKeyboardFld<Z1013>
 {
+  private static final long serialVersionUID = 3073330241561745509L;
   private static final int MARGIN            = 20;
   private static final int TEXT_FONT_SIZE    = 11;
   private static final int LETTER_FONT_SIZE  = 14;
@@ -28,7 +29,6 @@ public class Z1013KeyboardFld8x8 extends AbstractKeyboardFld<Z1013>
   private static final int KEY_SIZE          = 40;
   private static final int MEDIUM_KEY_SIZE   = 50;
   private static final int LARGE_KEY_SIZE    = 60;
-  private static final int SPACE_KEY_SIZE    = 320;
   private static final int DOUBLE_KEY_HEIGHT = 80;
 
   private Image imgLeft;

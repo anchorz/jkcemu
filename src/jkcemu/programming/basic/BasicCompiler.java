@@ -122,7 +122,6 @@ public class BasicCompiler
   private int                        errCnt;
   private int                        labelNum;
   private int                        codeCreationDisabledLevel;
-  private int                        codePosAtBegOfSrcLine;
   private long                       curBasicLineNum;
   private long                       lastBasicLineNum;
   private String                     lastBasicLineExpr;
@@ -1376,7 +1375,7 @@ public class BasicCompiler
     this.tmpStrBufUsed = false;
 
     char ch     = BasicUtil.skipSpaces( iter );
-    int  begPos = iter.getIndex();
+    iter.getIndex();
     if( (ch == '!') || (ch == '\'') ) {		// Kommentar
       iter.next();
       parseREM( iter );
@@ -1763,7 +1762,6 @@ public class BasicCompiler
 
   private void parseDECLARE( CharacterIterator iter ) throws PrgException
   {
-    CallableEntry entry = null;
     if( BasicUtil.checkKeyword( iter, "FUNCTION" ) ) {
       parseCallableDecl( iter, true, false );
     } else if( BasicUtil.checkKeyword( iter, "SUB" ) ) {
@@ -3671,12 +3669,6 @@ public class BasicCompiler
 
 	/* --- Parsen von Ausdruecke --- */
 
-  private void parseExpr( CharacterIterator iter ) throws PrgException
-  {
-    BasicExprParser.parseExpr( this, iter );
-  }
-
-
   private void parseLineExprList( CharacterIterator iter ) throws PrgException
   {
     java.util.List<String> labels = new ArrayList<>( 32 );
@@ -3772,7 +3764,7 @@ public class BasicCompiler
       // pruefen, ob nur ein Literal zugewiesen wird
       String  text = BasicUtil.checkStringLiteral( this, iter );
       if( text != null ) {
-	char ch = BasicUtil.skipSpaces( iter );
+	BasicUtil.skipSpaces( iter );
 	if( isEndOfInstr( iter ) ) {
 	  if( dstVar.hasStaticAddr() ) {
 	    dstVar.ensureStaticAddrInDE( this.asmOut, false );
@@ -3796,7 +3788,7 @@ public class BasicCompiler
 	this.asmOut.setLength( dstPos );
 	SimpleVarInfo srcVar = checkVariable( iter );
 	if( srcVar != null ) {
-	  char ch = BasicUtil.skipSpaces( iter );
+	  BasicUtil.skipSpaces( iter );
 	  if( isEndOfInstr( iter ) ) {
 	    if( srcVar.hasStaticAddr() ) {
 	      srcVar.ensureAddrInHL( this.asmOut );
@@ -4531,13 +4523,6 @@ public class BasicCompiler
   {
     throw new PrgException( "Dimension zu klein" );
   }
-
-
-  private static void throwDivisionByZero() throws PrgException
-  {
-    throw new PrgException( "Division durch 0" );
-  }
-
 
   private static void throwIOChannelNumOutOfRange() throws PrgException
   {

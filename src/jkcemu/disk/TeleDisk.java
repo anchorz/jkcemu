@@ -340,7 +340,6 @@ public class TeleDisk extends AbstractFloppyDisk
   {
     TeleDisk    rv    = null;
     InputStream in    = null;
-    Exception   errEx = null;
     try {
       in = new FileInputStream( file );
       if( EmuUtil.isGZipFile( file ) ) {
@@ -380,10 +379,9 @@ public class TeleDisk extends AbstractFloppyDisk
 
       // Kommantarblock mit Zeitstempel lesen
       String         remark   = null;
-      String         dateText = null;
       java.util.Date diskDate = null;
       if( hasRemark ) {
-	int crcValue = readMandatoryWord( in );
+	readMandatoryWord( in );
 	int len      = readMandatoryWord( in );
 	int year     = readMandatoryByte( in ) + 1900;
 	int month    = readMandatoryByte( in );
@@ -467,7 +465,7 @@ public class TeleDisk extends AbstractFloppyDisk
 	    int secNum      = readMandatoryByte( in );
 	    int secSizeCode = readMandatoryByte( in );
 	    int secCtrl     = readMandatoryByte( in );
-	    int secCrcValue = readMandatoryByte( in );
+	    readMandatoryByte( in );
 
 	    // Datenpuffer anlegen
 	    byte[] secBuf = null;

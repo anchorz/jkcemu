@@ -174,7 +174,7 @@ public class DateStamper
 	synchronized( calendar ) {
 	  calendar.clear();
 	  calendar.setTimeInMillis( millis.longValue() );
-	  int year = this.calendar.get( Calendar.YEAR );
+	  int year = calendar.get( Calendar.YEAR );
 	  if( (year >= 1978) && (year < 2078) ) {
 	    this.dateTimeBytes[ this.pos++ ] = toBcdByte( year );
 	    this.dateTimeBytes[ this.pos++ ] =

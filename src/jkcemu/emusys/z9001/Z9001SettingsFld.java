@@ -40,6 +40,7 @@ import jkcemu.emusys.Z9001;
 
 public class Z9001SettingsFld extends AbstractSettingsFld
 {
+  private static final long serialVersionUID = 1340052181026066307L;
   private static final String DEFAULT_LABEL_ROM_MODULE =
 				"Inhalt des ROM-Moduls:";
 

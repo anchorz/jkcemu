@@ -2029,7 +2029,7 @@ public class EmuUtil
 
 
   public static boolean setSelectedHeadersaveFileTypeItem(
-						JComboBox combo,
+						JComboBox<String> combo,
 						int       fileType )
   {
     boolean rv = false;

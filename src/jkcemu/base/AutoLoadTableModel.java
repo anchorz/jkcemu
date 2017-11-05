@@ -119,14 +119,14 @@ public class AutoLoadTableModel extends AbstractTableModel
   @Override
   public int getColumnCount()
   {
-    return this.colNames.length;
+    return colNames.length;
   }
 
 
   @Override
   public String getColumnName( int col )
   {
-    return (col >= 0) && (col < this.colNames.length) ? colNames[ col ] : "";
+    return (col >= 0) && (col < colNames.length) ? colNames[ col ] : "";
   }
 
 

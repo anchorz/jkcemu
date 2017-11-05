@@ -16,7 +16,6 @@
 package jkcemu.audio;
 
 import java.io.IOException;
-import jkcemu.base.EmuUtil;
 
 
 public class BitSampleBuffer

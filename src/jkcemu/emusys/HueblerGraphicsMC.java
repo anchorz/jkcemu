@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.zip.CRC32;
-import jkcemu.Main;
 import jkcemu.base.CharRaster;
 import jkcemu.base.EmuThread;
 import jkcemu.base.EmuUtil;

@@ -17,7 +17,6 @@ import jkcemu.base.EmuUtil;
 import jkcemu.base.FileInfo;
 import jkcemu.emusys.kc85.KCAudioCreator;
 import jkcemu.emusys.zxspectrum.ZXSpectrumAudioCreator;
-import jkcemu.text.TextUtil;
 import z80emu.Z80CPU;
 
 

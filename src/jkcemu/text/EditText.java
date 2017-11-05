@@ -62,7 +62,6 @@ import jkcemu.emusys.Z9001;
 import jkcemu.programming.PrgOptions;
 import jkcemu.programming.PrgSource;
 import jkcemu.programming.basic.BasicOptions;
-import z80emu.Z80MemView;
 
 
 public class EditText implements

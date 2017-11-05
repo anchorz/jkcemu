@@ -39,7 +39,6 @@ public class VIS implements GDC82720.GDCListener, GDC82720.VRAM
   private IndexColorModel colorModel;
   private Color[]         colors;
   private int[]           colorRGBs;
-  private boolean         colorMode;
   private boolean         fixedScreenSize;
   private boolean         fontGenVisAccess;
   private boolean         fontGenEnabled;
@@ -268,7 +267,6 @@ public class VIS implements GDC82720.GDCListener, GDC82720.VRAM
 	      while( a >= 0 ) {
 		int v = getVRAMWord( a & GDC82720.DISPL_ADDR_MASK );
 		int m = 0x0001;
-		int c = 0;
 		for( int i = 0; i < COLOR_COUNT; i++ ) {
 		  img.setRGB(
 			x++,
@@ -456,7 +454,7 @@ public class VIS implements GDC82720.GDCListener, GDC82720.VRAM
     switch( value & 0x70 ) {
       case 0x00:				// Betriebsartenregister 0
 	int oldMode    = this.mode;
-	this.colorMode = ((value & 0x03) != 0x03);
+	//this.colorMode = ((value & 0x03) != 0x03);
 	switch( value & 0x07 ) {
 	  case 0:
 	  case 3:

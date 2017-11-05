@@ -611,7 +611,7 @@ public class BCS3 extends EmuSys implements Z80CTCListener
   @Override
   public int getAppStartStackInitValue()
   {
-    return this.osBytes == this.osBytesSE24 ? 0x3C50 : 0x3C80;
+    return this.osBytes == osBytesSE24 ? 0x3C50 : 0x3C80;
   }
 
 

@@ -13,8 +13,6 @@ import jkcemu.programming.PrgSource;
 
 public class WhileEntry extends LoopEntry
 {
-  private String loopLabel;
-  private String endLabel;
 
 
   public WhileEntry(

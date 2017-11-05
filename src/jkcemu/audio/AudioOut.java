@@ -97,10 +97,10 @@ public class AudioOut extends AudioIO
       if( frameRate > 0 ) {
 	line = openSourceDataLine( mixer, frameRate, stereo );
       } else {
-	for( int i = 0; i < this.frameRates.length; i++ ) {
+	for( int i = 0; i < frameRates.length; i++ ) {
 	  line = openSourceDataLine(
 			mixer,
-			this.frameRates[ i ],
+		    frameRates[ i ],
 			stereo );
 	  if( line != null ) {
 	    break;
@@ -136,7 +136,7 @@ public class AudioOut extends AudioIO
     }
     if( this.frameRate <= 0 ) {
       if( frameRate <= 0 ) {
-	frameRate = this.frameRates[ 0 ];
+	frameRate = frameRates[ 0 ];
       }
       setFormat(
 		frameRate,

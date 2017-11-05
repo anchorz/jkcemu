@@ -28,7 +28,6 @@ import jkcemu.emusys.customsys.CustomSysROM;
 import jkcemu.etc.VDIP;
 import jkcemu.net.KCNet;
 import jkcemu.text.CharConverter;
-import jkcemu.text.TextUtil;
 import z80emu.Z80CPU;
 import z80emu.Z80CTC;
 import z80emu.Z80CTCListener;

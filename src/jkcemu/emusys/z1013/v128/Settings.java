@@ -8,8 +8,6 @@ import java.util.Properties;
 import javax.swing.event.ChangeListener;
 
 import jkcemu.base.EmuUtil;
-import jkcemu.base.ScreenFrm;
-import jkcemu.emusys.z1013.v128.Settings.BooleanProperty;
 
 public class Settings {
 

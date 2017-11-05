@@ -14,7 +14,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -35,6 +34,7 @@ import jkcemu.base.FileProgressInputStream;
 public class ZipPacker extends AbstractThreadDlg
 			implements FileVisitor<Path>
 {
+  private static final long serialVersionUID = 650777706136461182L;
   private Collection<Path> srcPaths;
   private Path             curRootPath;
   private File             outFile;
@@ -199,7 +199,6 @@ public class ZipPacker extends AbstractThreadDlg
   protected void doProgress()
   {
     boolean     failed = false;
-    InputStream in     = null;
     try {
       this.out = new ZipOutputStream(
 			new BufferedOutputStream(

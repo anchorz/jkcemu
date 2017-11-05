@@ -3569,7 +3569,7 @@ public class DebugFrm extends BaseFrm implements
     this.listIntSrc.setEnabled( true );
     this.fldIntSrc.setEnabled( true );
     updIntSrcFields();
-    ListModel lm = this.listIntSrc.getModel();
+    ListModel<Z80InterruptSource> lm = this.listIntSrc.getModel();
     if( lm != null ) {
       if( lm.getSize() == 1 ) {
 	this.listIntSrc.setSelectedIndex( 0 );
@@ -4241,7 +4241,7 @@ public class DebugFrm extends BaseFrm implements
 	}
       }
       if( !done ) {
-	ListModel lm = this.listIntSrc.getModel();
+	ListModel<Z80InterruptSource> lm = this.listIntSrc.getModel();
 	if( lm != null ) {
 	  if( lm.getSize() > 0 ) {
 	    this.fldIntSrc.setContentType( "text/plain" );

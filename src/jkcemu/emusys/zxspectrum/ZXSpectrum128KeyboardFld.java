@@ -25,6 +25,7 @@ import jkcemu.emusys.ZXSpectrum;
 
 public class ZXSpectrum128KeyboardFld extends AbstractKeyboardFld<ZXSpectrum>
 {
+  private static final long serialVersionUID = -2602447446391374851L;
   private static final String KEY_TEXT_CAPS_SHIFT   = "\nCAPS SHIFT";
   private static final String KEY_TEXT_SYMBOL_SHIFT = "SYMBOL\nSHIFT";
 

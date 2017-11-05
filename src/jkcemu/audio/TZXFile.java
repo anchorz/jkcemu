@@ -14,7 +14,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import jkcemu.Main;
 import jkcemu.base.EmuUtil;
 import jkcemu.base.FileInfo;
 

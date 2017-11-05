@@ -10,7 +10,6 @@ package jkcemu.emusys.kc85;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -20,8 +19,8 @@ import jkcemu.emusys.KC85;
 
 public class KC85KeyboardFld extends AbstractKC85KeyboardFld
 {
+  private static final long serialVersionUID = -4577846994871557282L;
   private static final int FS_KEY     = 14;
-  private static final int FS_NOSHIFT = 12;
   private static final int FS_SHIFT   = 10;
   private static final int MARGIN_X   = 15;
   private static final int MARGIN_Y   = 20;
@@ -46,9 +45,6 @@ public class KC85KeyboardFld extends AbstractKC85KeyboardFld
   private Image   imgShift;
   private Image   imgShLock;
   private Color   colorBG;
-  private Font    fontKey;
-  private Font    fontNoShift;
-  private Font    fontShift;
   private KeyData shiftKey;
   private KeyData spaceKey;
   private int     wKey;
@@ -78,9 +74,6 @@ public class KC85KeyboardFld extends AbstractKC85KeyboardFld
       this.wKey = this.imgKeySmall.getWidth( this );
       this.hKey = this.imgKeySmall.getHeight( this );
     }
-    this.fontKey     = new Font( "SansSerif", Font.BOLD, FS_KEY );
-    this.fontNoShift = new Font( "SansSerif", Font.BOLD, FS_NOSHIFT );
-    this.fontShift   = new Font( "SansSerif", Font.BOLD, FS_SHIFT );
     this.curIdx      = 0;
 
     int dist  = (KEY_PAD_W - ((KEY_COL_W * 11) + this.wKey)) / 3;
@@ -509,18 +502,6 @@ public class KC85KeyboardFld extends AbstractKC85KeyboardFld
       }
     }
   }
-
-
-  private void drawRight( Graphics g, int x, int y, int w, String text )
-  {
-    FontMetrics fm = g.getFontMetrics();
-    if( fm != null ) {
-      g.drawString( text, x + (w - fm.stringWidth( text )), y );
-    } else {
-      g.drawString( text, x, y );
-    }
-  }
-
 
   private void prepareLayout()
   {

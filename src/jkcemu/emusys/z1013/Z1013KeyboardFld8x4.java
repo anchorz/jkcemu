@@ -21,6 +21,7 @@ import jkcemu.emusys.Z1013;
 
 public class Z1013KeyboardFld8x4 extends AbstractKeyboardFld<Z1013>
 {
+  private static final long serialVersionUID = -9106621890749944220L;
   private static final String[] keyImgResources = {
 			"/images/keyboard/z1013/key_at.png",
 			"/images/keyboard/z1013/key_a.png",

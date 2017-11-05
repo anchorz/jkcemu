@@ -27,6 +27,7 @@ import jkcemu.emusys.ZXSpectrum;
 
 public class ZXSpectrumSettingsFld extends AbstractSettingsFld
 {
+  private static final long serialVersionUID = -2063551488489537482L;
   private JRadioButton       btn48K;
   private JRadioButton       btn128K;
   private ROMFileSettingsFld fldAltROM;

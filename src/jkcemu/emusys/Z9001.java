@@ -254,8 +254,6 @@ public class Z9001 extends EmuSys implements
   private boolean           colorSwap;
   private boolean           fdcReset;
   private boolean           fdcTC;
-  private boolean           rf1ReadOnly;
-  private boolean           rf2ReadOnly;
   private boolean           ram4000ExtEnabled;
   private boolean           ramC000Enabled;
   private boolean           ramFontActive;
@@ -1840,8 +1838,6 @@ public class Z9001 extends EmuSys implements
     this.plotterMoveState  = false;
     this.fdcReset          = false;
     this.fdcTC             = false;
-    this.rf1ReadOnly       = false;
-    this.rf2ReadOnly       = false;
     this.ram4000ExtEnabled = false;
     this.ramC000Enabled    = false;
     this.ramFontActive     = false;
@@ -2840,7 +2836,7 @@ public class Z9001 extends EmuSys implements
 	 */
 	int idx = addr - 0xB800;
 	if( (idx >= 0) && (idx < printerModBytes.length) ) {
-	  rv = (int) this.printerModBytes[ idx ] & 0xFF;
+	  rv = (int) printerModBytes[ idx ] & 0xFF;
 	}
       }
     }

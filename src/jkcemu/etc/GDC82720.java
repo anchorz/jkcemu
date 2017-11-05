@@ -577,7 +577,6 @@ public class GDC82720 implements
       if( this.screenEnabled != oldScreenEnabled ) {
 	configChanged = true;
       }
-      this.screenEnabled     = screenEnabled;
       this.lineCounter       = 0;
       this.lineTStateCounter = 0;
       switch( this.argIdx ) {

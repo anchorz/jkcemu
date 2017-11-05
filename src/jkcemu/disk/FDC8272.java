@@ -11,7 +11,6 @@ package jkcemu.disk;
 
 import java.util.Arrays;
 import jkcemu.Main;
-import jkcemu.base.EmuThread;
 import z80emu.Z80CPU;
 import z80emu.Z80MaxSpeedListener;
 import z80emu.Z80TStatesListener;

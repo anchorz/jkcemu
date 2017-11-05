@@ -24,7 +24,6 @@ import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import jkcemu.Main;
 import jkcemu.base.BaseDlg;
 
 

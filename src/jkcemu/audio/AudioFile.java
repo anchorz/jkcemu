@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import jkcemu.Main;
 import jkcemu.base.EmuUtil;
 
 

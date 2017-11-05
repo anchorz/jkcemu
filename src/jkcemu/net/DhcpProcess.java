@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import jkcemu.Main;
 import jkcemu.base.EmuUtil;
 
 

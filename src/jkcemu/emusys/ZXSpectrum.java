@@ -450,7 +450,7 @@ public class ZXSpectrum extends EmuSys implements
   public int getColorIndex( int x, int y )
   {
     int rv = 0;
-    if( (x >= 0) && (x < this.SCREEN_WIDTH)
+    if( (x >= 0) && (x < SCREEN_WIDTH)
 	&& (y >= 0) && (y < SCREEN_HEIGHT) )
     {
       rv = (int) this.screenColorNums[ (y * SCREEN_WIDTH) + x ] & 0x0F;

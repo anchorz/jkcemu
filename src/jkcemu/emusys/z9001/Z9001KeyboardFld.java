@@ -23,6 +23,7 @@ import jkcemu.emusys.Z9001;
 
 public class Z9001KeyboardFld extends AbstractKeyboardFld<Z9001>
 {
+  private static final long serialVersionUID = 6870991058837179616L;
   private static final int FS_SMALL   = 9;
   private static final int FS_KEY     = 12;
   private static final int FS_SKEY    = 9;

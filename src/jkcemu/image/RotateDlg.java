@@ -33,13 +33,13 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import jkcemu.Main;
 import jkcemu.base.BaseDlg;
 import jkcemu.base.EmuUtil;
 
 
 public class RotateDlg extends BaseDlg implements ChangeListener
 {
+  private static final long serialVersionUID = -5340401400328168625L;
   private static final int MIN_DEGREES = -180;
   private static final int MAX_DEGREES = 180;
 

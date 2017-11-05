@@ -91,7 +91,6 @@ import jkcemu.base.BaseDlg;
 import jkcemu.base.BaseFrm;
 import jkcemu.base.DirSelectDlg;
 import jkcemu.base.EmuUtil;
-import jkcemu.base.FileEntry;
 import jkcemu.base.HelpFrm;
 import jkcemu.base.ScreenFrm;
 import jkcemu.base.UserInputException;

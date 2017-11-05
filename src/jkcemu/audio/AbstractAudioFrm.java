@@ -36,8 +36,8 @@ public class AbstractAudioFrm extends BaseFrm
     JComboBox<Object> comboBox = new JComboBox<>();
     comboBox.setEditable( false );
     comboBox.addItem( "Standard" );
-    for( int i = 0; i < this.frameRates.length; i++ ) {
-      comboBox.addItem( this.frameRates[ i ] );
+    for( int i = 0; i < frameRates.length; i++ ) {
+      comboBox.addItem( frameRates[ i ] );
     }
     return comboBox;
   }

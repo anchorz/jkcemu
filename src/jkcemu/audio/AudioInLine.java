@@ -51,10 +51,10 @@ public class AudioInLine extends AudioIn
       line = openTargetDataLine( mixer, frameRate );
     } else {
       for( int i = 0;
-	   (line == null) && (i < this.frameRates.length);
+	   (line == null) && (i < frameRates.length);
 	   i++ )
       {
-	line = openTargetDataLine( mixer, this.frameRates[ i ] );
+	line = openTargetDataLine( mixer, frameRates[ i ] );
       }
     }
     if( line == null ) {

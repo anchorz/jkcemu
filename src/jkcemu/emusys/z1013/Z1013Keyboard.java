@@ -18,7 +18,6 @@ public class Z1013Keyboard
 {
   private Z80PIO                  z80pio;
   private volatile KeyboardMatrix keyboardMatrix;
-  private volatile boolean        fontAltEnabled;
   private volatile int            selectedCol;
 
 
@@ -26,7 +25,6 @@ public class Z1013Keyboard
   {
     this.z80pio         = z80pio;
     this.keyboardMatrix = null;
-    this.fontAltEnabled = false;
     this.selectedCol    = 0;
     applySettings( Main.getProperties() );
     if( this.keyboardMatrix == null ) {

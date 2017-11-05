@@ -10,7 +10,6 @@ package jkcemu.programming;
 
 import java.io.File;
 import java.util.Properties;
-import jkcemu.base.EmuThread;
 import jkcemu.programming.assembler.Z80Assembler;
 import jkcemu.programming.basic.BasicOptions;
 

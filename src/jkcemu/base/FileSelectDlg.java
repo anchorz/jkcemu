@@ -945,7 +945,7 @@ public class FileSelectDlg
   private void doListAction( int idx )
   {
     if( idx >= 0 ) {
-      ListModel model = this.list.getModel();
+      ListModel<File> model = this.list.getModel();
       if( model != null ) {
 	if( idx < model.getSize() ) {
 	  Object o = model.getElementAt( idx );

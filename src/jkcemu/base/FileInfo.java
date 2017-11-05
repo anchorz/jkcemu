@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
-import jkcemu.Main;
 
 
 public class FileInfo
