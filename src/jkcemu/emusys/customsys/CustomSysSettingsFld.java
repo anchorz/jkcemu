@@ -64,6 +64,7 @@ public class CustomSysSettingsFld
 				ListSelectionListener,
 				MouseListener
 {
+  private static final long serialVersionUID = -5091710297671563163L;
   private static final String TEXT_INVALID_ADDR  = " Ung\u00FCltige Adresse";
   private static final String TEXT_INVALID_VALUE = " Ung\u00FCltiger Wert";
   private static final String LABEL_CLOCK_FREQUENCY = "Taktfrequenz:";
@@ -160,7 +161,6 @@ public class CustomSysSettingsFld
   private JLabel                 labelSioClockB;
   private JLabel                 labelSioOutA;
   private JLabel                 labelSioOutB;
-  private JLabel                 labelVdipIOBaseAddr;
   private JPanel                 tabFDC;
   private JPanel                 tabGeneral;
   private JPanel                 tabIO;
@@ -876,7 +876,6 @@ public class CustomSysSettingsFld
 		boolean    selected ) throws UserInputException
   {
     Component tab  = null;
-    String    text = null;
     try {
 
       // Tab Allgemein
@@ -1527,23 +1526,19 @@ public class CustomSysSettingsFld
 		CustomSys.getFdcStatusIOAddr( props ), 4 );
     this.docFdcTCIOAddr.setValue(
 		CustomSys.getFdcTCIOAddr( props ), 4 );
-    int fdcTCIOBitIdx = 0;
     int fdcTCIOMask   = EmuUtil.getIntProperty(
 		props,
 		this.propPrefix + CustomSys.PROP_FDC_TC_IOMASK,
 		0 ) & 0xFF;
     if( fdcTCIOMask != 0 ) {
-      fdcTCIOBitIdx++;
       while( (fdcTCIOMask & 0x01) != 0 ) {
 	fdcTCIOMask <<= 1;
-	fdcTCIOBitIdx++;
-      }
+	  }
       if( (EmuUtil.getIntProperty(
 		props,
 		this.propPrefix + CustomSys.PROP_FDC_TC_IOVALUE,
 		0xFF ) & 0xFF) == 0 )
       {
-	fdcTCIOBitIdx += 8;
       }
     }
 
@@ -1745,14 +1740,14 @@ public class CustomSysSettingsFld
     }
   }
 
-  private static String getSioOutValue( JComboBox combo )
+  private static String getSioOutValue( JComboBox<String> combo )
   {
     return combo.getSelectedIndex() == 1 ? CustomSys.VALUE_PRINTER : "";
   }
 
 
   private void setSelectedSioClock(
-			JComboBox  combo,
+			JComboBox<String>  combo,
 			Properties props,
 			String     propName )
   {

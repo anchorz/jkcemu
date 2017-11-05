@@ -13,7 +13,6 @@ import java.io.IOException;
 import jkcemu.audio.BitSampleBuffer;
 import jkcemu.audio.PCMDataSource;
 import jkcemu.audio.TZXFile;
-import jkcemu.base.*;
 
 
 public class TZXFileTarget extends AbstractConvertTarget

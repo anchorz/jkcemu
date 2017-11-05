@@ -9,7 +9,6 @@
 package jkcemu.programming.basic;
 
 import java.text.CharacterIterator;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import jkcemu.programming.PrgException;
 

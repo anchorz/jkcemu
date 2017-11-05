@@ -24,7 +24,6 @@ public class CSWFile
   private static class CSWFormat
   {
     private long    sampleRate;
-    private long    pulses;
     private boolean initialPhase;
     private int     headerLen;
 
@@ -35,7 +34,6 @@ public class CSWFile
 		int     headerLen )
     {
       this.sampleRate   = sampleRate;
-      this.pulses       = pulses;
       this.initialPhase = initialPhase;
       this.headerLen    = headerLen;
     }
@@ -227,7 +225,6 @@ public class CSWFile
 				byte[] buf,
 				int    pos ) throws IOException
   {
-    CSWFormat rv = null;
     if( !FileInfo.isCswMagicAt( buf, pos ) ) {
       EmuUtil.throwUnsupportedFileFormat();
     }

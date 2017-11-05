@@ -25,7 +25,6 @@ import jkcemu.base.AutoLoadSettingsFld;
 import jkcemu.base.EmuUtil;
 import jkcemu.base.RAMFloppy;
 import jkcemu.base.RAMFloppiesSettingsFld;
-import jkcemu.base.RAMFloppySettingsFld;
 import jkcemu.base.SettingsFrm;
 import jkcemu.base.UserInputException;
 import jkcemu.emusys.A5105;
@@ -33,6 +32,7 @@ import jkcemu.emusys.A5105;
 
 public class A5105SettingsFld extends AbstractSettingsFld
 {
+  private static final long serialVersionUID = 4788195839804396466L;
   private JTabbedPane            tabbedPane;
   private JPanel                 tabEtc;
   private RAMFloppiesSettingsFld tabRF;

@@ -9,7 +9,6 @@
 package jkcemu.disk;
 
 import java.io.File;
-import jkcemu.base.*;
 
 
 public class HardDisk

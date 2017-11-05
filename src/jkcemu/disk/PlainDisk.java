@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
 import java.util.Properties;
-import java.util.zip.GZIPInputStream;
 import jkcemu.base.DeviceIO;
 import jkcemu.base.EmuUtil;
 

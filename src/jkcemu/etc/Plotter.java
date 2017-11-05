@@ -46,8 +46,6 @@ public class Plotter
   {
     this.image        = null;
     this.plotterFrm   = null;
-    this.width        = width;
-    this.height       = height;
     this.curX         = 0;
     this.curY         = 0;
     this.paperRGB     = 0xFFFFFFFF;

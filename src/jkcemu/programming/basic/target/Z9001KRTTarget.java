@@ -9,7 +9,6 @@
 
 package jkcemu.programming.basic.target;
 
-import java.util.Set;
 import jkcemu.base.EmuSys;
 import jkcemu.emusys.Z9001;
 import jkcemu.programming.basic.AsmCodeBuf;

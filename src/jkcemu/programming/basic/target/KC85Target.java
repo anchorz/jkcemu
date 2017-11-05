@@ -8,7 +8,6 @@
 
 package jkcemu.programming.basic.target;
 
-import java.util.Set;
 import jkcemu.base.EmuSys;
 import jkcemu.emusys.KC85;
 import jkcemu.programming.basic.AbstractTarget;

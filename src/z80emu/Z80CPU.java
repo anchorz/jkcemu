@@ -62,7 +62,6 @@ public class Z80CPU implements Runnable
   private volatile Z80TStatesListener[]     tStatesListeners;
   private Z80Memory                         memory;
   private Z80IOSystem                       ioSys;
-  private Thread                            thread;
   private volatile PrintWriter              debugTracer;
   private volatile Z80Breakpoint[]          breakpoints;
   private volatile Z80InterruptSource[]     interruptSources;
@@ -137,7 +136,6 @@ public class Z80CPU implements Runnable
   {
     this.memory                = memory;
     this.ioSys                 = ioSys;
-    this.thread                = null;
     this.pcListener            = null;
     this.addrListener          = null;
     this.tStatesListeners      = null;
@@ -1171,7 +1169,6 @@ public class Z80CPU implements Runnable
     resetSpeed();
 
     this.active = true;
-    this.thread = Thread.currentThread();
     updStatusListeners( null, null );
 
     try {

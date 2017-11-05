@@ -8,7 +8,6 @@
 
 package jkcemu.programming.basic;
 
-import java.util.Map;
 import jkcemu.programming.PrgSource;
 
 

@@ -8,7 +8,6 @@
 
 package jkcemu.audio;
 
-import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import jkcemu.base.EmuUtil;

@@ -25,7 +25,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.table.TableModel;
 import jkcemu.base.BaseDlg;
 import jkcemu.base.HexDocument;
 import jkcemu.base.UserInputException;

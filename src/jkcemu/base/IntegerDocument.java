@@ -8,7 +8,6 @@
 
 package jkcemu.base;
 
-import javax.swing.text.AttributeSet;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 

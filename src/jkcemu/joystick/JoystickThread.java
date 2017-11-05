@@ -26,7 +26,6 @@ public class JoystickThread extends Thread
 
   private EmuThread        emuThread;
   private int              joyNum;
-  private boolean          allowAltJoy;
   private boolean          interactive;
   private volatile boolean running;
 

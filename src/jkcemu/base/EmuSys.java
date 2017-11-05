@@ -8,9 +8,7 @@
 
 package jkcemu.base;
 
-import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.image.ImageObserver;
@@ -19,8 +17,6 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Arrays;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
-import javax.swing.JOptionPane;
 import jkcemu.Main;
 import jkcemu.base.ScreenFrm;
 import jkcemu.disk.FloppyDiskDrive;

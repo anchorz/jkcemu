@@ -60,8 +60,6 @@ public class A5105 extends EmuSys implements
 					Z80PCListener
 {
 
-private static int lastAA = -1;
-
   public static final String SYSNAME     = "A5105";
   public static final String SYSTEXT     = "A5105 (BIC)";
   public static final String PROP_PREFIX = "jkcemu.a5105.";
@@ -178,10 +176,8 @@ private static int lastAA = -1;
   private int                   v24TStateCounter;
   private int                   shiftTStateCounter;
   private int                   memConfig;
-  private int                   ledValues;
   private int                   psgRegNum;
   private int                   outAA;
-  private int                   coninRetAddr;
   private int[]                 keyboardMatrix;
   private A5105KeyboardFld      keyboardFld;
   private volatile ByteIterator keyClickSamples;

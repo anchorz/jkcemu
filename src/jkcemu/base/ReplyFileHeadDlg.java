@@ -14,7 +14,6 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Window;
-import java.io.File;
 import java.util.EventObject;
 import javax.swing.JButton;
 import javax.swing.JComboBox;

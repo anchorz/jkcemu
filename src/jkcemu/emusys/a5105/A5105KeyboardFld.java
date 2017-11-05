@@ -18,11 +18,11 @@ import java.util.Arrays;
 import jkcemu.base.AbstractKeyboardFld;
 import jkcemu.base.EmuSys;
 import jkcemu.emusys.A5105;
-import jkcemu.image.ImgUtil;
 
 
 public class A5105KeyboardFld extends AbstractKeyboardFld<A5105>
 {
+  private static final long serialVersionUID = 7044185409948409751L;
   private static final int TEXT_FONT_SIZE   = 9;
   private static final int LETTER_FONT_SIZE = 14;
   private static final int DIGIT_FONT_SIZE  = 12;

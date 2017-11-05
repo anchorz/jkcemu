@@ -14,7 +14,6 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Window;
-import java.util.EventObject;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import jkcemu.Main;

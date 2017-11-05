@@ -8,7 +8,6 @@
 
 package jkcemu.programming.assembler;
 
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.util.Collection;
 import jkcemu.Main;

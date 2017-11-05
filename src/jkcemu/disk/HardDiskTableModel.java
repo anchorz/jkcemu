@@ -8,7 +8,6 @@
 
 package jkcemu.disk;
 
-import java.awt.Window;
 import java.util.Collections;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;

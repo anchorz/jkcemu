@@ -8,8 +8,6 @@
 
 package jkcemu.tools.debugger;
 
-import java.util.ArrayList;
-import javax.swing.table.AbstractTableModel;
 import z80emu.Z80MemView;
 
 

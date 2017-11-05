@@ -320,7 +320,6 @@ public class RotateDlg extends BaseDlg implements ChangeListener
        */
       int w     = this.orgImg.getWidth();
       int h     = this.orgImg.getHeight();
-      int xOffs = -(w / 2);
       int yOffs = -(h / 2);
       int mOffs = (int) Math.round(
 		Math.sqrt( (double) ((w * w / 4) + (h * h / 4)) ) );

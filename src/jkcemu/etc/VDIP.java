@@ -67,6 +67,8 @@ public class VDIP implements
 
   private class IncompleteCmdException extends Exception
   {
+    private static final long serialVersionUID = -108618542908434563L;
+
     private IncompleteCmdException()
     {
       // leer
@@ -76,6 +78,7 @@ public class VDIP implements
 
   private class VdipException extends Exception
   {
+    private static final long serialVersionUID = -5212979110359426130L;
     private VdipErr vdipErr;
 
     private VdipException( VdipErr vdipErr )
@@ -1297,7 +1300,6 @@ public class VDIP implements
 	   * sollen sie den Wert der letzten Aenderung haben.
 	   */
 	  lastAccessDateTime   = lastModifiedDateTime;
-	  lastModifiedDateTime = lastModifiedDateTime;
 	}
 	v = ftv.getCreationMillis();
 	if( v != null ) {

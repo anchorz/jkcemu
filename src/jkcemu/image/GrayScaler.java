@@ -13,7 +13,6 @@
 
 package jkcemu.image;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Transparency;
 import java.awt.Window;
@@ -30,7 +29,6 @@ public class GrayScaler
 {
   private BufferedImage         srcImg;
   private BufferedImage         retImg;
-  private Integer               grayRGBForTransp;
   private int                   wImg;
   private int                   hImg;
   private volatile int          progressValue;

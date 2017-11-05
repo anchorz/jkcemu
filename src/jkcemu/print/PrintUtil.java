@@ -108,7 +108,7 @@ public class PrintUtil
 				int        pageNum )
   {
     String s = "- " + String.valueOf( pageNum ) + " -";
-    int    w = g.getFontMetrics().stringWidth( s );
+    //int    w = g.getFontMetrics().stringWidth( s );
     g.setColor( Color.black );
     g.setFont( new Font( Font.MONOSPACED, Font.PLAIN, fontSize ) );
     g.drawString(
