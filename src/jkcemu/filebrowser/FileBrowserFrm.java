@@ -286,7 +286,7 @@ public class FileBrowserFrm
 	      Object o = t.getTransferData( DataFlavor.javaFileListFlavor );
 	      if( o != null ) {
 		if( o instanceof Collection ) {
-		  fireRefreshParentNodesFor( (Collection<Path>) o );
+		  fireRefreshParentNodesFor( (Collection) o );
 		}
 	      }
 	    }
@@ -401,7 +401,7 @@ public class FileBrowserFrm
 	  Object o = t.getTransferData( DataFlavor.javaFileListFlavor );
 	  if( o != null ) {
 	    if( o instanceof Collection ) {
-	      Collection<File> files = (Collection<File>) o;
+	      Collection files = (Collection) o;
 
 	      // Pruefung und Sicherheitsabfrage
 	      boolean status    = true;
@@ -1025,11 +1025,11 @@ public class FileBrowserFrm
 	  if( this.clipboard != null ) {
 	    Object o = this.clipboard.getData( DataFlavor.javaFileListFlavor );
 	    if( o != null ) {
-	      Collection<File> files = null;
+	      Collection files = null;
 	      if( o instanceof File ) {
 		files = Collections.singletonList( (File) o );
 	      } else if( o instanceof Collection ) {
-		files = (Collection<File>) o;
+		files = (Collection) o;
 	      }
 	      if( !files.isEmpty() ) {
 		(new FileCopier(

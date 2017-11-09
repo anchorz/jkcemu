@@ -56,8 +56,8 @@ import jkcemu.tools.hexedit.HexEditFrm;
 
 public class Main
 {
-  public static final String APPNAME = "Andreas' JKCEMU";
-  public static final String VERSION = "0.9.7+AZ";
+  public static final String APPNAME = "JKCEMU";
+  public static final String VERSION = "0.9.7+Andreas' Patches";
   public static final String APPINFO = APPNAME + " Version " + VERSION;
 
   public static final String FILE_GROUP_AUDIO    = "audio";

@@ -32,22 +32,17 @@ public class Settings {
         }
         return aligned;
     }
-
-    private abstract class BaseProperty {
-        public abstract void getProperty(Properties props);
-
-        public abstract void setProperty(Properties props);
-    }
-
-    public class BooleanProperty extends BaseProperty {
-
+    
+    abstract class BaseProperty {
         ChangeListener l;
-        public boolean value;
+        
+        public abstract void setProperty(Properties props);
 
-        public BooleanProperty(boolean defaultValue) {
-            this.value = defaultValue;
+        public abstract void getProperty(Properties props);
+        
+        public void setChangeListener(ChangeListener l) {
+            this.l = l;
         }
-
         public String getName() {
             String ret = "unknown";
             Field[] f = Settings.class.getFields();
@@ -64,6 +59,38 @@ public class Settings {
             }
             return ret;
         }
+    }
+    
+    public class IntProperty extends BaseProperty {
+        public int value;        
+
+        public IntProperty(int defaultValue) {
+            this.value=defaultValue;
+        }
+
+        @Override
+        public void setProperty(Properties props) {
+            EmuUtil.setProperty(props, propPrefix + getName(), value);
+        }
+
+        @Override
+        public void getProperty(Properties props) {
+            String jp = EmuUtil.getProperty(props, propPrefix + getName());
+            if (jp.length() != 0) {
+                value = Integer.parseInt(jp);
+            }
+            if (l != null) {
+                l.stateChanged(null);
+            }
+        }
+    }
+    
+    public class BooleanProperty extends BaseProperty {
+        public boolean value;
+
+        public BooleanProperty(boolean defaultValue) {
+            this.value = defaultValue;
+        }
 
         public void getProperty(Properties props) {
             String jp = EmuUtil.getProperty(props, propPrefix + getName());
@@ -79,10 +106,6 @@ public class Settings {
             EmuUtil.setProperty(props, propPrefix + getName(), value);
         }
 
-        public void setChangeListener(ChangeListener l) {
-            this.l = l;
-        }
-
     };
 
     private String propPrefix;
@@ -92,6 +115,7 @@ public class Settings {
     public BooleanProperty jp9_bws_resetActive = new BooleanProperty(true);
     public BooleanProperty jp19_64k_resetHigh = new BooleanProperty(false);
     public BooleanProperty jp11_eprom_inactive = new BooleanProperty(false);
+    public IntProperty jp7_freq = new IntProperty(2);
 
     public byte ram[] = new byte[65536];
     public byte eprom[];

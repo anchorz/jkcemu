@@ -98,7 +98,7 @@ public abstract class EmuSys
   private volatile int soundOutFrameRate;
   private volatile int tapeOutFrameRate;
 
-  private static final int CHESSBOARD_SQUARE_WIDTH = 48;
+  //private static final int CHESSBOARD_SQUARE_WIDTH = 48;
 
 
   public EmuSys(

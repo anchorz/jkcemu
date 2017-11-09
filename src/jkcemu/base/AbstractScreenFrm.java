@@ -36,7 +36,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import jkcemu.Main;
 import jkcemu.image.ImageFrm;
@@ -49,6 +48,7 @@ public abstract class AbstractScreenFrm
 			extends BaseFrm
 			implements FlavorListener
 {
+  private static final long serialVersionUID = -5249783771168617046L;
   public static final String PROP_PREFIX = "jkcemu.";
 
   public static final String PROP_SCREEN_MARGIN = "screen.margin";
@@ -256,9 +256,7 @@ public abstract class AbstractScreenFrm
 	this.mnuCopy = createJMenuItem(
 			"Kopieren",
 			ACTION_COPY,
-			KeyStroke.getKeyStroke(
-					KeyEvent.VK_C,
-					InputEvent.ALT_MASK ) );
+            ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_COPY));
 	this.mnuCopy.setEnabled( false );
 	mnuEdit.add( this.mnuCopy );
       }
@@ -267,9 +265,7 @@ public abstract class AbstractScreenFrm
 	this.mnuPaste = createJMenuItem(
 			"Einf\u00FCgen",
 			ACTION_PASTE,
-			KeyStroke.getKeyStroke(
-					KeyEvent.VK_V,
-					InputEvent.ALT_MASK ) );
+            ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_PASTE));
 	this.mnuPaste.setEnabled( false );
 	mnuEdit.add( this.mnuPaste );
 
@@ -301,9 +297,7 @@ public abstract class AbstractScreenFrm
 				"100 %",
 				ACTION_SCALE_1,
 				true,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_1,
-					InputEvent.ALT_MASK ) );
+	            ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_SCALE_1));
     mnuScale.add( this.mnuScale1 );
 
     this.mnuScale2 = createJRadioButtonMenuItem(
@@ -311,9 +305,8 @@ public abstract class AbstractScreenFrm
 				"200 %",
 				ACTION_SCALE_2,
 				false,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_2,
-					InputEvent.ALT_MASK ) );
+                ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_SCALE_2));
+
     mnuScale.add( this.mnuScale2 );
 
     this.mnuScale3 = createJRadioButtonMenuItem(
@@ -321,9 +314,8 @@ public abstract class AbstractScreenFrm
 				"300 %",
 				ACTION_SCALE_3,
 				false,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_3,
-					InputEvent.ALT_MASK ) );
+                ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_SCALE_3));
+
     mnuScale.add( this.mnuScale3 );
 
     this.mnuScale4 = createJRadioButtonMenuItem(
@@ -331,9 +323,7 @@ public abstract class AbstractScreenFrm
 				"400 %",
 				ACTION_SCALE_4,
 				false,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_4,
-					InputEvent.ALT_MASK ) );
+                ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_SCALE_4));
     mnuScale.add( this.mnuScale4 );
     return mnuScale;
   }
@@ -373,9 +363,7 @@ public abstract class AbstractScreenFrm
       this.mnuScreenTextQuick = createJMenuItem(
 				"als Binärdaten speichern...",
 				ACTION_SCREENTEXT_QUICK,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_U,
-					InputEvent.ALT_MASK| InputEvent.SHIFT_MASK  ) );
+                ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_SCREENTEXT_QUICK));
       mnuScreen.add( this.mnuScreenTextQuick );
 
     }

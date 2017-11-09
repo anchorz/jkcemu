@@ -16,8 +16,10 @@ public class OptionPanel extends AbstractSettingsFld {
                          // Jumper.
         this.propPrefix = propPrefix;
 
-        ArrayJumper jp7 = new ArrayJumper("JP7", 121, 108, ArrayJumper.Settings3);
+        ArrayJumper jp7 = new ArrayJumper(this, "JP7", 121, 108, ArrayJumper.Settings3);
         jp7.setInfoMessage(new String[] { "4 MHz", "2 MHz", "1 MHz" });
+        jp7.setProperty(settings.jp7_freq);
+        jp7.setEnabled(false);
         add(jp7);
         Jumper jp6 = new Jumper(this, "JP6", 135, 48, Jumper.TYPE_321);
         jp6.setInfoMessage(
@@ -42,7 +44,7 @@ public class OptionPanel extends AbstractSettingsFld {
         jp11.setEnabled(true);
         add(jp11);
 
-        ArrayJumper jp14 = new ArrayJumper("JP14", 65, 73, ArrayJumper.Settings8);
+        ArrayJumper jp14 = new ArrayJumper(this, "JP14", 65, 73, ArrayJumper.Settings8);
         jp14.setEnabled(false);
         add(jp14);
         Jumper jp17 = new Jumper(this, "JP17", 109, 51, Jumper.TYPE_321);

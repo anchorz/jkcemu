@@ -30,7 +30,6 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -51,7 +50,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import jkcemu.Main;
 import jkcemu.audio.AudioFrm;
@@ -96,6 +94,7 @@ public class ScreenFrm
 			Z80StatusListener,
 			StatusUpdateListener
 {
+  private static final long serialVersionUID = -5086333769812794996L;
   public static final String PROP_CONFIRM_NMI       = "confirm.nmi";
   public static final String PROP_CONFIRM_RESET     = "confirm.reset";
   public static final String PROP_CONFIRM_QUIT      = "confirm.quit";
@@ -255,41 +254,32 @@ public class ScreenFrm
 
     // Menu Datei
     JMenu mnuFile = new JMenu( "Datei" );
-    mnuFile.setMnemonic( KeyEvent.VK_D );
+    ScreenFrmKeys.setMnemonic(mnuFile,ScreenFrmKeys.DATEI );
 
     mnuFile.add( createJMenuItem(
 			"Online Suchen...",
 			ACTION_WEB_LOAD,
-            KeyStroke.getKeyStroke(
-					KeyEvent.VK_O,
-					InputEvent.ALT_MASK | InputEvent.SHIFT_MASK  ) ) );
+			ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_WEB_LOAD))
+             );
    mnuFile.add( createJMenuItem(
 			"Laden...",
 			ACTION_FILE_LOAD,
-			KeyStroke.getKeyStroke(
-					KeyEvent.VK_L,
-					InputEvent.ALT_MASK ) ) );
+			ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_FILE_LOAD)) );
     mnuFile.add( createJMenuItem(
 			"Speichern...",
 			ACTION_FILE_SAVE,
-			KeyStroke.getKeyStroke(
-					KeyEvent.VK_S,
-					InputEvent.ALT_MASK ) ) );
+			ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_FILE_SAVE)) );
     mnuFile.addSeparator();
     this.mnuBasicOpen = createJMenuItem(
 	"BASIC-Programm im Texteditor \u00F6ffnen...",
 	ACTION_BASIC_OPEN,
-	KeyStroke.getKeyStroke(
-			KeyEvent.VK_T,
-			InputEvent.ALT_MASK | InputEvent.SHIFT_MASK ) );
+	ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_BASIC_OPEN) );
     mnuFile.add( this.mnuBasicOpen );
 
     this.mnuBasicSave = createJMenuItem(
 	"BASIC-Programm speichern...",
 	ACTION_BASIC_SAVE,
-	KeyStroke.getKeyStroke(
-			KeyEvent.VK_S,
-			InputEvent.ALT_MASK | InputEvent.SHIFT_MASK ) );
+	ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_BASIC_SAVE) );
     mnuFile.add( this.mnuBasicSave );
     mnuFile.addSeparator();
 
@@ -314,16 +304,12 @@ public class ScreenFrm
     mnuFile.add( createJMenuItem(
 			"Texteditor/Programmierung...",
 			ACTION_TEXTEDITOR,
-			KeyStroke.getKeyStroke(
-				KeyEvent.VK_T,
-				InputEvent.ALT_MASK ) ) );
+			ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_TEXTEDITOR)) );
     mnuFile.add( createJMenuItem( "Datei-Browser...", ACTION_FILEBROWSER ) );
     mnuFile.add( createJMenuItem(
 			"Dateien suchen...",
 			ACTION_FIND_FILES,
-			KeyStroke.getKeyStroke(
-					KeyEvent.VK_F,
-					InputEvent.ALT_MASK ) ) );
+	        ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_FIND_FILES)) );
     mnuFile.addSeparator();
     mnuFile.add( createJMenuItem( "Beenden", ACTION_QUIT ) );
 
@@ -334,7 +320,7 @@ public class ScreenFrm
 
     // Menu Extra
     this.mnuExtra = new JMenu( "Extra" );
-    this.mnuExtra.setMnemonic( KeyEvent.VK_E );
+    ScreenFrmKeys.setMnemonic(mnuFile,ScreenFrmKeys.EXTRA );
 
     this.mnuExtra.add( createScaleMenu() );
     this.mnuExtra.addSeparator();
@@ -342,25 +328,19 @@ public class ScreenFrm
     this.mnuAudio = createJMenuItem(
 				"Audio/Kassette...",
 				ACTION_AUDIO,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_A,
-					InputEvent.ALT_MASK ) );
+				ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_AUDIO));
     this.mnuExtra.add( this.mnuAudio );
 
     this.mnuKeyboard = createJMenuItem(
 				"Tastatur...",
 				ACTION_KEYBOARD,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_K,
-					InputEvent.ALT_MASK ) );
+				ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_KEYBOARD));
     this.mnuExtra.add( this.mnuKeyboard );
 
     this.mnuJoystick = createJMenuItem(
 				"Joysticks...",
 				ACTION_JOYSTICK,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_J,
-					InputEvent.ALT_MASK ) );
+				ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_JOYSTICK));
     this.mnuExtra.add( this.mnuJoystick );
 
     this.mnuPrintJobs = createJMenuItem(
@@ -376,9 +356,7 @@ public class ScreenFrm
     this.mnuUSB = createJMenuItem(
 				"USB-Anschluss...",
 				ACTION_USB,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_U,
-					InputEvent.ALT_MASK ) );
+				ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_USB));
     this.mnuExtra.add( this.mnuUSB );
 
     this.mnuChessboard = createJMenuItem(
@@ -403,27 +381,19 @@ public class ScreenFrm
     mnuExtraTools.add( createJMenuItem(
 		"Debugger...",
 		ACTION_DEBUGGER,
-		KeyStroke.getKeyStroke(
-			KeyEvent.VK_D,
-			InputEvent.ALT_MASK | InputEvent.SHIFT_MASK ) ) );
+		ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_DEBUGGER)));
     mnuExtraTools.add( createJMenuItem(
 		"Reassembler...",
 		ACTION_REASSEMBLER,
-		KeyStroke.getKeyStroke(
-			KeyEvent.VK_R,
-			InputEvent.ALT_MASK | InputEvent.SHIFT_MASK ) ) );
+		ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_REASSEMBLER)));
     mnuExtraTools.add( createJMenuItem(
 		"Speichereditor...",
 		ACTION_MEMEDITOR,
-		KeyStroke.getKeyStroke(
-			KeyEvent.VK_M,
-			InputEvent.ALT_MASK | InputEvent.SHIFT_MASK ) ) );
+        ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_MEMEDITOR)));
     mnuExtraTools.add( createJMenuItem(
 		"Hex-Editor...",
 		ACTION_HEXEDITOR,
-		KeyStroke.getKeyStroke(
-			KeyEvent.VK_H,
-			InputEvent.ALT_MASK | InputEvent.SHIFT_MASK ) ) );
+        ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_HEXEDITOR)));
     mnuExtraTools.add( createJMenuItem(
 				"Hex-Dateivergleicher...",
 				ACTION_HEXDIFF ) );
@@ -476,39 +446,27 @@ public class ScreenFrm
     this.mnuSpeed = createJMenuItem(
 				TEXT_MAX_SPEED,
 				ACTION_SPEED,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_G,
-					InputEvent.ALT_MASK ) );
+				ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_SPEED));
     this.mnuExtra.add( this.mnuSpeed );
 
     this.mnuPause = createJMenuItem(
 				"Pause",
 				ACTION_PAUSE,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_P,
-					InputEvent.ALT_MASK ) );
+                ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_PAUSE));
     this.mnuExtra.add( this.mnuPause );
 
     this.mnuExtra.add( createJMenuItem(
 				"NMI ausl\u00F6sen",
 				ACTION_NMI,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_N,
-					InputEvent.ALT_MASK ) ) );
+                ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_NMI)));
     this.mnuExtra.add( createJMenuItem(
 				"Zur\u00FCcksetzen (RESET)",
 				ACTION_RESET,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_R,
-					InputEvent.ALT_MASK ) ) );
+				ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_RESET)));
     this.mnuExtra.add( createJMenuItem(
 				"Einschalten (Power On)",
 				ACTION_POWER_ON,
-				KeyStroke.getKeyStroke(
-					KeyEvent.VK_I,
-					InputEvent.ALT_MASK ) ) );
-
-
+                ScreenFrmKeys.getKeyStroke(ScreenFrmKeys.ACTION_POWER_ON)));
     // Menu Hilfe
     JMenu mnuHelp = new JMenu( "?" );
     mnuHelp.add( createJMenuItem( "Hilfe...", ACTION_HELP_CONTENT ) );
@@ -1454,8 +1412,6 @@ public class ScreenFrm
 	{
 	  this.secondScreenFrm.doClose();
 	}
-      } else {
-	this.secondScreenFrm.doClose();
       }
     }
     if( !supportsRAMFloppies ) {
@@ -2467,9 +2423,6 @@ public class ScreenFrm
 	if( secondName != null ) {
 	  this.secondReassFrm.setTitle(
 			"JKCEMU Reassembler: " + secondName );
-	} else {
-	  this.secondReassFrm.setTitle(
-			"JKCEMU Reassembler: Sekund\u00E4rsystem" );
 	}
 	EmuUtil.showFrame( this.secondReassFrm );
       }
