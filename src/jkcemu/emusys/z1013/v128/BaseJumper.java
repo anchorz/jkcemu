@@ -25,6 +25,7 @@ public abstract class BaseJumper extends JPanel implements FocusListener {
 	public static final int TYPE_321 = 321;
 	public static final int TYPE_123 = 123;
 
+	OptionPanel owner;
 	private int type;
 	private int cnt;
 	private int value, bitValue;
@@ -53,8 +54,10 @@ public abstract class BaseJumper extends JPanel implements FocusListener {
 		super.setEnabled(v);
 	}
 
-	BaseJumper(String label, int xmm, int ymm, int type, int cnt, int range) {
+	BaseJumper(OptionPanel owner, String label, int xmm, int ymm, int type, int cnt, int range) {
 		super(new GridLayout(1, 1));
+        this.owner=owner;
+
 		ev = new ChangeEvent(this);
 
 		this.type = type;
@@ -206,4 +209,5 @@ public abstract class BaseJumper extends JPanel implements FocusListener {
 		this.toolTip = msg;
 		dataRange = toolTip.length;
 	}
+
 }

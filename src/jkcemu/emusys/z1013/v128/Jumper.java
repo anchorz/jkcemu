@@ -13,11 +13,8 @@ public class Jumper extends BaseJumper implements ChangeListener {
     private static final int SET_23 = 1;
     private static final int SET_12 = 0;
     
-    OptionPanel owner;
-
     public Jumper(OptionPanel owner,String label, int xmm, int ymm, int type) {
-        super(label, xmm, ymm, type, 2, 2);
-        this.owner=owner;
+        super(owner, label, xmm, ymm, type, 2, 2);
     }
 
     @Override
@@ -33,7 +30,7 @@ public class Jumper extends BaseJumper implements ChangeListener {
         this.pValue=pValue;   
         pValue.setChangeListener(this);
     }
-
+    
     protected void setValue(int v)
     { 
         if (v==1)
