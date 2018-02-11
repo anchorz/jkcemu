@@ -1292,7 +1292,7 @@ public class Z1013 extends EmuSys implements
     z80AddressChanged( port );
     int rv = 0x0F;			// wird von unbelegten Ports gelesen
 
-    port &= 0xFF;
+    //port &= 0xFF;
     if( port == 4 ) {
       rv = 0;
       if( this.romDisabled ) {
@@ -1319,7 +1319,7 @@ public class Z1013 extends EmuSys implements
     {
       int value = this.gide.read( port );
       if( value >= 0 ) {
-	rv = value;
+	    rv = value;
       }
     }
     else if( (port & 0xF0) == 0x70 ) {
@@ -1864,7 +1864,7 @@ public class Z1013 extends EmuSys implements
   @Override
   public void writeIOByte( int port, int value, int tStates )
   {
-    port &= 0xFF;
+    //port &= 0xFF;
     if( (port&0xfc) == 4 ) {
       if (sysName.equals(SYSNAME_Z1013_128))
       {
