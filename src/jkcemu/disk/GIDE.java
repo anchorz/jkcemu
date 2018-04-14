@@ -353,6 +353,7 @@ public class GIDE implements Runnable
 
   public synchronized void write( int port, int value )
   {
+    System.out.printf("GIDE: port %04x\n",port);
     value &= 0xFF;
     switch( port & 0x0F ) {
 
@@ -510,8 +511,12 @@ public class GIDE implements Runnable
 				"JKCEMU GIDE" );
 
     String text = System.getProperty( SYSPROP_DEBUG );
+    System.out.printf("GIDE: init\n");
+this.debugLevel =5;
     if( text != null ) {
       try {
+      System.out.printf("GIDE: %s\n",text);
+
 	this.debugLevel = Integer.parseInt( text );
       }
       catch( NumberFormatException ex ) {}

@@ -88,6 +88,7 @@ public class Z80CPU implements Runnable
   private int                               instBegPC;
   private int                               preCode;
   private int                               regPC;
+  private int                               regPcOrigin;
   private int                               regSP;
   private int                               regA;
   private int                               regB;
@@ -1055,6 +1056,10 @@ public class Z80CPU implements Runnable
     return this.regPC;
   }
 
+  public int getRegPCOrigin()
+  {
+    return this.regPcOrigin;
+  }
 
   public int getRegAF2()
   {
@@ -1373,6 +1378,7 @@ public class Z80CPU implements Runnable
 	  opCode=0x00;
         } else {
 	  opCode     = readMemByteM1( this.regPC );
+      this.regPcOrigin   = this.regPC; 
 	}
 	this.regPC = (this.regPC + 1) & 0xFFFF;
 	//System.out.printf("%04x:%02x HALT=%s\n",regPC,opCode,haltState?"true":"false");

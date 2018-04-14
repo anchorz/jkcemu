@@ -3,6 +3,7 @@ package jkcemu.base;
 import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.Event;
 
 import javax.swing.JMenu;
 import javax.swing.KeyStroke;
@@ -46,7 +47,11 @@ public class ScreenFrmKeys {
     }
 
     public static KeyStroke getKeyStroke(int[] id) {
-        int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        String vers = System.getProperty("os.name").toLowerCase();
+        int mask =  Event.ALT_MASK;
+        if (vers.indexOf("mac") != -1) {
+           mask=Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        }        
         return KeyStroke.getKeyStroke(id[0], mask | id[1]);
     }
 }
