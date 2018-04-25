@@ -391,21 +391,31 @@ public class Z1013 extends EmuSys implements FDC8272.DriveSelector, Z80AddressLi
         }
     }
 
+    HashMap <Integer,String> driveradr=new HashMap<Integer,String>() {{ 
+        put(0xe003,"03:load");
+        put(0xe006,"06:save");
+ 
+    }};
+
     HashMap <Integer,String> monitor202adr=new HashMap<Integer,String>() {{ 
         put(0xf21b,"OUTCH");  
         put(0xf20c,"INCH");  
         put(0xf2a5,"PRST7");  
-
+        put(0xf2f4,"INHEX");  
         put(0xf130,"INKEY");  
         put(0xf6d1,"WIND"); 
+
+        put(0xf50b,"KILL");
     }};
     HashMap <Integer,String> monitorA2adr=new HashMap<Integer,String>() {{ 
         put(0xf258,"OUTCH");  
         put(0xf219,"INCH");  
         put(0xf2e2,"PRST7");
-  
+        put(0xf331,"INHEX");   
         put(0xf119,"INKEY"); 
         put(0xf6f5,"WIND"); 
+
+        put(0xf548,"KILL"); 
    }};
 
 	@Override
@@ -414,7 +424,7 @@ public class Z1013 extends EmuSys implements FDC8272.DriveSelector, Z80AddressLi
 
         //AZ begin
         int origin=this.getEmuThread().getZ80CPU().getRegPCOrigin();
-        if ((origin<0xf000 && pc>=0xf000) || (origin<0xf000 && pc==0x0020)) {
+        if ((origin<0xf000 && pc>=0xe000) || (origin<0xf000 && pc==0x0020)) {
             String text="unbekannt";
             int id=origin<<16|pc;
             if (!newAdrItem.contains(id)) {
@@ -473,7 +483,16 @@ public class Z1013 extends EmuSys implements FDC8272.DriveSelector, Z80AddressLi
                     }
                     tag.add(mapRst20(adr));
                     callingConvention.add("rst20"); 
-                } 
+                } else if (pc>=0xe000 && origin<0xe000) {
+                    text=String.format("e000 %s",driveradr.get(pc));
+                    HashSet <String> tag=callingConventionTag.get("e000");
+                    if (tag==null) {
+                        tag=new HashSet <String> (); 
+                        callingConventionTag.put("e000",tag);            
+                    }
+                    tag.add(driveradr.get(pc));
+                    callingConvention.add("e000");       
+                }
                 System.err.printf("PC: %04x -> %04x %08x %s\n",origin,pc,id,text);
                 formatIo();
                 formatCallingConvention();                
@@ -1254,7 +1273,7 @@ public class Z1013 extends EmuSys implements FDC8272.DriveSelector, Z80AddressLi
                             System.out.printf("<port range=\"01\" mode=\"%s\" device=\"Userport: Tonausgabe, S3004, Joystick JU+TE PA0188, unbekannte Funktion\"/>\n",mapUsedIo(used[io]));
                             break;                  
                         case 0x02: 
-                            System.out.printf("<port range=\"%02x\" mode=\"%s\" device=\"Systemport: Tonausgabe, Toneingabe, Tastatur+RB/8x4, unbekannte Funktion\"/>\n",io,mapUsedIo(used[io]));
+                            System.out.printf("<port range=\"%02x\" mode=\"%s\" device=\"Systemport: Tonausgabe, Toneingabe, Tastatur+RB/8x4, unbekannte Funktion, [4]ROM-Disc\"/>\n",io,mapUsedIo(used[io]));
                             break;                  
                         case 0x03: 
                             System.out.printf("<port range=\"%02x\" mode=\"%s\" device=\"Systemport: Tonausgabe, Tastatur+RB/8x4, unbekannte Funktion\"/>\n",io,mapUsedIo(used[io]));
@@ -1964,6 +1983,14 @@ public class Z1013 extends EmuSys implements FDC8272.DriveSelector, Z80AddressLi
 				}
 				break;
 
+            case 0x18:
+				if (this.ramPixel != null) {
+					this.modeGraph = (value>0x7);
+					this.ramPixelBank = (value & 0x07);
+					this.screenFrm.setScreenDirty(true);
+				}
+				break;
+
 			case 0x0C: // IOSEL3
 				if (this.ramPixel != null) {
 					this.modeGraph = true;
@@ -2076,6 +2103,10 @@ public class Z1013 extends EmuSys implements FDC8272.DriveSelector, Z80AddressLi
         //AZ begin
         for (int i = 0xf000; i < 0xffff; i++) {
 				addrs.add(i);
+		}
+        for (int i = 0xe000; i < 0xe040; i++) {
+				addrs.add(i);
+				addrs.add(i+0xe800);
 		}
    	    addrs.add(0x20);//RST20
         //AZ ends
