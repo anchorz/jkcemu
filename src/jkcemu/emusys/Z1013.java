@@ -2372,12 +2372,17 @@ public class Z1013 extends EmuSys implements FDC8272.DriveSelector, Z80AddressLi
 		int value = 0xFF;
 		int joySel = ~this.pio.fetchOutValuePortA(false);
 		int actionMask = 0;
-		if ((joySel & 0x20) != 0) { // Joystick 1 selektiert
+        //(joySel & 0x60) Hardware Anpassung am echten Joystick, weil
+        //   machmal initalisiert das Programm die beiden Bit nicht
+        //   und oder bzw. es ist nur ein Joystick angeschlossen und demnach werden die Bits von der Hardware
+        //      ignoriert 
+		if (((joySel & 0x20) != 0) || ((joySel & 0x60) == 0))  { // Joystick 1 selektiert
 			actionMask |= this.joy0ActionMask;
 		}
 		if ((joySel & 0x40) != 0) { // Joystick 2 selektiert
 			actionMask |= this.joy1ActionMask;
 		}
+
 		if ((actionMask & JoystickThread.LEFT_MASK) != 0) {
 			value ^= 0x01;
 		}
